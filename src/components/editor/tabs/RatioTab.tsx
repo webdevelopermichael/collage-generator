@@ -1,7 +1,7 @@
 import React from 'react';
 import { AspectRatioOption, CollageState } from '../../../types';
 import { ASPECT_RATIOS } from '../../../core/layoutEngine';
-import { Ratio, Check, Smartphone, Monitor, Instagram, Youtube, Printer, Sliders } from 'lucide-react';
+import { Ratio, Check, Smartphone, Monitor, Printer, Sliders, Square, Video } from 'lucide-react';
 
 interface RatioTabProps {
   state: CollageState;
@@ -13,11 +13,11 @@ export const RatioTab: React.FC<RatioTabProps> = ({ state, onChangeState }) => {
     switch (id) {
       case '1:1':
       case '4:5':
-        return Instagram;
+        return Square;
       case '9:16':
         return Smartphone;
       case '16:9':
-        return Youtube;
+        return Video;
       case 'A4':
       case '3:2':
         return Printer;
@@ -34,7 +34,7 @@ export const RatioTab: React.FC<RatioTabProps> = ({ state, onChangeState }) => {
           Размер и Пропорции Полотна
         </h3>
         <p className="text-xs text-neutral-500">
-          Выберите готовый стандарт под социальные сети или задайте свои размеры.
+          Выберите готовый формат под социальные сети или задайте свои размеры.
         </p>
       </div>
 
