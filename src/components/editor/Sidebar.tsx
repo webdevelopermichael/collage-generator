@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
+  Ratio,
   LayoutGrid,
   Palette,
   Image as ImageIcon,
@@ -9,13 +10,14 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { CollageState } from '../../types';
+import { RatioTab } from './tabs/RatioTab';
 import { LayoutTab } from './tabs/LayoutTab';
 import { StyleTab } from './tabs/StyleTab';
 import { ImagesTab } from './tabs/ImagesTab';
 import { AiComposerTab } from './tabs/AiComposerTab';
 import { TextBadgesTab } from './tabs/TextBadgesTab';
 
-export type SidebarTabId = 'layouts' | 'styles' | 'images' | 'ai' | 'badges';
+export type SidebarTabId = 'ratios' | 'layouts' | 'styles' | 'images' | 'ai' | 'badges';
 
 interface SidebarProps {
   state: CollageState;
@@ -42,9 +44,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleOpen,
 }) => {
   const tabs = [
-    { id: 'layouts' as SidebarTabId, label: 'Шаблоны', icon: LayoutGrid },
+    { id: 'ratios' as SidebarTabId, label: 'Размер', icon: Ratio },
+    { id: 'layouts' as SidebarTabId, label: 'Сетка', icon: LayoutGrid },
     { id: 'styles' as SidebarTabId, label: 'Стили', icon: Palette },
-    { id: 'images' as SidebarTabId, label: 'Картинки', icon: ImageIcon },
+    { id: 'images' as SidebarTabId, label: 'Фото', icon: ImageIcon },
     { id: 'ai' as SidebarTabId, label: 'AI Magic', icon: Wand2, highlight: true },
     { id: 'badges' as SidebarTabId, label: 'Бейджи', icon: Tag },
   ];
@@ -63,8 +66,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`fixed md:relative bottom-0 left-0 right-0 z-40 bg-neutral-900/95 backdrop-blur-xl border-t border-neutral-800 shadow-2xl transition-all duration-300 flex flex-col shrink-0 select-none ${
-        isOpen ? 'h-[52vh] sm:h-[45vh] md:h-full md:w-80 lg:w-96' : 'h-14 md:h-14 md:w-full'
+      className={`fixed bottom-0 left-0 right-0 z-40 bg-neutral-900/95 backdrop-blur-xl border-t border-neutral-800 shadow-2xl transition-all duration-300 flex flex-col shrink-0 select-none ${
+        isOpen ? 'h-[54vh] sm:h-[48vh] md:h-[420px]' : 'h-14'
       } overflow-hidden`}
     >
       {/* Bottom Dock Bar with Tab Names */}
@@ -77,7 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
-                className={`flex items-center gap-1.5 py-1.5 px-2.5 sm:px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 py-1.5 px-2 sm:px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   isActive
                     ? tab.highlight
                       ? 'bg-pink-500/25 text-pink-300 border border-pink-500/50 shadow-md'
@@ -86,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }`}
               >
                 <Icon
-                  className={`w-4 h-4 ${
+                  className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
                     isActive
                       ? tab.highlight
                         ? 'text-pink-400'
@@ -117,6 +120,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Pop-up Drawer Content */}
       {isOpen && (
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 overscroll-contain">
+          {activeTab === 'ratios' && (
+            <RatioTab state={state} onChangeState={onChangeState} />
+          )}
           {activeTab === 'layouts' && (
             <LayoutTab state={state} onChangeState={onChangeState} />
           )}
