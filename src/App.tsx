@@ -40,6 +40,7 @@ export function App() {
   const [selectedCellId, setSelectedCellId] = useState<string | null>(null);
   const [selectedBadgeId, setSelectedBadgeId] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [isMobileToolbarCollapsed, setIsMobileToolbarCollapsed] = useState(false);
 
   // Undo / Redo stacks
   const [history, setHistory] = useState<CollageState[]>([collageState]);
@@ -172,7 +173,7 @@ export function App() {
           <Footer onOpenEditor={() => setCurrentView('editor')} />
         </>
       ) : (
-        <div className="h-screen flex flex-col overflow-hidden bg-neutral-950">
+        <div className="h-[100dvh] flex flex-col overflow-hidden bg-neutral-950">
           <EditorHeader
             state={collageState}
             onChangeState={handleUpdateCollageState}
@@ -188,7 +189,8 @@ export function App() {
           />
 
           <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-            <main className="flex-1 flex flex-col overflow-hidden relative order-1 md:order-2 h-[55vh] md:h-full">
+            {/* Canvas Stage Area */}
+            <main className="flex-1 flex flex-col overflow-hidden relative order-1 md:order-2 h-full">
               <CanvasStage
                 state={collageState}
                 selectedCellId={selectedCellId}
@@ -203,6 +205,7 @@ export function App() {
               </div>
             </main>
 
+            {/* Sidebar Controls Area */}
             <Sidebar
               state={collageState}
               activeTab={activeSidebarTab}
@@ -212,6 +215,10 @@ export function App() {
               onSelectCell={setSelectedCellId}
               onSelectBadge={setSelectedBadgeId}
               onChangeState={handleUpdateCollageState}
+              isCollapsedMobile={isMobileToolbarCollapsed}
+              onToggleCollapseMobile={() =>
+                setIsMobileToolbarCollapsed(!isMobileToolbarCollapsed)
+              }
             />
           </div>
         </div>
