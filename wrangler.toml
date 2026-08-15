@@ -1,0 +1,6 @@
+name = "collage-generator"
+compatibility_date = "2026-08-15"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
