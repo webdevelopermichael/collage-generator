@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   Download,
   FolderOpen,
+  UserCircle,
   Undo2,
   Redo2,
   Sparkles,
@@ -154,12 +155,38 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         </div>
       </div>
 
-      {/* Right section: Projects, Auth, Download */}
+      {/* Right section: Auth / User, Projects, Export */}
       <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* Auth / Account Profile Button */}
+        {user.isLoggedIn ? (
+          <button
+            onClick={onOpenAuth}
+            className="flex items-center gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1.5 bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 rounded-xl text-neutral-200 transition-colors cursor-pointer"
+            title="Account Settings"
+          >
+            {user.avatarUrl ? (
+              <img src={user.avatarUrl} alt={user.name} className="w-4 h-4 rounded-full" />
+            ) : (
+              <UserCircle className="w-4 h-4 text-indigo-400" />
+            )}
+            <span className="text-[11px] sm:text-xs font-medium max-w-[70px] truncate hidden sm:inline">
+              {user.name}
+            </span>
+          </button>
+        ) : (
+          <button
+            onClick={onOpenAuth}
+            className="flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 rounded-xl text-indigo-300 hover:text-white text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer"
+          >
+            <UserCircle className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Sign In</span>
+          </button>
+        )}
+
         <button
           onClick={onOpenProjects}
           className="p-1.5 sm:px-2.5 sm:py-1.5 bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 rounded-xl text-neutral-300 transition-colors cursor-pointer"
-          title="Projects"
+          title="Saved Projects"
         >
           <FolderOpen className="w-3.5 h-3.5 text-purple-400" />
         </button>
@@ -168,7 +195,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           onClick={onOpenExport}
           className="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white text-[11px] sm:text-xs font-bold px-2.5 sm:px-3.5 py-1.5 rounded-xl shadow-md transition-all cursor-pointer hover:scale-105"
         >
-          <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+          <Download className="w-3.5 h-3.5" />
           <span className="hidden xs:inline">Export</span>
         </button>
       </div>
