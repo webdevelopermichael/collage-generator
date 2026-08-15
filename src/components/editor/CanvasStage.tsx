@@ -9,7 +9,6 @@ import {
   X,
   Plus,
   Minus,
-  Sparkles,
 } from 'lucide-react';
 import { CollageState } from '../../types';
 
@@ -40,16 +39,15 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
   const [draggingBadgeId, setDraggingBadgeId] = useState<string | null>(null);
   const dragStartRef = useRef<{ mouseX: number; mouseY: number; badgeX: number; badgeY: number } | null>(null);
 
-  // Global mouse move and mouse up handlers for smooth dragging
+  // Support both Mouse and Touch events for mobile dragging
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMove = (clientX: number, clientY: number) => {
       if (!draggingBadgeId || !dragStartRef.current || !canvasRef.current) return;
 
       const canvasRect = canvasRef.current.getBoundingClientRect();
-      const deltaX = e.clientX - dragStartRef.current.mouseX;
-      const deltaY = e.clientY - dragStartRef.current.mouseY;
+      const deltaX = clientX - dragStartRef.current.mouseX;
+      const deltaY = clientY - dragStartRef.current.mouseY;
 
-      // Convert delta pixels to percentage of canvas
       const deltaPercentX = (deltaX / (canvasRect.width * zoomLevel)) * 100;
       const deltaPercentY = (deltaY / (canvasRect.height * zoomLevel)) * 100;
 
@@ -62,7 +60,14 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
       }));
     };
 
-    const handleMouseUp = () => {
+    const handleMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY);
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        handleMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    const handleEnd = () => {
       if (draggingBadgeId) {
         setDraggingBadgeId(null);
         dragStartRef.current = null;
@@ -71,23 +76,26 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
 
     if (draggingBadgeId) {
       window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('mouseup', handleEnd);
+      window.addEventListener('touchmove', handleTouchMove, { passive: false });
+      window.addEventListener('touchend', handleEnd);
     }
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mouseup', handleEnd);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleEnd);
     };
   }, [draggingBadgeId, zoomLevel, onChangeState]);
 
-  const handleBadgeMouseDown = (e: React.MouseEvent, badgeId: string, badgeX: number, badgeY: number) => {
-    e.stopPropagation();
+  const handleBadgeStart = (clientX: number, clientY: number, badgeId: string, badgeX: number, badgeY: number) => {
     onSelectBadge(badgeId);
     onSelectCell(null);
     setDraggingBadgeId(badgeId);
     dragStartRef.current = {
-      mouseX: e.clientX,
-      mouseY: e.clientY,
+      mouseX: clientX,
+      mouseY: clientY,
       badgeX,
       badgeY,
     };
@@ -96,21 +104,21 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
   const getRatioStyle = () => {
     switch (state.aspectRatio) {
       case '1:1':
-        return 'aspect-square max-h-[600px]';
+        return 'aspect-square max-h-[340px] sm:max-h-[600px]';
       case '4:5':
-        return 'aspect-[4/5] max-h-[640px]';
+        return 'aspect-[4/5] max-h-[380px] sm:max-h-[640px]';
       case '9:16':
-        return 'aspect-[9/16] max-h-[660px]';
+        return 'aspect-[9/16] max-h-[400px] sm:max-h-[660px]';
       case '16:9':
-        return 'aspect-[16/9] max-h-[540px]';
+        return 'aspect-[16/9] max-h-[280px] sm:max-h-[540px]';
       case '4:3':
-        return 'aspect-[4/3] max-h-[580px]';
+        return 'aspect-[4/3] max-h-[320px] sm:max-h-[580px]';
       case '3:2':
-        return 'aspect-[3/2] max-h-[560px]';
+        return 'aspect-[3/2] max-h-[300px] sm:max-h-[560px]';
       case 'A4':
-        return 'aspect-[1/1.414] max-h-[660px]';
+        return 'aspect-[1/1.414] max-h-[400px] sm:max-h-[660px]';
       default:
-        return 'aspect-video max-h-[560px]';
+        return 'aspect-video max-h-[300px] sm:max-h-[540px]';
     }
   };
 
@@ -174,7 +182,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center p-4 sm:p-8 overflow-auto canvas-checkerboard relative select-none">
+    <div className="flex-1 flex items-center justify-center p-2 sm:p-6 overflow-auto canvas-checkerboard relative select-none">
       <input
         ref={fileInputRef}
         type="file"
@@ -254,16 +262,16 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                         className="w-full h-full object-cover transition-transform"
                       />
 
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 sm:gap-2">
                         <button
                           onClick={e => {
                             e.stopPropagation();
                             handleImageUploadForCell(cell.id);
                           }}
                           title="Replace Photo"
-                          className="p-2 bg-neutral-900/90 text-white rounded-lg hover:bg-neutral-800 transition-colors shadow-lg cursor-pointer"
+                          className="p-1.5 sm:p-2 bg-neutral-900/90 text-white rounded-lg hover:bg-neutral-800 transition-colors shadow-lg cursor-pointer"
                         >
-                          <ImageIcon className="w-4 h-4" />
+                          <ImageIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </button>
                         <button
                           onClick={e => {
@@ -276,9 +284,9 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                             }));
                           }}
                           title="Zoom In"
-                          className="p-2 bg-neutral-900/90 text-white rounded-lg hover:bg-neutral-800 transition-colors shadow-lg cursor-pointer"
+                          className="p-1.5 sm:p-2 bg-neutral-900/90 text-white rounded-lg hover:bg-neutral-800 transition-colors shadow-lg cursor-pointer"
                         >
-                          <ZoomIn className="w-4 h-4" />
+                          <ZoomIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </button>
                         <button
                           onClick={e => {
@@ -291,9 +299,9 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                             }));
                           }}
                           title="Zoom Out"
-                          className="p-2 bg-neutral-900/90 text-white rounded-lg hover:bg-neutral-800 transition-colors shadow-lg cursor-pointer"
+                          className="p-1.5 sm:p-2 bg-neutral-900/90 text-white rounded-lg hover:bg-neutral-800 transition-colors shadow-lg cursor-pointer"
                         >
-                          <ZoomOut className="w-4 h-4" />
+                          <ZoomOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </button>
                         <button
                           onClick={e => {
@@ -306,21 +314,21 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                             }));
                           }}
                           title="Remove Photo"
-                          className="p-2 bg-rose-950/90 text-rose-300 rounded-lg hover:bg-rose-900 transition-colors shadow-lg cursor-pointer"
+                          className="p-1.5 sm:p-2 bg-rose-950/90 text-rose-300 rounded-lg hover:bg-rose-900 transition-colors shadow-lg cursor-pointer"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </button>
                       </div>
                     </div>
                   ) : (
                     <div
                       onClick={() => handleImageUploadForCell(cell.id)}
-                      className="w-full h-full bg-neutral-900/60 border border-dashed border-neutral-700/80 hover:border-indigo-500/80 flex flex-col items-center justify-center p-4 text-center transition-colors"
+                      className="w-full h-full bg-neutral-900/60 border border-dashed border-neutral-700/80 hover:border-indigo-500/80 flex flex-col items-center justify-center p-2 text-center transition-colors"
                     >
-                      <div className="w-9 h-9 rounded-full bg-neutral-800 text-neutral-400 group-hover:text-indigo-400 flex items-center justify-center mb-2 transition-colors">
-                        <Upload className="w-4 h-4" />
+                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-neutral-800 text-neutral-400 group-hover:text-indigo-400 flex items-center justify-center mb-1 transition-colors">
+                        <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </div>
-                      <span className="text-[11px] font-medium text-neutral-400 group-hover:text-white transition-colors">
+                      <span className="text-[10px] sm:text-[11px] font-medium text-neutral-400 group-hover:text-white transition-colors">
                         Add Photo
                       </span>
                     </div>
@@ -330,7 +338,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
             })}
           </div>
 
-          {/* Metric Badges Layer (Draggable + Resizable + Removable) */}
+          {/* Metric Badges Layer (Touch + Mouse draggable) */}
           {state.badges?.map(badge => {
             const isBadgeSelected = selectedBadgeId === badge.id;
             const isDragging = draggingBadgeId === badge.id;
@@ -338,7 +346,16 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
             return (
               <div
                 key={badge.id}
-                onMouseDown={e => handleBadgeMouseDown(e, badge.id, badge.x, badge.y)}
+                onMouseDown={e => {
+                  e.stopPropagation();
+                  handleBadgeStart(e.clientX, e.clientY, badge.id, badge.x, badge.y);
+                }}
+                onTouchStart={e => {
+                  e.stopPropagation();
+                  if (e.touches.length > 0) {
+                    handleBadgeStart(e.touches[0].clientX, e.touches[0].clientY, badge.id, badge.x, badge.y);
+                  }
+                }}
                 style={{
                   left: `${badge.x}%`,
                   top: `${badge.y}%`,
@@ -349,7 +366,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                 }`}
               >
                 <div
-                  className={`relative bg-neutral-950/90 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-2xl border transition-all ${
+                  className={`relative bg-neutral-950/90 backdrop-blur-md px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shadow-2xl border transition-all ${
                     badge.color === 'emerald'
                       ? 'border-emerald-500/50'
                       : badge.color === 'rose'
@@ -363,15 +380,14 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                       : 'hover:border-pink-400/80'
                   }`}
                 >
-                  {/* Badge Text */}
-                  <div className="flex items-center gap-1.5">
-                    <Move className="w-3 h-3 text-neutral-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <Move className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-neutral-500 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div>
-                      <div className="text-[9px] uppercase font-bold tracking-wider text-neutral-400">
+                      <div className="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider text-neutral-400">
                         {badge.title}
                       </div>
                       {badge.value && (
-                        <div className="text-xs sm:text-sm font-bold text-white tracking-tight">
+                        <div className="text-[10px] sm:text-xs md:text-sm font-bold text-white tracking-tight">
                           {badge.value}
                         </div>
                       )}
@@ -379,7 +395,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                   </div>
 
                   {/* Inline Delete & Quick Scale Controls */}
-                  <div className="absolute -top-3 -right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-neutral-900 border border-neutral-700 rounded-lg p-0.5 shadow-xl">
+                  <div className="absolute -top-3 -right-3 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 sm:group-hover:opacity-100 transition-opacity bg-neutral-900 border border-neutral-700 rounded-lg p-0.5 shadow-xl">
                     <button
                       onClick={e => {
                         e.stopPropagation();

@@ -8,7 +8,7 @@ import {
   clearStoredUser,
   DEFAULT_INITIAL_STATE,
 } from './core/storage';
-import { applyPopularTemplate, POPULAR_TEMPLATES } from './core/aiComposerEngine';
+import { applyPopularTemplate } from './core/aiComposerEngine';
 import { LAYOUT_PRESETS } from './core/layoutEngine';
 
 // Landing Page Components
@@ -154,7 +154,7 @@ export function App() {
             onLogout={handleLogout}
           />
 
-          <main className="flex-1">
+          <main className="flex-1 overflow-x-hidden">
             <Hero
               onOpenEditor={() => setCurrentView('editor')}
               onOpenAiTab={() => {
@@ -187,7 +187,22 @@ export function App() {
             onRedo={handleRedo}
           />
 
-          <div className="flex-1 flex flex-row overflow-hidden relative">
+          <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+            <main className="flex-1 flex flex-col overflow-hidden relative order-1 md:order-2 h-[55vh] md:h-full">
+              <CanvasStage
+                state={collageState}
+                selectedCellId={selectedCellId}
+                selectedBadgeId={selectedBadgeId}
+                onSelectCell={setSelectedCellId}
+                onSelectBadge={setSelectedBadgeId}
+                onChangeState={handleUpdateCollageState}
+                zoomLevel={zoomLevel}
+              />
+              <div className="hidden md:block">
+                <AdBanner placement="canvas_bottom" />
+              </div>
+            </main>
+
             <Sidebar
               state={collageState}
               activeTab={activeSidebarTab}
@@ -198,19 +213,6 @@ export function App() {
               onSelectBadge={setSelectedBadgeId}
               onChangeState={handleUpdateCollageState}
             />
-
-            <main className="flex-1 flex flex-col overflow-hidden relative">
-              <CanvasStage
-                state={collageState}
-                selectedCellId={selectedCellId}
-                selectedBadgeId={selectedBadgeId}
-                onSelectCell={setSelectedCellId}
-                onSelectBadge={setSelectedBadgeId}
-                onChangeState={handleUpdateCollageState}
-                zoomLevel={zoomLevel}
-              />
-              <AdBanner placement="canvas_bottom" />
-            </main>
           </div>
         </div>
       )}
