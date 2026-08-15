@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight, UserCircle, LogOut, Menu, X } from 'lucide-react';
+import { Sparkles, ArrowRight, UserCircle, LogOut, Menu, X, LogIn } from 'lucide-react';
 import { UserAccount } from '../../types';
 
 interface NavbarProps {
@@ -56,10 +56,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Right CTA Actions */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           {user.isLoggedIn ? (
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-neutral-900 border border-neutral-800 rounded-xl text-xs text-neutral-200">
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-neutral-900 border border-neutral-800 rounded-xl text-xs text-neutral-200">
                 {user.avatarUrl ? (
                   <img src={user.avatarUrl} alt={user.name} className="w-4 h-4 rounded-full" />
                 ) : (
@@ -80,9 +80,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <button
               onClick={onOpenAuth}
-              className="text-xs sm:text-sm font-medium text-neutral-300 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-neutral-800/80 transition-colors cursor-pointer hidden xs:inline"
+              className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-neutral-200 hover:text-white px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition-all cursor-pointer shadow-sm"
             >
-              Sign In
+              <LogIn className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Sign In</span>
             </button>
           )}
 
@@ -141,9 +142,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setMobileMenuOpen(false);
                 onOpenAuth();
               }}
-              className="w-full text-left text-sm font-medium text-indigo-400 py-1"
+              className="w-full text-left text-sm font-semibold text-indigo-400 py-1.5 flex items-center gap-2"
             >
-              Sign In to Account
+              <LogIn className="w-4 h-4" />
+              <span>Sign In / Register</span>
             </button>
           )}
         </div>
