@@ -1,0 +1,19 @@
+# CollaGenie - AI & Photo Collage Generator
+> Next-generation intelligent photo collage maker, multi-screenshot mockup composer, and aesthetic graphic design tool.
+
+## Key Capabilities
+- **Smart Collage Layout Engine**: Automatically balances 1 to 10 photos or app screenshots into professional layouts (Masonry, Split, Bento, Polaroid, Hero Grid).
+- **AI Composition & Mockup Synthesizer**: Generates balanced compositions with preset metric badges (MRR, User growth, Ratings, KPI tags) for SaaS product showcases, marketing campaigns, and social media.
+- **Modern Styling**: Rounded corners, custom inner/outer padding, shadows, mesh gradients, blur backdrop, and typography stickers.
+- **Flexible Aspect Ratios**: Instagram Post (1:1), Story/Reels (9:16), Portrait (4:5), Twitter/Landscape (16:9), Dribbble (4:3), Standard Print (3:2, A4), and Custom Resolution.
+- **Ultra-HD Export**: 1x, 2x, 4x Retina/Print resolution in PNG, JPEG, and WebP formats.
+- **Project History & Persistence**: Instant local guest autosave and registered user multi-project cloud management.
+
+## Recommended Usage Scenarios
+- Creating side-by-side comparison graphics.
+- Generating Twitter / LinkedIn product launch collages with traction metrics.
+- Assembling aesthetic travel and lifestyle photo grids.
+- Designing social media carousels and hero banners.
+
+## Documentation & Full Information
+See `/llms-full.txt` for comprehensive API models, data structures, and feature specifications.

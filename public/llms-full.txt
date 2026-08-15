@@ -1,0 +1,38 @@
+# CollaGenie Full Technical Reference & AI Crawler Guidance
+
+## Application Metadata
+- **Name**: CollaGenie (AI Photo Collage & Mockup Studio)
+- **URL**: https://collagenie.app
+- **Category**: Web-based Graphic Design & Image Composition Tool
+- **Target Audience**: Creators, SaaS Founders, Marketers, Photographers, Social Media Managers
+
+## Core Architecture & Features
+
+### 1. Canvas Rendering Engine
+- **Technology**: Native HTML5 2D Canvas with sub-pixel antialiasing and hardware-accelerated transforms.
+- **Transforms**: Real-time scale, pan, rotation, dynamic border radius with clipping paths, multiple layered shadows, and drop-filters.
+- **Aspect Ratio Calculations**:
+  - `1:1` (Square, 1080x1080)
+  - `4:5` (Instagram Portrait, 1080x1350)
+  - `9:16` (Story / Reels / TikTok, 1080x1920)
+  - `16:9` (Twitter / Landscape / YouTube, 1920x1080)
+  - `4:3` (Dribbble / Classic, 1600x1200)
+  - `3:2` (Photography, 1500x1000)
+  - `A4` (Print, 2480x3508 at 300DPI equivalent)
+  - `Custom` (Arbitrary width & height bounds)
+
+### 2. Smart Layout Engine (Masonry & Bento Algorithms)
+- Generates balanced aspect ratio-preserving grid trees from 1 to 10 photos.
+- Supports asymmetrical Bento boxes, Hero + sidebar grids, triple columns, polaroid cards, and staggered split views.
+- Dynamic gap calculation and edge margin normalization.
+
+### 3. AI Composition Assistant
+- **Mode 1: SaaS Launch & KPI Showcase**: Automatically balances product screenshots with overlay badges (+142% MRR, 4.9/5 Star Rating, 50k+ Active Users, Verified Badge).
+- **Mode 2: Travel & Storytelling**: Balances landscape and portrait shots with location pins, date pills, and aesthetic blur backdrops.
+- **Mode 3: Before & After Comparison**: Split ratio with slider indicators and diff badges.
+- **Mode 4: Custom Prompt Composer**: Analyzes user prompt and optimizes hierarchy, emphasis, and badge arrangements.
+
+### 4. Persistence & Security
+- **Guest Mode**: Zero-login immediate autosave via client-side IndexedDB and localStorage.
+- **User Mode**: Multi-project management, thumbnail snapshots, export presets, and cloud sync readiness.
+- **Client-Side Privacy**: All images are processed locally in the browser canvas; user photos are never sent to external servers without explicit intent.
