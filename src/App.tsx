@@ -25,7 +25,6 @@ import { Footer } from './components/landing/Footer';
 import { EditorHeader } from './components/editor/EditorHeader';
 import { CanvasStage } from './components/editor/CanvasStage';
 import { Sidebar, SidebarTabId } from './components/editor/Sidebar';
-import { AdBanner } from './components/editor/AdBanner';
 import { ExportModal } from './components/editor/ExportModal';
 import { ProjectsModal } from './components/editor/ProjectsModal';
 import { AuthModal } from './components/auth/AuthModal';
@@ -37,10 +36,10 @@ export function App() {
 
   // Editor UI state
   const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTabId>('layouts');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default hidden at bottom
   const [selectedCellId, setSelectedCellId] = useState<string | null>(null);
   const [selectedBadgeId, setSelectedBadgeId] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const [isMobileToolbarCollapsed, setIsMobileToolbarCollapsed] = useState(false);
 
   // Undo / Redo stacks
   const [history, setHistory] = useState<CollageState[]>([collageState]);
@@ -104,6 +103,7 @@ export function App() {
       ...synthesized,
     }));
     setActiveSidebarTab('ai');
+    setIsSidebarOpen(true);
     setCurrentView('editor');
   };
 
@@ -126,6 +126,7 @@ export function App() {
       }));
     }
     setActiveSidebarTab('layouts');
+    setIsSidebarOpen(true);
     setCurrentView('editor');
   };
 
@@ -160,6 +161,7 @@ export function App() {
               onOpenEditor={() => setCurrentView('editor')}
               onOpenAiTab={() => {
                 setActiveSidebarTab('ai');
+                setIsSidebarOpen(true);
                 setCurrentView('editor');
               }}
             />
@@ -173,7 +175,7 @@ export function App() {
           <Footer onOpenEditor={() => setCurrentView('editor')} />
         </>
       ) : (
-        <div className="h-[100dvh] flex flex-col overflow-hidden bg-neutral-950">
+        <div className="h-[100dvh] flex flex-col overflow-hidden bg-neutral-950 relative">
           <EditorHeader
             state={collageState}
             onChangeState={handleUpdateCollageState}
@@ -188,39 +190,33 @@ export function App() {
             onRedo={handleRedo}
           />
 
-          <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-            {/* Canvas Stage Area */}
-            <main className="flex-1 flex flex-col overflow-hidden relative order-1 md:order-2 h-full">
-              <CanvasStage
-                state={collageState}
-                selectedCellId={selectedCellId}
-                selectedBadgeId={selectedBadgeId}
-                onSelectCell={setSelectedCellId}
-                onSelectBadge={setSelectedBadgeId}
-                onChangeState={handleUpdateCollageState}
-                zoomLevel={zoomLevel}
-              />
-              <div className="hidden md:block">
-                <AdBanner placement="canvas_bottom" />
-              </div>
-            </main>
-
-            {/* Sidebar Controls Area */}
-            <Sidebar
+          {/* Canvas Viewport Area */}
+          <div className="flex-1 flex flex-col overflow-hidden relative pb-14">
+            <CanvasStage
               state={collageState}
-              activeTab={activeSidebarTab}
-              setActiveTab={setActiveSidebarTab}
               selectedCellId={selectedCellId}
               selectedBadgeId={selectedBadgeId}
               onSelectCell={setSelectedCellId}
               onSelectBadge={setSelectedBadgeId}
               onChangeState={handleUpdateCollageState}
-              isCollapsedMobile={isMobileToolbarCollapsed}
-              onToggleCollapseMobile={() =>
-                setIsMobileToolbarCollapsed(!isMobileToolbarCollapsed)
-              }
+              zoomLevel={zoomLevel}
+              setZoomLevel={setZoomLevel}
             />
           </div>
+
+          {/* Bottom Dock Toolbar (Opens upwards, default collapsed) */}
+          <Sidebar
+            state={collageState}
+            activeTab={activeSidebarTab}
+            setActiveTab={setActiveSidebarTab}
+            selectedCellId={selectedCellId}
+            selectedBadgeId={selectedBadgeId}
+            onSelectCell={setSelectedCellId}
+            onSelectBadge={setSelectedBadgeId}
+            onChangeState={handleUpdateCollageState}
+            isOpen={isSidebarOpen}
+            onToggleOpen={() => setIsSidebarOpen(!isSidebarOpen)}
+          />
         </div>
       )}
 
