@@ -1,5 +1,7 @@
 name = "collage-generator"
+main = "worker.js"
 compatibility_date = "2026-08-15"
 
 [assets]
 directory = "./dist"
+binding = "ASSETS"
