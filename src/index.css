@@ -6,8 +6,20 @@
     --font-heading: 'Space Grotesk', system-ui, sans-serif;
   }
   
-  body {
+  html, body {
     font-family: var(--font-sans);
+    overscroll-behavior: none;
+    overflow: hidden;
+    height: 100%;
+    /* Prevent iOS Safari address bar bounce */
+    position: fixed;
+    width: 100%;
+  }
+
+  #root {
+    height: 100%;
+    overflow: auto;
+    overscroll-behavior: none;
   }
   
   h1, h2, h3, .font-heading {

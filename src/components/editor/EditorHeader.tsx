@@ -7,11 +7,8 @@ import {
   Undo2,
   Redo2,
   Sparkles,
-  Ratio,
-  Check,
 } from 'lucide-react';
 import { CollageState, UserAccount } from '../../types';
-import { ASPECT_RATIOS } from '../../core/layoutEngine';
 
 interface EditorHeaderProps {
   state: CollageState;
@@ -42,7 +39,6 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 }) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [title, setTitle] = useState(state.name);
-  const [showRatiosDropdown, setShowRatiosDropdown] = useState(false);
 
   const handleTitleSubmit = () => {
     setIsEditingTitle(false);
@@ -97,9 +93,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         </div>
       </div>
 
-      {/* Center section: Aspect Ratio & Undo/Redo */}
-      <div className="flex items-center gap-1 sm:gap-2">
-        {/* Undo / Redo */}
+      {/* Center section: Undo / Redo only */}
+      <div className="flex items-center">
         <div className="flex items-center bg-neutral-950 p-0.5 rounded-xl border border-neutral-800">
           <button
             onClick={onUndo}
@@ -117,41 +112,6 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           >
             <Redo2 className="w-3.5 h-3.5 sm:w-3.5 sm:h-3.5" />
           </button>
-        </div>
-
-        {/* Aspect Ratio Selector Dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => setShowRatiosDropdown(!showRatiosDropdown)}
-            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 rounded-xl text-[11px] sm:text-xs font-medium text-neutral-300 transition-colors cursor-pointer"
-          >
-            <Ratio className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-indigo-400" />
-            <span>{state.aspectRatio}</span>
-          </button>
-
-          {showRatiosDropdown && (
-            <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-44 sm:w-48 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl p-1.5 z-50">
-              <div className="text-[9px] sm:text-[10px] uppercase font-bold text-neutral-500 px-2 py-1">
-                Aspect Ratios
-              </div>
-              {ASPECT_RATIOS.map(ratio => (
-                <button
-                  key={ratio.id}
-                  onClick={() => {
-                    onChangeState(prev => ({ ...prev, aspectRatio: ratio.id }));
-                    setShowRatiosDropdown(false);
-                  }}
-                  className="w-full flex items-center justify-between px-2 py-1.5 text-[11px] sm:text-xs text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
-                >
-                  <div className="text-left">
-                    <span className="font-semibold text-white">{ratio.label}</span>
-                    <span className="text-[9px] text-neutral-500 ml-1">{ratio.sublabel}</span>
-                  </div>
-                  {state.aspectRatio === ratio.id && <Check className="w-3.5 h-3.5 text-indigo-400" />}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 

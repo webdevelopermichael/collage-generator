@@ -175,7 +175,10 @@ export function App() {
           <Footer onOpenEditor={() => setCurrentView('editor')} />
         </>
       ) : (
-        <div className="h-[100dvh] flex flex-col overflow-hidden bg-neutral-950 relative">
+        <div
+          className="flex flex-col bg-neutral-950"
+          style={{ height: '100dvh', overflow: 'hidden', position: 'fixed', inset: 0 }}
+        >
           <EditorHeader
             state={collageState}
             onChangeState={handleUpdateCollageState}
@@ -190,8 +193,8 @@ export function App() {
             onRedo={handleRedo}
           />
 
-          {/* Canvas Viewport Area */}
-          <div className="flex-1 flex flex-col overflow-hidden relative pb-14">
+          {/* Canvas Viewport Area — pb-14 clears the fixed bottom dock */}
+          <div className="flex-1 overflow-hidden relative" style={{ paddingBottom: '3.5rem' }}>
             <CanvasStage
               state={collageState}
               selectedCellId={selectedCellId}
