@@ -10,6 +10,7 @@ import {
 } from './core/storage';
 import { applyPopularTemplate } from './core/aiComposerEngine';
 import { LAYOUT_PRESETS } from './core/layoutEngine';
+import { Language } from './core/i18n';
 
 // Landing Page Components
 import { Navbar } from './components/landing/Navbar';
@@ -29,13 +30,42 @@ import { ExportModal } from './components/editor/ExportModal';
 import { ProjectsModal } from './components/editor/ProjectsModal';
 import { AuthModal } from './components/auth/AuthModal';
 
-export function App() {
-  // Check URL pathname for /editor routing support
-  const getInitialView = (): 'landing' | 'editor' => {
-    return window.location.pathname.startsWith('/editor') ? 'editor' : 'landing';
-  };
+// Helpers to parse route and language from URL path
+// Supported paths: /, /ru, /ua, /editor, /ru/editor, /ua/editor
+function parseRouteAndLang(pathname: string): { view: 'landing' | 'editor'; lang: Language } {
+  let lang: Language = 'en';
+  const clean = pathname.toLowerCase();
 
-  const [currentView, setCurrentView] = useState<'landing' | 'editor'>(getInitialView);
+  if (clean.startsWith('/ru')) {
+    lang = 'ru';
+  } else if (clean.startsWith('/ua') || clean.startsWith('/uk')) {
+    lang = 'ua';
+  }
+
+  const isEditor = clean.includes('/editor');
+  return { view: isEditor ? 'editor' : 'landing', lang };
+}
+
+function constructPath(view: 'landing' | 'editor', lang: Language): string {
+  const langPrefix = lang === 'en' ? '' : `/${lang}`;
+  if (view === 'editor') {
+    return `${langPrefix}/editor`;
+  }
+  return langPrefix || '/';
+}
+
+export function App() {
+  const initial = parseRouteAndLang(window.location.pathname);
+
+  const [currentView, setCurrentView] = useState<'landing' | 'editor'>(initial.view);
+  const [language, setLanguage] = useState<Language>(() => {
+    const saved = localStorage.getItem('collagenie_lang') as Language;
+    if (saved && (saved === 'en' || saved === 'ru' || saved === 'ua')) {
+      return initial.lang !== 'en' ? initial.lang : saved;
+    }
+    return initial.lang;
+  });
+
   const [user, setUser] = useState<UserAccount>(getStoredUser());
   const [collageState, setCollageState] = useState<CollageState>(loadCurrentProject());
 
@@ -55,10 +85,19 @@ export function App() {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
 
-  // Synchronize browser URL bar (/editor vs /)
-  const navigateTo = (view: 'landing' | 'editor') => {
+  // Navigation with URL updates
+  const navigateTo = (view: 'landing' | 'editor', nextLang: Language = language) => {
     setCurrentView(view);
-    const targetPath = view === 'editor' ? '/editor' : '/';
+    const targetPath = constructPath(view, nextLang);
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState({}, '', targetPath);
+    }
+  };
+
+  const handleSelectLanguage = (newLang: Language) => {
+    setLanguage(newLang);
+    localStorage.setItem('collagenie_lang', newLang);
+    const targetPath = constructPath(currentView, newLang);
     if (window.location.pathname !== targetPath) {
       window.history.pushState({}, '', targetPath);
     }
@@ -67,7 +106,9 @@ export function App() {
   // Listen to popstate (browser Back / Forward buttons)
   useEffect(() => {
     const onPopState = () => {
-      setCurrentView(window.location.pathname.startsWith('/editor') ? 'editor' : 'landing');
+      const parsed = parseRouteAndLang(window.location.pathname);
+      setCurrentView(parsed.view);
+      setLanguage(parsed.lang);
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
@@ -104,7 +145,7 @@ export function App() {
     }
   };
 
-  // Create new project with empty initial state & save current into list
+  // Create new project
   const handleNewProject = () => {
     const freshState: CollageState = {
       ...DEFAULT_INITIAL_STATE,
@@ -188,6 +229,8 @@ export function App() {
             onOpenAuth={() => setIsAuthOpen(true)}
             user={user}
             onLogout={handleLogout}
+            language={language}
+            onSelectLanguage={handleSelectLanguage}
           />
 
           <main className="flex-1 overflow-x-hidden">
@@ -198,15 +241,16 @@ export function App() {
                 setIsSidebarOpen(true);
                 navigateTo('editor');
               }}
+              language={language}
             />
-            <LiveDemo onOpenEditorWithPreset={handleOpenPresetFromLanding} />
-            <Features />
-            <AiSection onSelectAiPreset={handleOpenAiWithPreset} />
-            <SeoContent />
-            <Faq />
+            <LiveDemo onOpenEditorWithPreset={handleOpenPresetFromLanding} language={language} />
+            <Features language={language} />
+            <AiSection onSelectAiPreset={handleOpenAiWithPreset} language={language} />
+            <SeoContent language={language} />
+            <Faq language={language} />
           </main>
 
-          <Footer onOpenEditor={() => navigateTo('editor')} />
+          <Footer onOpenEditor={() => navigateTo('editor')} language={language} />
         </>
       ) : (
         <div
@@ -226,11 +270,12 @@ export function App() {
             canRedo={historyIndex < history.length - 1}
             onUndo={handleUndo}
             onRedo={handleRedo}
+            language={language}
+            onSelectLanguage={handleSelectLanguage}
           />
 
-          {/* Main Workspace Container: Desktop uses Left Sidebar + Canvas, Mobile uses Canvas + Bottom Dock */}
+          {/* Main Workspace: Desktop Left Sidebar + Canvas, Mobile Canvas + Bottom Dock */}
           <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-            {/* Desktop Left-Hand Sidebar / Mobile Drawer */}
             <Sidebar
               state={collageState}
               activeTab={activeSidebarTab}
@@ -242,9 +287,9 @@ export function App() {
               onChangeState={handleUpdateCollageState}
               isOpen={isSidebarOpen}
               onToggleOpen={() => setIsSidebarOpen(!isSidebarOpen)}
+              language={language}
             />
 
-            {/* Canvas Viewport Area (pb-14 on mobile to clear bottom dock, normal full height on desktop) */}
             <div className="flex-1 overflow-hidden relative pb-14 md:pb-0 h-full">
               <CanvasStage
                 state={collageState}
@@ -272,6 +317,7 @@ export function App() {
         isOpen={isExportOpen}
         onClose={() => setIsExportOpen(false)}
         state={collageState}
+        language={language}
       />
 
       <ProjectsModal
@@ -284,6 +330,7 @@ export function App() {
           setHistoryIndex(0);
         }}
         onNewProject={handleNewProject}
+        language={language}
       />
     </div>
   );

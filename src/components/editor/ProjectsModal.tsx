@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ProjectSummary, CollageState } from '../../types';
 import { getAllProjects, loadProjectById, deleteProjectById } from '../../core/storage';
 import { FolderOpen, Plus, Trash2, Clock, Check, X, ArrowRight } from 'lucide-react';
+import { Language, TRANSLATIONS } from '../../core/i18n';
 
 interface ProjectsModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface ProjectsModalProps {
   currentProjectId?: string;
   onSelectProject: (project: CollageState) => void;
   onNewProject: () => void;
+  language: Language;
 }
 
 export const ProjectsModal: React.FC<ProjectsModalProps> = ({
@@ -17,8 +19,10 @@ export const ProjectsModal: React.FC<ProjectsModalProps> = ({
   currentProjectId,
   onSelectProject,
   onNewProject,
+  language,
 }) => {
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
+  const t = TRANSLATIONS[language];
 
   // Always refresh latest project list every time modal opens
   useEffect(() => {
@@ -59,7 +63,7 @@ export const ProjectsModal: React.FC<ProjectsModalProps> = ({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <FolderOpen className="w-5 h-5 text-purple-400" />
-              <h2 className="text-xl font-heading font-bold text-white">Your Saved Projects</h2>
+              <h2 className="text-xl font-heading font-bold text-white">{t.savedProjects}</h2>
             </div>
             <p className="text-xs text-neutral-400">
               Switch between saved collages or start a fresh workspace.
@@ -74,7 +78,7 @@ export const ProjectsModal: React.FC<ProjectsModalProps> = ({
             className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer transition-all shrink-0 hover:scale-105"
           >
             <Plus className="w-4 h-4" />
-            <span>New Project</span>
+            <span>{t.newProject}</span>
           </button>
         </div>
 
@@ -83,7 +87,7 @@ export const ProjectsModal: React.FC<ProjectsModalProps> = ({
           {projects.length === 0 ? (
             <div className="py-12 text-center text-neutral-500">
               <FolderOpen className="w-10 h-10 mx-auto mb-2 opacity-30" />
-              <p className="text-sm">No saved projects yet</p>
+              <p className="text-sm">{t.noSavedProjects}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -111,7 +115,7 @@ export const ProjectsModal: React.FC<ProjectsModalProps> = ({
                       <button
                         onClick={e => handleDelete(e, proj.id)}
                         className="p-1.5 text-neutral-500 hover:text-rose-400 hover:bg-rose-950/50 rounded-lg transition-colors cursor-pointer"
-                        title="Delete project"
+                        title={t.delete}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -128,11 +132,11 @@ export const ProjectsModal: React.FC<ProjectsModalProps> = ({
                         </span>
                         {isActive ? (
                           <span className="text-emerald-400 font-semibold flex items-center text-xs">
-                            <Check className="w-3.5 h-3.5 mr-0.5" /> Active
+                            <Check className="w-3.5 h-3.5 mr-0.5" /> {t.active}
                           </span>
                         ) : (
                           <span className="text-indigo-400 font-semibold flex items-center text-xs">
-                            Open <ArrowRight className="w-3 h-3 ml-0.5 group-hover:translate-x-0.5 transition-transform" />
+                            {t.open} <ArrowRight className="w-3 h-3 ml-0.5 group-hover:translate-x-0.5 transition-transform" />
                           </span>
                         )}
                       </div>

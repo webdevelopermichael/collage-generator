@@ -12,9 +12,11 @@ import {
   Sparkles,
   Ratio,
   Check,
+  Globe,
 } from 'lucide-react';
 import { CollageState, UserAccount } from '../../types';
 import { ASPECT_RATIOS } from '../../core/layoutEngine';
+import { Language, TRANSLATIONS } from '../../core/i18n';
 
 interface EditorHeaderProps {
   state: CollageState;
@@ -29,6 +31,8 @@ interface EditorHeaderProps {
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
+  language: Language;
+  onSelectLanguage: (lang: Language) => void;
 }
 
 export const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -44,11 +48,22 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   canRedo,
   onUndo,
   onRedo,
+  language,
+  onSelectLanguage,
 }) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [title, setTitle] = useState(state.name);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showRatiosDropdown, setShowRatiosDropdown] = useState(false);
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+
+  const t = TRANSLATIONS[language];
+
+  const languages: { id: Language; label: string; flag: string }[] = [
+    { id: 'en', label: 'English', flag: '🇺🇸' },
+    { id: 'ru', label: 'Русский', flag: '🇷🇺' },
+    { id: 'ua', label: 'Українська', flag: '🇺🇦' },
+  ];
 
   const handleTitleSubmit = () => {
     setIsEditingTitle(false);
@@ -62,7 +77,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         <button
           onClick={onBackToLanding}
           className="p-1.5 sm:p-2 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors cursor-pointer"
-          title="Back to Landing Page"
+          title={t.backToLanding}
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
@@ -111,7 +126,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           <button
             onClick={onUndo}
             disabled={!canUndo}
-            title="Undo"
+            title={t.undo}
             className="p-1 sm:p-1.5 text-neutral-400 hover:text-white disabled:opacity-30 rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
           >
             <Undo2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -119,7 +134,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           <button
             onClick={onRedo}
             disabled={!canRedo}
-            title="Redo"
+            title={t.redo}
             className="p-1 sm:p-1.5 text-neutral-400 hover:text-white disabled:opacity-30 rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
           >
             <Redo2 className="w-3.5 h-3.5 sm:w-3.5 sm:h-3.5" />
@@ -139,7 +154,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           {showRatiosDropdown && (
             <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-48 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl p-1.5 z-50 animate-in fade-in">
               <div className="text-[10px] uppercase font-bold text-neutral-500 px-2 py-1">
-                Aspect Ratios
+                {t.aspectRatios}
               </div>
               {ASPECT_RATIOS.map(ratio => (
                 <button
@@ -162,8 +177,42 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         </div>
       </div>
 
-      {/* Right section: Desktop Quick Actions + Mobile 3-dots */}
+      {/* Right section: Language Picker, Desktop Quick Actions + Mobile 3-dots */}
       <div className="flex items-center gap-1.5 sm:gap-2 relative">
+        {/* Language Switcher Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+            className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 text-xs font-semibold text-neutral-300 transition-colors cursor-pointer"
+            title="Change language"
+          >
+            <Globe className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="uppercase">{language}</span>
+          </button>
+
+          {langDropdownOpen && (
+            <div className="absolute right-0 top-full mt-2 w-36 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl p-1 z-50 animate-in fade-in">
+              {languages.map(l => (
+                <button
+                  key={l.id}
+                  onClick={() => {
+                    onSelectLanguage(l.id);
+                    setLangDropdownOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-medium rounded-xl transition-colors cursor-pointer ${
+                    language === l.id
+                      ? 'bg-indigo-600/20 text-indigo-300 font-bold'
+                      : 'text-neutral-300 hover:bg-neutral-800 hover:text-white'
+                  }`}
+                >
+                  <span>{l.label}</span>
+                  <span className="text-sm">{l.flag}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Desktop Sign In / User Profile */}
         <div className="hidden md:flex items-center gap-2">
           {user.isLoggedIn ? (
@@ -181,7 +230,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               className="flex items-center gap-1 px-3 py-1.5 bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 rounded-xl text-indigo-300 hover:text-white text-xs font-semibold transition-colors cursor-pointer"
             >
               <LogIn className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Sign In</span>
+              <span>{t.signIn}</span>
             </button>
           )}
 
@@ -189,7 +238,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           <button
             onClick={onOpenProjects}
             className="p-2 bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 rounded-xl text-neutral-300 transition-colors cursor-pointer"
-            title="Saved Projects"
+            title={t.savedProjects}
           >
             <FolderOpen className="w-4 h-4 text-purple-400" />
           </button>
@@ -201,7 +250,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white text-xs font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl shadow-md transition-all cursor-pointer hover:scale-105"
         >
           <Download className="w-3.5 h-3.5" />
-          <span>Extract</span>
+          <span>{t.extract}</span>
         </button>
 
         {/* 3-dots Menu for Mobile (md:hidden) */}
@@ -225,7 +274,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-neutral-200 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors cursor-pointer"
               >
                 <FolderOpen className="w-4 h-4 text-purple-400" />
-                <span>Saved Projects</span>
+                <span>{t.savedProjects}</span>
               </button>
 
               <div className="my-1 border-t border-neutral-800" />
@@ -244,7 +293,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                     className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-rose-400 hover:bg-rose-950/40 rounded-xl transition-colors cursor-pointer"
                   >
                     <LogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
+                    <span>{t.signOut}</span>
                   </button>
                 </>
               ) : (
@@ -256,7 +305,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                   className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-indigo-400 hover:text-indigo-300 hover:bg-indigo-950/40 rounded-xl transition-colors cursor-pointer"
                 >
                   <LogIn className="w-4 h-4" />
-                  <span>Sign In / Register</span>
+                  <span>{t.signIn}</span>
                 </button>
               )}
             </div>

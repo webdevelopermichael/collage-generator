@@ -1,7 +1,122 @@
 import React from 'react';
 import { BookOpen, CheckCircle, Lightbulb, Share2 } from 'lucide-react';
+import { Language } from '../../core/i18n';
 
-export const SeoContent: React.FC = () => {
+interface SeoContentProps {
+  language: Language;
+}
+
+export const SeoContent: React.FC<SeoContentProps> = ({ language }) => {
+  if (language === 'ru') {
+    return (
+      <article className="py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-neutral-300">
+        <div className="border-b border-neutral-800 pb-8 mb-12 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-semibold text-neutral-400 mb-4">
+            <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Руководство по дизайну и композиции</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-heading font-bold text-white mb-4">
+            Полное руководство по созданию фотоколлажей и SaaS-мокапов в 2026 году
+          </h2>
+          <p className="text-sm text-neutral-400">
+            Лучшие практики визуальной иерархии, бенто-сеток и публикации в социальных сетях.
+          </p>
+        </div>
+
+        <div className="prose prose-invert max-w-none space-y-8 text-sm sm:text-base leading-relaxed">
+          <section>
+            <h3 className="text-xl sm:text-2xl font-heading font-bold text-white mb-3 flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-amber-400" />
+              1. Почему коллажи работают эффективнее одиночных картинок
+            </h3>
+            <p>
+              В современных лентах социальных сетей (X, Telegram, Instagram, VK) внимание пользователя удерживается менее 1.5 секунд.
+              Многослойный коллаж или <strong>Bento-сетка</strong> создает визуальную глубину и передает полную историю продукта
+              в одном компактном и эстетичном посте.
+            </p>
+            <p>
+              Для разработчиков и фаундеров демонстрация интерфейса вместе с бейджами метрик (например, <em>+142% MRR</em> или <em>5.0 Star Rating</em>)
+              дает мгновенное социальное доказательство и существенно увеличивает CTR.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-xl sm:text-2xl font-heading font-bold text-white mb-3 flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-emerald-400" />
+              2. Принципы сбалансированной композиции
+            </h3>
+            <ul className="list-disc pl-5 space-y-2 text-neutral-300">
+              <li>
+                <strong>Главный акцент (Hero):</strong> Выделяйте главный скриншот в большой блок (60% площади), дополняя его 2–4 деталями.
+              </li>
+              <li>
+                <strong>Гармоничные отступы и радиус:</strong> Одинаковые расстояния между блоками (12px–20px) и скругления придают премиальный вид.
+              </li>
+              <li>
+                <strong>Контрастный темный фон:</strong> Радиальные градиенты подчеркивают скриншоты и великолепно смотрятся на смартфонах.
+              </li>
+            </ul>
+          </section>
+        </div>
+      </article>
+    );
+  }
+
+  if (language === 'ua') {
+    return (
+      <article className="py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-neutral-300">
+        <div className="border-b border-neutral-800 pb-8 mb-12 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-semibold text-neutral-400 mb-4">
+            <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Керівництво з дизайну та композиції</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-heading font-bold text-white mb-4">
+            Повний посібник зі створення естетичних фотоколажів та SaaS-мокапів
+          </h2>
+          <p className="text-sm text-neutral-400">
+            Кращі практики візуальної ієрархії, бенто-сіток та публікацій у соцмережах у 2026 році.
+          </p>
+        </div>
+
+        <div className="prose prose-invert max-w-none space-y-8 text-sm sm:text-base leading-relaxed">
+          <section>
+            <h3 className="text-xl sm:text-2xl font-heading font-bold text-white mb-3 flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-amber-400" />
+              1. Чому колажі привертають більше уваги
+            </h3>
+            <p>
+              У сучасних стрічках соцмереж фокус уваги триває менше 1.5 секунди.
+              Композиція з кількох зображень або <strong>Bento-сітка</strong> дозволяє розповісти повну історію
+              вашого продукту або події в одному інформативному візуалі.
+            </p>
+            <p>
+              Поєднання інтерфейсу з бейджами показників (наприклад, <em>+142% MRR</em> або <em>5.0 Оцінка</em>)
+              підсилює довіру та стимулює кліки.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-xl sm:text-2xl font-heading font-bold text-white mb-3 flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-emerald-400" />
+              2. Основи збалансованого макету
+            </h3>
+            <ul className="list-disc pl-5 space-y-2 text-neutral-300">
+              <li>
+                <strong>Головний елемент:</strong> Виділяйте провідне зображення більшим розміром, супроводжуючи його компактними акцентами.
+              </li>
+              <li>
+                <strong>Рівномірні відступи:</strong> Акуратні проміжки та заокруглені кути створюють професійний дизайн.
+              </li>
+              <li>
+                <strong>Глибокий контраст:</strong> Темні градієнти підкреслюють яскравість фотографій та мокапів.
+              </li>
+            </ul>
+          </section>
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article className="py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-neutral-300">
       <div className="border-b border-neutral-800 pb-8 mb-12 text-center">
@@ -24,7 +139,7 @@ export const SeoContent: React.FC = () => {
             1. Why Visual Collages Outperform Single Images in 2026
           </h3>
           <p>
-            In modern social feeds like X (formerly Twitter), LinkedIn, and Instagram, user attention spans average less than 1.5 seconds.
+            In modern social feeds like X, LinkedIn, and Instagram, user attention spans average less than 1.5 seconds.
             A multi-photo collage or asymmetrical <strong>Bento grid layout</strong> creates depth and visual storytelling by showing
             multiple angles, features, or stages in a single high-density asset.
           </p>

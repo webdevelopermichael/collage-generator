@@ -16,6 +16,7 @@ import { StyleTab } from './tabs/StyleTab';
 import { ImagesTab } from './tabs/ImagesTab';
 import { AiComposerTab } from './tabs/AiComposerTab';
 import { TextBadgesTab } from './tabs/TextBadgesTab';
+import { Language, TRANSLATIONS } from '../../core/i18n';
 
 export type SidebarTabId = 'ratios' | 'layouts' | 'styles' | 'images' | 'ai' | 'badges';
 
@@ -30,6 +31,7 @@ interface SidebarProps {
   onChangeState: (updater: (prev: CollageState) => CollageState) => void;
   isOpen: boolean;
   onToggleOpen: () => void;
+  language: Language;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -42,32 +44,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onChangeState,
   isOpen,
   onToggleOpen,
+  language,
 }) => {
+  const t = TRANSLATIONS[language];
+
   // Mobile tabs (includes Canvas size tab)
   const mobileTabs = [
-    { id: 'ratios' as SidebarTabId, label: 'Canvas', icon: Ratio },
-    { id: 'layouts' as SidebarTabId, label: 'Grid', icon: LayoutGrid },
-    { id: 'styles' as SidebarTabId, label: 'Style', icon: Palette },
-    { id: 'images' as SidebarTabId, label: 'Photos', icon: ImageIcon },
-    { id: 'ai' as SidebarTabId, label: 'AI', icon: Wand2, highlight: true },
-    { id: 'badges' as SidebarTabId, label: 'Badges', icon: Tag },
+    { id: 'ratios' as SidebarTabId, label: t.tabCanvas, icon: Ratio },
+    { id: 'layouts' as SidebarTabId, label: t.tabGrid, icon: LayoutGrid },
+    { id: 'styles' as SidebarTabId, label: t.tabStyle, icon: Palette },
+    { id: 'images' as SidebarTabId, label: t.tabPhotos, icon: ImageIcon },
+    { id: 'ai' as SidebarTabId, label: t.tabAi, icon: Wand2, highlight: true },
+    { id: 'badges' as SidebarTabId, label: t.tabBadges, icon: Tag },
   ];
 
-  // Desktop sidebar tabs (Layouts, Styles, Images, AI Magic, Badges)
+  // Desktop sidebar tabs
   const desktopTabs = [
-    { id: 'layouts' as SidebarTabId, label: 'Layouts', icon: LayoutGrid },
-    { id: 'styles' as SidebarTabId, label: 'Styles', icon: Palette },
-    { id: 'images' as SidebarTabId, label: 'Images', icon: ImageIcon },
-    { id: 'ai' as SidebarTabId, label: 'AI Magic', icon: Wand2, highlight: true },
-    { id: 'badges' as SidebarTabId, label: 'Badges', icon: Tag },
+    { id: 'layouts' as SidebarTabId, label: t.tabGrid, icon: LayoutGrid },
+    { id: 'styles' as SidebarTabId, label: t.tabStyle, icon: Palette },
+    { id: 'images' as SidebarTabId, label: t.tabPhotos, icon: ImageIcon },
+    { id: 'ai' as SidebarTabId, label: t.tabAi, icon: Wand2, highlight: true },
+    { id: 'badges' as SidebarTabId, label: t.tabBadges, icon: Tag },
   ];
 
   const handleMobileTabClick = (tabId: SidebarTabId) => {
     if (activeTab === tabId && isOpen) {
-      onToggleOpen(); // 2nd click on same tab closes
+      onToggleOpen();
     } else {
       setActiveTab(tabId);
-      if (!isOpen) onToggleOpen(); // 1st click opens
+      if (!isOpen) onToggleOpen();
     }
   };
 

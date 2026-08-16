@@ -1,12 +1,16 @@
 import React from 'react';
-import { Wand2, Rocket, TrendingUp, Star, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Wand2, TrendingUp, Star, ShieldCheck, ArrowRight } from 'lucide-react';
 import { POPULAR_TEMPLATES } from '../../core/aiComposerEngine';
+import { Language, TRANSLATIONS } from '../../core/i18n';
 
 interface AiSectionProps {
   onSelectAiPreset: (templateId: string) => void;
+  language: Language;
 }
 
-export const AiSection: React.FC<AiSectionProps> = ({ onSelectAiPreset }) => {
+export const AiSection: React.FC<AiSectionProps> = ({ onSelectAiPreset, language }) => {
+  const t = TRANSLATIONS[language];
+
   return (
     <section id="ai-generator" className="py-24 bg-gradient-to-b from-neutral-950 via-indigo-950/20 to-neutral-950 border-t border-neutral-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,15 +19,15 @@ export const AiSection: React.FC<AiSectionProps> = ({ onSelectAiPreset }) => {
           <div className="lg:col-span-5 space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/30 text-xs font-semibold text-pink-400">
               <Wand2 className="w-3.5 h-3.5" />
-              <span>Smart AI Composition</span>
+              <span>{t.aiBadge}</span>
             </div>
 
             <h2 className="text-3xl sm:text-5xl font-heading font-bold text-white leading-tight">
-              Curated Popular Templates & Natural Language Generator
+              {t.aiTitle}
             </h2>
 
             <p className="text-neutral-300 text-sm sm:text-base leading-relaxed">
-              Choose from top trending templates for Instagram, TikTok, and SaaS product launches — complete with matching aesthetic stock photos and high-conversion social proof badges.
+              {t.aiSubtitle}
             </p>
 
             <div className="space-y-3 pt-2">
@@ -31,19 +35,19 @@ export const AiSection: React.FC<AiSectionProps> = ({ onSelectAiPreset }) => {
                 <div className="p-1 rounded bg-emerald-500/20 text-emerald-400 mt-0.5">
                   <TrendingUp className="w-4 h-4" />
                 </div>
-                <span>Curated photo sets matching each aesthetic mood and color palette.</span>
+                <span>{t.aiPoint1}</span>
               </div>
               <div className="flex items-start gap-3 text-sm text-neutral-300">
                 <div className="p-1 rounded bg-amber-500/20 text-amber-400 mt-0.5">
                   <Star className="w-4 h-4" />
                 </div>
-                <span>Natural Language Parsing: detects slot count, aspect ratios, and tags from text.</span>
+                <span>{t.aiPoint2}</span>
               </div>
               <div className="flex items-start gap-3 text-sm text-neutral-300">
                 <div className="p-1 rounded bg-indigo-500/20 text-indigo-400 mt-0.5">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
-                <span>Instant 1-click apply: preserves your custom photos when switching styles.</span>
+                <span>{t.aiPoint3}</span>
               </div>
             </div>
           </div>
@@ -60,30 +64,32 @@ export const AiSection: React.FC<AiSectionProps> = ({ onSelectAiPreset }) => {
 
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-bold text-pink-400 bg-pink-500/10 px-2 py-0.5 rounded-full border border-pink-500/20">
-                      {tmpl.badgeLabel}
-                    </span>
-                    <span className="text-[10px] font-mono text-neutral-400 bg-neutral-950 px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-400 border border-neutral-700/50">
                       {tmpl.aspectRatio}
+                    </span>
+                    <span className="text-xs font-semibold text-pink-400">
+                      {tmpl.category}
                     </span>
                   </div>
 
-                  <h3 className="font-heading font-bold text-base text-white mb-1.5 group-hover:text-pink-300 transition-colors">
+                  <h3 className="font-heading font-bold text-base text-white mb-2 group-hover:text-pink-300 transition-colors">
                     {tmpl.name}
                   </h3>
-                  <p className="text-xs text-neutral-400 mb-3 leading-relaxed">{tmpl.description}</p>
+
+                  <p className="text-neutral-400 text-xs line-clamp-2 mb-4">
+                    {tmpl.description}
+                  </p>
                 </div>
 
-                {/* Mini Preview Photos Strip */}
-                <div className="grid grid-cols-4 gap-1 h-10 overflow-hidden rounded-lg mb-3">
-                  {tmpl.defaultImages.slice(0, 4).map((img, i) => (
-                    <img key={i} src={img} alt="Mini preview" className="w-full h-full object-cover rounded" />
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between pt-2 border-t border-neutral-800 text-xs font-semibold text-pink-400">
-                  <span>Use Template</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <div className="pt-3 border-t border-neutral-800/80 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-[11px] text-neutral-500">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <span>Auto-compose</span>
+                  </div>
+                  <span className="text-xs font-bold text-indigo-400 group-hover:text-pink-400 flex items-center gap-1 transition-colors">
+                    <span>{t.applyPreset}</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  </span>
                 </div>
               </div>
             ))}

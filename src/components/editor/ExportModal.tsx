@@ -3,17 +3,21 @@ import { CollageState } from '../../types';
 import { renderCollageToCanvas, downloadCanvas } from '../../core/exportUtils';
 import { X, Download, RefreshCw, ExternalLink } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { Language, TRANSLATIONS } from '../../core/i18n';
 
 interface ExportModalProps {
   isOpen: boolean;
   onClose: () => void;
   state: CollageState;
+  language: Language;
 }
 
-export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state }) => {
+export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state, language }) => {
   const [format, setFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
   const [scale, setScale] = useState<1 | 2 | 4>(2);
   const [isExporting, setIsExporting] = useState(false);
+
+  const t = TRANSLATIONS[language];
 
   if (!isOpen) return null;
 
@@ -65,22 +69,22 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white">
             <Download className="w-4 h-4" />
           </div>
-          <h2 className="text-xl font-heading font-bold text-white">Export Ultra-HD Collage</h2>
+          <h2 className="text-xl font-heading font-bold text-white">{t.exportTitle}</h2>
         </div>
         <p className="text-xs text-neutral-400 mb-5">
-          Select resolution and file format. Hardware-accelerated canvas rasterizer preserves crisp subpixels.
+          {t.exportSubtitle}
         </p>
 
         {/* Resolution Scale Selector */}
         <div className="mb-4">
           <label className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block mb-2">
-            Resolution Scale
+            {t.resolutionScale}
           </label>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { s: 1 as const, label: '1x Standard', desc: 'Web & Preview' },
-              { s: 2 as const, label: '2x High-Res', desc: 'Retina & Social' },
-              { s: 4 as const, label: '4x Ultra-HD', desc: '4K & Print' },
+              { s: 1 as const, label: t.scale1x, desc: 'Web & Preview' },
+              { s: 2 as const, label: t.scale2x, desc: 'Retina & Social' },
+              { s: 4 as const, label: t.scale4x, desc: '4K & Print' },
             ].map(opt => (
               <button
                 key={opt.s}
@@ -101,7 +105,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state
         {/* Format Selector */}
         <div className="mb-5">
           <label className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block mb-2">
-            File Format
+            {t.fileFormat}
           </label>
           <div className="grid grid-cols-3 gap-2">
             {[
@@ -156,12 +160,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state
           {isExporting ? (
             <>
               <RefreshCw className="w-4 h-4 animate-spin" />
-              <span>Generating Image...</span>
+              <span>{t.generatingImage}</span>
             </>
           ) : (
             <>
               <Download className="w-4 h-4" />
-              <span>Save & Download ({format.toUpperCase()} • {scale}x)</span>
+              <span>{t.saveAndDownload} ({format.toUpperCase()} • {scale}x)</span>
             </>
           )}
         </button>
