@@ -9,6 +9,7 @@ import {
 import { Wand2, Sparkles, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Language, TRANSLATIONS } from '../../../core/i18n';
+import { getTemplateI18n } from '../../../core/contentTranslations';
 
 interface AiComposerTabProps {
   state: CollageState;
@@ -38,7 +39,6 @@ export const AiComposerTab: React.FC<AiComposerTabProps> = ({ state, onChangeSta
 
     setTimeout(() => {
       setIsGenerating(false);
-      // Keep existing user photos if they already uploaded custom ones, otherwise use template's curated photos
       const userUploadedImages = state.cells.map(c => c.imageUrl).filter(Boolean) as string[];
       const synthesized = applyPopularTemplate(templateId, userUploadedImages);
 
@@ -152,7 +152,7 @@ export const AiComposerTab: React.FC<AiComposerTabProps> = ({ state, onChangeSta
             { id: 'all', label: t.categoryAll },
             { id: 'social', label: t.categorySocial },
             { id: 'saas', label: t.categorySaas },
-            { id: 'artistic', label: t.categoryArt },
+            { id: 'aesthetic', label: t.categoryArt },
           ].map(cat => (
             <button
               key={cat.id}
@@ -168,10 +168,18 @@ export const AiComposerTab: React.FC<AiComposerTabProps> = ({ state, onChangeSta
           ))}
         </div>
 
-        {/* Templates Grid */}
+        {/* Templates Grid with Multi-language Translation */}
         <div className="space-y-3">
           {filteredTemplates.map(tmpl => {
             const isSelected = selectedTemplateId === tmpl.id;
+            const { name: translatedName, description: translatedDesc, category: translatedCat } = getTemplateI18n(
+              tmpl.id,
+              tmpl.name,
+              tmpl.description,
+              tmpl.category,
+              language
+            );
+
             return (
               <div
                 key={tmpl.id}
@@ -186,14 +194,14 @@ export const AiComposerTab: React.FC<AiComposerTabProps> = ({ state, onChangeSta
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs font-bold text-white group-hover:text-pink-300 transition-colors">
-                        {tmpl.name}
+                        {translatedName}
                       </span>
                       <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-400">
                         {tmpl.aspectRatio}
                       </span>
                     </div>
                     <p className="text-[11px] text-neutral-400 leading-relaxed">
-                      {tmpl.description}
+                      {translatedDesc}
                     </p>
                   </div>
 
@@ -203,7 +211,7 @@ export const AiComposerTab: React.FC<AiComposerTabProps> = ({ state, onChangeSta
                 </div>
 
                 <div className="flex items-center justify-between text-[10px] text-neutral-500 pt-2 border-t border-neutral-800/60">
-                  <span className="capitalize">{tmpl.category} • {tmpl.defaultBadges.length} stickers</span>
+                  <span className="capitalize">{translatedCat} • {tmpl.defaultBadges.length} {language === 'ua' ? 'стікери' : language === 'ru' ? 'стикера' : 'stickers'}</span>
                   <span className="text-pink-400 font-semibold group-hover:underline">
                     {t.applyPreset} →
                   </span>

@@ -2,6 +2,7 @@ import React from 'react';
 import { LAYOUT_PRESETS, getPresetsByCount } from '../../../core/layoutEngine';
 import { CollageState } from '../../../types';
 import { Language, TRANSLATIONS } from '../../../core/i18n';
+import { getPresetI18n } from '../../../core/contentTranslations';
 
 interface LayoutTabProps {
   state: CollageState;
@@ -70,6 +71,13 @@ export const LayoutTab: React.FC<LayoutTabProps> = ({ state, onChangeState, lang
             <div className="grid grid-cols-2 gap-2.5">
               {presets.map(preset => {
                 const isSelected = state.layoutTemplateId === preset.id;
+                const { name: translatedName, category: translatedCat } = getPresetI18n(
+                  preset.id,
+                  preset.name,
+                  preset.category,
+                  language
+                );
+
                 return (
                   <button
                     key={preset.id}
@@ -106,10 +114,10 @@ export const LayoutTab: React.FC<LayoutTabProps> = ({ state, onChangeState, lang
                     </div>
 
                     <div className="truncate font-semibold text-xs text-white group-hover:text-indigo-400 transition-colors">
-                      {preset.name}
+                      {translatedName}
                     </div>
                     <div className="text-[10px] text-neutral-500 capitalize">
-                      {preset.category}
+                      {translatedCat}
                     </div>
                   </button>
                 );
