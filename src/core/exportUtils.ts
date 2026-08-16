@@ -73,7 +73,7 @@ export async function renderCollageToCanvas(
   const innerW = targetW - scaledPadding * 2;
   const innerH = targetH - scaledPadding * 2;
 
-  // Pre-load current user images exactly as set in state
+  // Pre-load current user images safely (timeout fallback to avoid locking)
   const loadedImages: Map<string, HTMLImageElement> = new Map();
   await Promise.all(
     state.cells
@@ -82,12 +82,20 @@ export async function renderCollageToCanvas(
         c =>
           new Promise<void>(resolve => {
             const img = new Image();
-            img.crossOrigin = 'anonymous';
+            // Do not force crossOrigin for data URIs or local blobs
+            if (c.imageUrl!.startsWith('http')) {
+              img.crossOrigin = 'anonymous';
+            }
+            const timer = setTimeout(() => resolve(), 3000); // 3s fallback timeout
             img.onload = () => {
+              clearTimeout(timer);
               loadedImages.set(c.imageUrl!, img);
               resolve();
             };
-            img.onerror = () => resolve(); // Resolve on failure
+            img.onerror = () => {
+              clearTimeout(timer);
+              resolve(); // Continue even if an image fails to load
+            };
             img.src = c.imageUrl!;
           })
       )
@@ -95,8 +103,8 @@ export async function renderCollageToCanvas(
 
   // 2. Draw Exact Current Cells
   for (const cell of state.cells) {
-    const cellX = scaledPadding + cell.x * innerW + (cell.x > 0 ? scaledGap / 2 : 0);
-    const cellY = scaledPadding + cell.y * innerH + (cell.y > 0 ? scaledGap / 2 : 0);
+    const cellX = scaledPadding + cell.x * innerW + (cell.x > 0 ? (scaledGap * (1 - cell.x)) : 0);
+    const cellY = scaledPadding + cell.y * innerH + (cell.y > 0 ? (scaledGap * (1 - cell.y)) : 0);
     const cellW = cell.w * innerW - (scaledGap > 0 ? scaledGap * (1 - cell.w) : 0);
     const cellH = cell.h * innerH - (scaledGap > 0 ? scaledGap * (1 - cell.h) : 0);
     const radius = Math.min(state.cellRadius * scaleFactor, Math.min(cellW, cellH) / 2);
@@ -331,16 +339,75 @@ function drawTextOverlay(
   ctx.restore();
 }
 
-export function downloadCanvas(
+/**
+ * Universal cross-platform downloader supporting Web Share API (Mobile Safari/Chrome)
+ * and Blob / dataUrl fallback for desktop.
+ */
+export async function downloadCanvas(
   canvas: HTMLCanvasElement,
   filename: string,
   format: 'png' | 'jpeg' | 'webp' = 'png',
   quality: number = 0.95
-) {
+): Promise<void> {
   const mimeType = format === 'jpeg' ? 'image/jpeg' : format === 'webp' ? 'image/webp' : 'image/png';
+  const cleanFilename = `${filename.replace(/[^a-zA-Z0-9_-]/g, '_') || 'collage'}.${format}`;
+
+  // 1. Try Mobile Native Web Share API first (Native iOS / Android Photos sheet)
+  if (navigator.share && navigator.canShare && canvas.toBlob) {
+    try {
+      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, mimeType, quality));
+      if (blob) {
+        const file = new File([blob], cleanFilename, { type: mimeType });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: filename,
+          });
+          return;
+        }
+      }
+    } catch (shareErr) {
+      // If user canceled sheet or share failed, fallback to anchor download
+      console.warn('Native share canceled or failed, using fallback download', shareErr);
+    }
+  }
+
+  // 2. Blob URL download (Best for Mobile Chrome & Desktop)
+  if (canvas.toBlob) {
+    canvas.toBlob(blob => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = cleanFilename;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }, 1000);
+        return;
+      }
+      fallbackDataUrlDownload(canvas, cleanFilename, mimeType, quality);
+    }, mimeType, quality);
+  } else {
+    fallbackDataUrlDownload(canvas, cleanFilename, mimeType, quality);
+  }
+}
+
+function fallbackDataUrlDownload(
+  canvas: HTMLCanvasElement,
+  filename: string,
+  mimeType: string,
+  quality: number
+) {
   const dataUrl = canvas.toDataURL(mimeType, quality);
   const link = document.createElement('a');
-  link.download = `${filename.replace(/[^a-zA-Z0-9_-]/g, '_') || 'collage'}.${format}`;
+  link.download = filename;
   link.href = dataUrl;
+  document.body.appendChild(link);
   link.click();
+  setTimeout(() => {
+    document.body.removeChild(link);
+  }, 1000);
 }

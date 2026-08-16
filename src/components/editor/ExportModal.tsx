@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CollageState } from '../../types';
 import { renderCollageToCanvas, downloadCanvas } from '../../core/exportUtils';
-import { X, Download, Sparkles, CheckCircle2, ShieldCheck, RefreshCw, ExternalLink } from 'lucide-react';
+import { X, Download, RefreshCw, ExternalLink } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface ExportModalProps {
@@ -14,7 +14,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state
   const [format, setFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
   const [scale, setScale] = useState<1 | 2 | 4>(2);
   const [isExporting, setIsExporting] = useState(false);
-  const [hasAdPlayed, setHasAdPlayed] = useState(false);
 
   if (!isOpen) return null;
 
@@ -22,19 +21,20 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state
     setIsExporting(true);
 
     try {
-      // Simulate quick rendering
+      // 1. Render collage to canvas
       const canvas = await renderCollageToCanvas(state, {
         format,
         scale,
         quality: 0.95,
       });
 
-      downloadCanvas(canvas, state.name || 'collage', format);
+      // 2. Perform cross-platform download
+      await downloadCanvas(canvas, state.name || 'collage', format, 0.95);
 
       try {
         confetti({
-          particleCount: 70,
-          spread: 70,
+          particleCount: 50,
+          spread: 60,
           origin: { y: 0.6 },
         });
       } catch {
@@ -45,6 +45,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state
       onClose();
     } catch (err) {
       console.error('Export failed', err);
+      alert('Export failed. Please try saving again.');
       setIsExporting(false);
     }
   };
@@ -55,7 +56,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-white rounded-lg hover:bg-neutral-800 transition-colors"
+          className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-white rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -155,12 +156,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state
           {isExporting ? (
             <>
               <RefreshCw className="w-4 h-4 animate-spin" />
-              <span>Rasterizing 4K Canvas...</span>
+              <span>Generating Image...</span>
             </>
           ) : (
             <>
               <Download className="w-4 h-4" />
-              <span>Download Image ({format.toUpperCase()} • {scale}x)</span>
+              <span>Save & Download ({format.toUpperCase()} • {scale}x)</span>
             </>
           )}
         </button>
