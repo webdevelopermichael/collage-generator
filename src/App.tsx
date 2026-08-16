@@ -40,7 +40,7 @@ export function App() {
   const [collageState, setCollageState] = useState<CollageState>(loadCurrentProject());
 
   // Editor UI state
-  const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTabId>('ratios');
+  const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTabId>('layouts');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedCellId, setSelectedCellId] = useState<string | null>(null);
   const [selectedBadgeId, setSelectedBadgeId] = useState<string | null>(null);
@@ -228,33 +228,36 @@ export function App() {
             onRedo={handleRedo}
           />
 
-          {/* Canvas Viewport Area — pb-14 clears the fixed bottom dock */}
-          <div className="flex-1 overflow-hidden relative" style={{ paddingBottom: '3.5rem' }}>
-            <CanvasStage
+          {/* Main Workspace Container: Desktop uses Left Sidebar + Canvas, Mobile uses Canvas + Bottom Dock */}
+          <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+            {/* Desktop Left-Hand Sidebar / Mobile Drawer */}
+            <Sidebar
               state={collageState}
+              activeTab={activeSidebarTab}
+              setActiveTab={setActiveSidebarTab}
               selectedCellId={selectedCellId}
               selectedBadgeId={selectedBadgeId}
               onSelectCell={setSelectedCellId}
               onSelectBadge={setSelectedBadgeId}
               onChangeState={handleUpdateCollageState}
-              zoomLevel={zoomLevel}
-              setZoomLevel={setZoomLevel}
+              isOpen={isSidebarOpen}
+              onToggleOpen={() => setIsSidebarOpen(!isSidebarOpen)}
             />
-          </div>
 
-          {/* Bottom Dock Toolbar (Opens upwards, default collapsed) */}
-          <Sidebar
-            state={collageState}
-            activeTab={activeSidebarTab}
-            setActiveTab={setActiveSidebarTab}
-            selectedCellId={selectedCellId}
-            selectedBadgeId={selectedBadgeId}
-            onSelectCell={setSelectedCellId}
-            onSelectBadge={setSelectedBadgeId}
-            onChangeState={handleUpdateCollageState}
-            isOpen={isSidebarOpen}
-            onToggleOpen={() => setIsSidebarOpen(!isSidebarOpen)}
-          />
+            {/* Canvas Viewport Area (pb-14 on mobile to clear bottom dock, normal full height on desktop) */}
+            <div className="flex-1 overflow-hidden relative pb-14 md:pb-0 h-full">
+              <CanvasStage
+                state={collageState}
+                selectedCellId={selectedCellId}
+                selectedBadgeId={selectedBadgeId}
+                onSelectCell={setSelectedCellId}
+                onSelectBadge={setSelectedBadgeId}
+                onChangeState={handleUpdateCollageState}
+                zoomLevel={zoomLevel}
+                setZoomLevel={setZoomLevel}
+              />
+            </div>
+          </div>
         </div>
       )}
 

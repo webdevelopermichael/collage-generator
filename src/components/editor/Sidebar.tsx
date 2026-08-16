@@ -43,7 +43,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onToggleOpen,
 }) => {
-  const tabs = [
+  // Mobile tabs (includes Canvas size tab)
+  const mobileTabs = [
     { id: 'ratios' as SidebarTabId, label: 'Canvas', icon: Ratio },
     { id: 'layouts' as SidebarTabId, label: 'Grid', icon: LayoutGrid },
     { id: 'styles' as SidebarTabId, label: 'Style', icon: Palette },
@@ -52,68 +53,131 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'badges' as SidebarTabId, label: 'Badges', icon: Tag },
   ];
 
-  const handleTabClick = (tabId: SidebarTabId) => {
+  // Desktop sidebar tabs (Layouts, Styles, Images, AI Magic, Badges)
+  const desktopTabs = [
+    { id: 'layouts' as SidebarTabId, label: 'Layouts', icon: LayoutGrid },
+    { id: 'styles' as SidebarTabId, label: 'Styles', icon: Palette },
+    { id: 'images' as SidebarTabId, label: 'Images', icon: ImageIcon },
+    { id: 'ai' as SidebarTabId, label: 'AI Magic', icon: Wand2, highlight: true },
+    { id: 'badges' as SidebarTabId, label: 'Badges', icon: Tag },
+  ];
+
+  const handleMobileTabClick = (tabId: SidebarTabId) => {
     if (activeTab === tabId && isOpen) {
-      onToggleOpen(); // 2nd click on same → close
+      onToggleOpen(); // 2nd click on same tab closes
     } else {
       setActiveTab(tabId);
-      if (!isOpen) onToggleOpen(); // 1st click → open
+      if (!isOpen) onToggleOpen(); // 1st click opens
     }
   };
 
   return (
-    <aside
-      className={`fixed bottom-0 left-0 right-0 z-40 bg-neutral-900/97 backdrop-blur-xl border-t border-neutral-800 shadow-2xl flex flex-col shrink-0 select-none transition-all duration-300 ease-out ${
-        isOpen ? 'h-[52vh] sm:h-[46vh] md:h-[400px]' : 'h-14'
-      } overflow-hidden`}
-    >
-      {/* Bottom dock bar */}
-      <div className="h-14 flex items-center px-2 sm:px-4 bg-neutral-950/90 border-b border-neutral-800 shrink-0 gap-1">
-        <div className="flex-1 flex items-center justify-around sm:justify-start sm:gap-2 overflow-x-auto">
-          {tabs.map(tab => {
+    <>
+      {/* ─────────────────────────────────────────────────────────────────
+          DESKTOP SIDEBAR (md:flex)
+          Permanent Left-Hand Navigation Panel with Full Height
+          ───────────────────────────────────────────────────────────────── */}
+      <aside className="hidden md:flex w-80 lg:w-96 bg-neutral-900/95 border-r border-neutral-800 flex-col shrink-0 h-full select-none z-20 overflow-hidden">
+        {/* Desktop Tab Selector Bar */}
+        <div className="flex items-center justify-between border-b border-neutral-800 p-2 bg-neutral-950/60 shrink-0">
+          {desktopTabs.map(tab => {
             const Icon = tab.icon;
-            const isActive = activeTab === tab.id && isOpen;
+            const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
-                onClick={() => handleTabClick(tab.id)}
-                className={`flex items-center gap-1.5 py-1.5 px-2 sm:px-3 rounded-xl font-semibold transition-all cursor-pointer ${
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 flex flex-col items-center gap-1 py-2 px-1 rounded-xl text-[11px] font-medium transition-all cursor-pointer ${
                   isActive
                     ? tab.highlight
-                      ? 'bg-pink-500/20 text-pink-300 border border-pink-500/50'
-                      : 'bg-neutral-800 text-white border border-neutral-700'
+                      ? 'bg-pink-500/20 text-pink-300 font-bold border border-pink-500/40'
+                      : 'bg-neutral-800 text-white font-bold border border-neutral-700'
                     : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900 border border-transparent'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? (tab.highlight ? 'text-pink-400' : 'text-indigo-400') : 'text-neutral-500'}`} />
-                <span className="text-[11px] sm:text-xs">{tab.label}</span>
+                <Icon
+                  className={`w-4 h-4 ${
+                    isActive
+                      ? tab.highlight
+                        ? 'text-pink-400'
+                        : 'text-indigo-400'
+                      : 'text-neutral-400'
+                  }`}
+                />
+                <span>{tab.label}</span>
               </button>
             );
           })}
         </div>
 
-        <button
-          onClick={onToggleOpen}
-          className="p-2 text-neutral-400 hover:text-white rounded-xl hover:bg-neutral-800 transition-colors shrink-0 ml-1"
-          title={isOpen ? 'Collapse panel' : 'Expand panel'}
-        >
-          {isOpen
-            ? <ChevronDown className="w-4 h-4 text-neutral-300" />
-            : <ChevronUp className="w-4 h-4 text-indigo-400" />}
-        </button>
-      </div>
-
-      {/* Drawer content */}
-      {isOpen && (
+        {/* Desktop Tab Content Area */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 overscroll-contain">
-          {activeTab === 'ratios' && <RatioTab state={state} onChangeState={onChangeState} />}
           {activeTab === 'layouts' && <LayoutTab state={state} onChangeState={onChangeState} />}
           {activeTab === 'styles' && <StyleTab state={state} onChangeState={onChangeState} />}
           {activeTab === 'images' && <ImagesTab state={state} onChangeState={onChangeState} onSelectCell={onSelectCell} />}
           {activeTab === 'ai' && <AiComposerTab state={state} onChangeState={onChangeState} />}
           {activeTab === 'badges' && <TextBadgesTab state={state} selectedBadgeId={selectedBadgeId} onSelectBadge={onSelectBadge} onChangeState={onChangeState} />}
+          {activeTab === 'ratios' && <RatioTab state={state} onChangeState={onChangeState} />}
         </div>
-      )}
-    </aside>
+      </aside>
+
+      {/* ─────────────────────────────────────────────────────────────────
+          MOBILE BOTTOM DOCK (md:hidden)
+          Collapsible Upward-Opening Drawer with 1-click open / 2-click close
+          ───────────────────────────────────────────────────────────────── */}
+      <aside
+        className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-neutral-900/97 backdrop-blur-xl border-t border-neutral-800 shadow-2xl flex flex-col shrink-0 select-none transition-all duration-300 ease-out ${
+          isOpen ? 'h-[52vh] sm:h-[46vh]' : 'h-14'
+        } overflow-hidden`}
+      >
+        {/* Mobile bottom dock bar */}
+        <div className="h-14 flex items-center px-2 sm:px-4 bg-neutral-950/90 border-b border-neutral-800 shrink-0 gap-1">
+          <div className="flex-1 flex items-center justify-around overflow-x-auto">
+            {mobileTabs.map(tab => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id && isOpen;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleMobileTabClick(tab.id)}
+                  className={`flex items-center gap-1.5 py-1.5 px-2 sm:px-3 rounded-xl font-semibold transition-all cursor-pointer ${
+                    isActive
+                      ? tab.highlight
+                        ? 'bg-pink-500/20 text-pink-300 border border-pink-500/50'
+                        : 'bg-neutral-800 text-white border border-neutral-700'
+                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900 border border-transparent'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 ${isActive ? (tab.highlight ? 'text-pink-400' : 'text-indigo-400') : 'text-neutral-500'}`} />
+                  <span className="text-[11px] sm:text-xs">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={onToggleOpen}
+            className="p-2 text-neutral-400 hover:text-white rounded-xl hover:bg-neutral-800 transition-colors shrink-0 ml-1"
+            title={isOpen ? 'Collapse panel' : 'Expand panel'}
+          >
+            {isOpen
+              ? <ChevronDown className="w-4 h-4 text-neutral-300" />
+              : <ChevronUp className="w-4 h-4 text-indigo-400" />}
+          </button>
+        </div>
+
+        {/* Mobile Drawer content */}
+        {isOpen && (
+          <div className="flex-1 overflow-y-auto p-4 overscroll-contain">
+            {activeTab === 'ratios' && <RatioTab state={state} onChangeState={onChangeState} />}
+            {activeTab === 'layouts' && <LayoutTab state={state} onChangeState={onChangeState} />}
+            {activeTab === 'styles' && <StyleTab state={state} onChangeState={onChangeState} />}
+            {activeTab === 'images' && <ImagesTab state={state} onChangeState={onChangeState} onSelectCell={onSelectCell} />}
+            {activeTab === 'ai' && <AiComposerTab state={state} onChangeState={onChangeState} />}
+            {activeTab === 'badges' && <TextBadgesTab state={state} selectedBadgeId={selectedBadgeId} onSelectBadge={onSelectBadge} onChangeState={onChangeState} />}
+          </div>
+        )}
+      </aside>
+    </>
   );
 };
