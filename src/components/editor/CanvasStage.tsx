@@ -240,21 +240,21 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
   const getRatioStyle = (): React.CSSProperties => {
     switch (state.aspectRatio) {
       case '1:1':
-        return { aspectRatio: '1 / 1', width: 'min(78vw, 68vh, 520px)' };
+        return { aspectRatio: '1 / 1', width: 'min(82vw, calc(100dvh - 160px), 520px)' };
       case '4:5':
-        return { aspectRatio: '4 / 5', width: 'min(72vw, 68vh, 460px)' };
+        return { aspectRatio: '4 / 5', width: 'min(76vw, calc(100dvh - 160px), 460px)' };
       case '9:16':
-        return { aspectRatio: '9 / 16', width: 'min(58vw, 68vh, 380px)' };
+        return { aspectRatio: '9 / 16', width: 'min(60vw, calc(100dvh - 160px), 380px)' };
       case '16:9':
-        return { aspectRatio: '16 / 9', width: 'min(86vw, 64vh, 640px)' };
+        return { aspectRatio: '16 / 9', width: 'min(88vw, calc(100dvh - 160px), 640px)' };
       case '4:3':
-        return { aspectRatio: '4 / 3', width: 'min(82vw, 68vh, 560px)' };
+        return { aspectRatio: '4 / 3', width: 'min(84vw, calc(100dvh - 160px), 560px)' };
       case '3:2':
-        return { aspectRatio: '3 / 2', width: 'min(84vw, 66vh, 580px)' };
+        return { aspectRatio: '3 / 2', width: 'min(86vw, calc(100dvh - 160px), 580px)' };
       case 'A4':
-        return { aspectRatio: '1 / 1.414', width: 'min(64vw, 68vh, 440px)' };
+        return { aspectRatio: '1 / 1.414', width: 'min(66vw, calc(100dvh - 160px), 440px)' };
       default:
-        return { aspectRatio: '16 / 9', width: 'min(84vw, 65vh, 580px)' };
+        return { aspectRatio: '16 / 9', width: 'min(86vw, calc(100dvh - 160px), 580px)' };
     }
   };
 
@@ -317,7 +317,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
         }}
         className="shrink-0 relative"
       >
-        {/* Main Canvas */}
+        {/* Main Canvas with Box-Sizing */}
         <div
           ref={canvasRef}
           id="collage-main-canvas"
@@ -326,19 +326,19 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
             ...getRatioStyle(),
             padding: `${state.padding}px`,
             borderRadius: `${state.canvasRadius}px`,
+            boxSizing: 'border-box',
           }}
           className="relative shadow-2xl overflow-hidden border border-neutral-800/60 transition-all duration-150"
           data-pan-target="1"
           onClick={() => { onSelectCell(null); onSelectBadge(null); setActionCellId(null); }}
         >
-          {/* Cell grid */}
+          {/* Inner Cells Grid Layer (Matches Canvas Internal Dimension exactly) */}
           <div className="w-full h-full relative" data-pan-target="1">
             {state.cells.map(cell => {
               const isSelected = selectedCellId === cell.id || actionCellId === cell.id;
               
-              // Correct CSS Grid / absolute cell dimensions accounting for gap
-              const gapX = state.gap > 0 ? `${state.gap}px` : '0px';
-              const gapY = state.gap > 0 ? `${state.gap}px` : '0px';
+              // Exact mathematical distribution matching exportEngine
+              const gapPx = state.gap || 0;
 
               return (
                 <div
@@ -346,10 +346,10 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                   onClick={e => handleCellClick(e, cell.id)}
                   style={{
                     position: 'absolute',
-                    left: `calc(${cell.x * 100}% + ${cell.x > 0 ? `(${gapX} / 2)` : '0px'})`,
-                    top: `calc(${cell.y * 100}% + ${cell.y > 0 ? `(${gapY} / 2)` : '0px'})`,
-                    width: `calc(${cell.w * 100}% - ${cell.w < 1 ? `(${gapX} / 2)` : '0px'})`,
-                    height: `calc(${cell.h * 100}% - ${cell.h < 1 ? `(${gapY} / 2)` : '0px'})`,
+                    left: `calc(${cell.x * 100}% + ${cell.x > 0 ? (gapPx / 2) : 0}px)`,
+                    top: `calc(${cell.y * 100}% + ${cell.y > 0 ? (gapPx / 2) : 0}px)`,
+                    width: `calc(${cell.w * 100}% - ${gapPx > 0 ? gapPx * (1 - cell.w) : 0}px)`,
+                    height: `calc(${cell.h * 100}% - ${gapPx > 0 ? gapPx * (1 - cell.h) : 0}px)`,
                     borderRadius: `${state.cellRadius}px`,
                     borderWidth: `${state.cellBorderWidth}px`,
                     borderColor: state.cellBorderColor,
@@ -495,7 +495,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                     <button
                       onPointerDown={e => { e.stopPropagation(); e.preventDefault(); onSelectBadge(null); }}
                       className="p-1 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-lg transition-colors"
-                    ><X className="w-3 h-3" /></button>
+                    ><X className="w-3.5 h-3.5" /></button>
                   </div>
                 )}
               </div>
