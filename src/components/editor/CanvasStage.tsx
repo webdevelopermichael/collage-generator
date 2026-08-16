@@ -277,6 +277,10 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
     return { backgroundColor: state.background.color || '#0f172a' };
   };
 
+  // Calculate selected cell center for outer floating toolbar
+  const activeCell = actionCellId ? state.cells.find(c => c.id === actionCellId) : null;
+  const selectedBadge = selectedBadgeId ? state.badges?.find(b => b.id === selectedBadgeId) : null;
+
   return (
     <div
       ref={stageRef}
@@ -317,7 +321,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
         }}
         className="shrink-0 relative flex items-center justify-center"
       >
-        {/* Main Canvas with Box-Sizing */}
+        {/* Main Canvas Container (overflow: visible on outer so floating action bars never clip) */}
         <div
           ref={canvasRef}
           id="collage-main-canvas"
@@ -328,15 +332,14 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
             borderRadius: `${state.canvasRadius}px`,
             boxSizing: 'border-box',
           }}
-          className="relative shadow-2xl overflow-hidden border border-neutral-800/60 transition-all duration-150 flex flex-col"
+          className="relative shadow-2xl border border-neutral-800/60 transition-all duration-150 flex flex-col"
           data-pan-target="1"
           onClick={() => { onSelectCell(null); onSelectBadge(null); setActionCellId(null); }}
         >
-          {/* Inner Cells Grid Layer (Matches Canvas Internal Dimension exactly with absolute bounds) */}
+          {/* Inner Cells Grid Layer */}
           <div className="w-full h-full relative" style={{ width: '100%', height: '100%', minHeight: 0, position: 'relative' }} data-pan-target="1">
             {state.cells.map(cell => {
               const isSelected = selectedCellId === cell.id || actionCellId === cell.id;
-              
               const gapPx = state.gap || 0;
 
               return (
@@ -386,48 +389,6 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
             })}
           </div>
 
-          {/* ─ Floating Cell Action Toolbar ─ */}
-          {actionCellId && (() => {
-            const cell = state.cells.find(c => c.id === actionCellId);
-            if (!cell) return null;
-            const leftPct = (cell.x + cell.w / 2) * 100;
-            const topPct = cell.y * 100;
-            return (
-              <div
-                className="absolute z-50 pointer-events-auto"
-                style={{ left: `${leftPct}%`, top: `${topPct}%`, transform: 'translate(-50%, -115%)' }}
-                onClick={e => e.stopPropagation()}
-              >
-                <div className="flex items-center gap-1 bg-neutral-950/95 backdrop-blur-md p-1.5 rounded-2xl border border-neutral-700 shadow-2xl">
-                  <button
-                    onClick={() => handleImageUpload(actionCellId)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors"
-                  >
-                    <ImageIcon className="w-3.5 h-3.5" />
-                    Replace
-                  </button>
-                  <button
-                    onClick={() => onChangeState(prev => ({ ...prev, cells: prev.cells.map(c => c.id === actionCellId ? { ...c, zoom: Math.min(3, (c.zoom || 1) + 0.2) } : c) }))}
-                    className="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors" title="Zoom in photo"
-                  ><ZoomIn className="w-4 h-4" /></button>
-                  <button
-                    onClick={() => onChangeState(prev => ({ ...prev, cells: prev.cells.map(c => c.id === actionCellId ? { ...c, zoom: Math.max(1, (c.zoom || 1) - 0.2) } : c) }))}
-                    className="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors" title="Zoom out photo"
-                  ><ZoomOut className="w-4 h-4" /></button>
-                  <button
-                    onClick={() => { onChangeState(prev => ({ ...prev, cells: prev.cells.map(c => c.id === actionCellId ? { ...c, imageUrl: undefined } : c) })); setActionCellId(null); }}
-                    className="p-1.5 bg-rose-950/80 hover:bg-rose-900 text-rose-300 rounded-xl cursor-pointer transition-colors" title="Remove photo"
-                  ><Trash2 className="w-4 h-4" /></button>
-                  <button
-                    onClick={() => setActionCellId(null)}
-                    className="p-1.5 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors"
-                  ><X className="w-3.5 h-3.5" /></button>
-                </div>
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-neutral-700" />
-              </div>
-            );
-          })()}
-
           {/* ─ Badges ─ */}
           {state.badges?.map(badge => {
             const isSel = selectedBadgeId === badge.id;
@@ -467,39 +428,89 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                     </div>
                   </div>
                 </div>
-
-                {isSel && (
-                  <div
-                    className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-0.5 bg-neutral-900/95 border border-neutral-700 rounded-xl p-1 shadow-2xl backdrop-blur-md pointer-events-auto"
-                    onClick={e => e.stopPropagation()}
-                    onMouseDown={e => e.stopPropagation()}
-                    onTouchStart={e => e.stopPropagation()}
-                  >
-                    <button
-                      onPointerDown={e => { e.stopPropagation(); e.preventDefault(); onChangeState(prev => ({ ...prev, badges: prev.badges.map(b => b.id === badge.id ? { ...b, scale: Math.max(0.5, Number(((b.scale || 1) - 0.1).toFixed(1))) } : b) })); }}
-                      className="p-1 hover:bg-neutral-800 text-neutral-400 hover:text-white rounded-lg transition-colors"
-                      title="Shrink"
-                    ><Minus className="w-3 h-3" /></button>
-                    <button
-                      onPointerDown={e => { e.stopPropagation(); e.preventDefault(); onChangeState(prev => ({ ...prev, badges: prev.badges.map(b => b.id === badge.id ? { ...b, scale: Math.min(2.5, Number(((b.scale || 1) + 0.1).toFixed(1))) } : b) })); }}
-                      className="p-1 hover:bg-neutral-800 text-neutral-400 hover:text-white rounded-lg transition-colors"
-                      title="Grow"
-                    ><Plus className="w-3 h-3" /></button>
-                    <div className="w-px h-4 bg-neutral-700" />
-                    <button
-                      onPointerDown={e => { e.stopPropagation(); e.preventDefault(); onChangeState(prev => ({ ...prev, badges: prev.badges.filter(b => b.id !== badge.id) })); onSelectBadge(null); }}
-                      className="p-1 hover:bg-rose-900/80 text-rose-400 hover:text-rose-200 rounded-lg transition-colors"
-                      title="Delete badge"
-                    ><Trash2 className="w-3 h-3" /></button>
-                    <button
-                      onPointerDown={e => { e.stopPropagation(); e.preventDefault(); onSelectBadge(null); }}
-                      className="p-1 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-lg transition-colors"
-                    ><X className="w-3.5 h-3.5" /></button>
-                  </div>
-                )}
               </div>
             );
           })}
+
+          {/* ─ High Z-Index Floating Cell Action Toolbar ─ */}
+          {activeCell && (
+            <div
+              className="absolute z-50 pointer-events-auto"
+              style={{
+                left: `${(activeCell.x + activeCell.w / 2) * 100}%`,
+                top: `${activeCell.y * 100}%`,
+                transform: 'translate(-50%, -125%)',
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-1 bg-neutral-950/98 backdrop-blur-xl p-1.5 rounded-2xl border border-neutral-700 shadow-2xl">
+                <button
+                  onClick={() => handleImageUpload(activeCell.id)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors"
+                >
+                  <ImageIcon className="w-3.5 h-3.5" />
+                  Replace
+                </button>
+                <button
+                  onClick={() => onChangeState(prev => ({ ...prev, cells: prev.cells.map(c => c.id === activeCell.id ? { ...c, zoom: Math.min(3, (c.zoom || 1) + 0.2) } : c) }))}
+                  className="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors" title="Zoom in photo"
+                ><ZoomIn className="w-4 h-4" /></button>
+                <button
+                  onClick={() => onChangeState(prev => ({ ...prev, cells: prev.cells.map(c => c.id === activeCell.id ? { ...c, zoom: Math.max(1, (c.zoom || 1) - 0.2) } : c) }))}
+                  className="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors" title="Zoom out photo"
+                ><ZoomOut className="w-4 h-4" /></button>
+                <button
+                  onClick={() => { onChangeState(prev => ({ ...prev, cells: prev.cells.map(c => c.id === activeCell.id ? { ...c, imageUrl: undefined } : c) })); setActionCellId(null); }}
+                  className="p-1.5 bg-rose-950/80 hover:bg-rose-900 text-rose-300 rounded-xl cursor-pointer transition-colors" title="Remove photo"
+                ><Trash2 className="w-4 h-4" /></button>
+                <button
+                  onClick={() => setActionCellId(null)}
+                  className="p-1.5 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors"
+                ><X className="w-3.5 h-3.5" /></button>
+              </div>
+              {/* Tooltip Down Arrow */}
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-neutral-700" />
+            </div>
+          )}
+
+          {/* ─ High Z-Index Floating Badge Edit Toolbar ─ */}
+          {selectedBadge && (
+            <div
+              className="absolute z-50 pointer-events-auto"
+              style={{
+                left: `${selectedBadge.x}%`,
+                top: `${selectedBadge.y}%`,
+                transform: 'translate(-10%, -125%)',
+              }}
+              onClick={e => e.stopPropagation()}
+              onMouseDown={e => e.stopPropagation()}
+              onTouchStart={e => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-1 bg-neutral-950/98 backdrop-blur-xl border border-neutral-700 rounded-2xl p-1.5 shadow-2xl">
+                <button
+                  onPointerDown={e => { e.stopPropagation(); e.preventDefault(); onChangeState(prev => ({ ...prev, badges: prev.badges.map(b => b.id === selectedBadge.id ? { ...b, scale: Math.max(0.5, Number(((b.scale || 1) - 0.1).toFixed(1))) } : b) })); }}
+                  className="p-1 hover:bg-neutral-800 text-neutral-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  title="Shrink"
+                ><Minus className="w-3.5 h-3.5" /></button>
+                <button
+                  onPointerDown={e => { e.stopPropagation(); e.preventDefault(); onChangeState(prev => ({ ...prev, badges: prev.badges.map(b => b.id === selectedBadge.id ? { ...b, scale: Math.min(2.5, Number(((b.scale || 1) + 0.1).toFixed(1))) } : b) })); }}
+                  className="p-1 hover:bg-neutral-800 text-neutral-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  title="Grow"
+                ><Plus className="w-3.5 h-3.5" /></button>
+                <div className="w-px h-4 bg-neutral-700 mx-0.5" />
+                <button
+                  onPointerDown={e => { e.stopPropagation(); e.preventDefault(); onChangeState(prev => ({ ...prev, badges: prev.badges.filter(b => b.id !== selectedBadge.id) })); onSelectBadge(null); }}
+                  className="p-1 hover:bg-rose-900/80 text-rose-400 hover:text-rose-200 rounded-lg transition-colors cursor-pointer"
+                  title="Delete badge"
+                ><Trash2 className="w-3.5 h-3.5" /></button>
+                <button
+                  onPointerDown={e => { e.stopPropagation(); e.preventDefault(); onSelectBadge(null); }}
+                  className="p-1 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-lg transition-colors cursor-pointer"
+                ><X className="w-3.5 h-3.5" /></button>
+              </div>
+              <div className="absolute left-6 bottom-0 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-neutral-700" />
+            </div>
+          )}
         </div>
       </div>
     </div>
