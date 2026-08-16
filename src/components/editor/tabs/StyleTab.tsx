@@ -1,10 +1,12 @@
 import React from 'react';
 import { CollageState, BackgroundConfig } from '../../../types';
-import { Sliders, Sparkles, Palette, Layers, BoxSelect, Droplet } from 'lucide-react';
+import { Palette, BoxSelect } from 'lucide-react';
+import { Language, TRANSLATIONS } from '../../../core/i18n';
 
 interface StyleTabProps {
   state: CollageState;
   onChangeState: (updater: (prev: CollageState) => CollageState) => void;
+  language: Language;
 }
 
 const GRADIENT_PRESETS: BackgroundConfig[] = [
@@ -59,6 +61,10 @@ const GRADIENT_PRESETS: BackgroundConfig[] = [
   },
   {
     type: 'solid',
+    color: '#0f172a',
+  },
+  {
+    type: 'solid',
     color: '#09090b',
   },
   {
@@ -67,14 +73,16 @@ const GRADIENT_PRESETS: BackgroundConfig[] = [
   },
 ];
 
-export const StyleTab: React.FC<StyleTabProps> = ({ state, onChangeState }) => {
+export const StyleTab: React.FC<StyleTabProps> = ({ state, onChangeState, language }) => {
+  const t = TRANSLATIONS[language];
+
   return (
     <div className="space-y-6">
       {/* Background Section */}
       <div>
         <label className="text-xs font-semibold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5 mb-2.5">
           <Palette className="w-3.5 h-3.5 text-purple-400" />
-          Canvas Background
+          {t.canvasBackground}
         </label>
 
         <div className="grid grid-cols-4 gap-2 mb-3">
@@ -125,7 +133,7 @@ export const StyleTab: React.FC<StyleTabProps> = ({ state, onChangeState }) => {
         <div>
           <div className="flex justify-between text-xs font-medium text-neutral-300 mb-1.5">
             <span className="flex items-center gap-1.5">
-              <BoxSelect className="w-3.5 h-3.5 text-indigo-400" /> Outer Padding
+              <BoxSelect className="w-3.5 h-3.5 text-indigo-400" /> {t.outerPadding}
             </span>
             <span className="font-mono text-neutral-400">{state.padding}px</span>
           </div>
@@ -143,15 +151,13 @@ export const StyleTab: React.FC<StyleTabProps> = ({ state, onChangeState }) => {
 
         <div>
           <div className="flex justify-between text-xs font-medium text-neutral-300 mb-1.5">
-            <span className="flex items-center gap-1.5">
-              <Sliders className="w-3.5 h-3.5 text-indigo-400" /> Cell Gap
-            </span>
+            <span>{t.cellSpacingGap}</span>
             <span className="font-mono text-neutral-400">{state.gap}px</span>
           </div>
           <input
             type="range"
             min="0"
-            max="48"
+            max="40"
             value={state.gap}
             onChange={e =>
               onChangeState(prev => ({ ...prev, gap: Number(e.target.value) }))
@@ -159,70 +165,70 @@ export const StyleTab: React.FC<StyleTabProps> = ({ state, onChangeState }) => {
             className="w-full accent-indigo-500 cursor-pointer"
           />
         </div>
-      </div>
 
-      {/* Rounding & Borders */}
-      <div className="space-y-4 pt-4 border-t border-neutral-800">
         <div>
           <div className="flex justify-between text-xs font-medium text-neutral-300 mb-1.5">
-            <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-pink-400" /> Cell Corner Radius
-            </span>
+            <span>{t.cellRounding}</span>
             <span className="font-mono text-neutral-400">{state.cellRadius}px</span>
           </div>
           <input
             type="range"
             min="0"
-            max="36"
+            max="48"
             value={state.cellRadius}
             onChange={e =>
               onChangeState(prev => ({ ...prev, cellRadius: Number(e.target.value) }))
             }
-            className="w-full accent-indigo-500 cursor-pointer"
-          />
-        </div>
-
-        <div>
-          <div className="flex justify-between text-xs font-medium text-neutral-300 mb-1.5">
-            <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-pink-400" /> Canvas Radius
-            </span>
-            <span className="font-mono text-neutral-400">{state.canvasRadius}px</span>
-          </div>
-          <input
-            type="range"
-            min="0"
-            max="36"
-            value={state.canvasRadius}
-            onChange={e =>
-              onChangeState(prev => ({ ...prev, canvasRadius: Number(e.target.value) }))
-            }
-            className="w-full accent-indigo-500 cursor-pointer"
+            className="w-full accent-purple-500 cursor-pointer"
           />
         </div>
       </div>
 
-      {/* Shadows */}
-      <div className="pt-4 border-t border-neutral-800">
-        <label className="text-xs font-semibold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5 mb-2.5">
-          <Droplet className="w-3.5 h-3.5 text-amber-400" /> Cell Drop Shadow
-        </label>
-        <div className="grid grid-cols-3 gap-2">
-          {(['none', 'sm', 'md', 'lg', 'xl', '2xl'] as CollageState['cellShadow'][]).map(
-            shadow => (
+      {/* Borders & Shadows */}
+      <div className="space-y-4 pt-4 border-t border-neutral-800">
+        <div>
+          <div className="flex justify-between text-xs font-medium text-neutral-300 mb-1.5">
+            <span>{t.borderStroke}</span>
+            <span className="font-mono text-neutral-400">{state.cellBorderWidth}px</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="8"
+            value={state.cellBorderWidth}
+            onChange={e =>
+              onChangeState(prev => ({ ...prev, cellBorderWidth: Number(e.target.value) }))
+            }
+            className="w-full accent-pink-500 cursor-pointer"
+          />
+        </div>
+
+        {/* Drop Shadow Preset Selector */}
+        <div>
+          <label className="text-xs font-medium text-neutral-300 block mb-2">
+            {t.dropShadow}
+          </label>
+          <div className="grid grid-cols-5 gap-1.5">
+            {[
+              { id: 'none' as const, label: t.shadowNone },
+              { id: 'sm' as const, label: t.shadowSubtle },
+              { id: 'lg' as const, label: t.shadowMedium },
+              { id: '2xl' as const, label: t.shadowDeep },
+              { id: 'glow' as const, label: t.shadowGlow },
+            ].map(sh => (
               <button
-                key={shadow}
-                onClick={() => onChangeState(prev => ({ ...prev, cellShadow: shadow }))}
-                className={`py-2 px-2.5 rounded-xl text-xs font-medium border transition-all cursor-pointer capitalize ${
-                  state.cellShadow === shadow
-                    ? 'bg-indigo-600/20 border-indigo-500 text-white'
-                    : 'bg-neutral-900/60 border-neutral-800 text-neutral-400 hover:text-white'
+                key={sh.id}
+                onClick={() => onChangeState(prev => ({ ...prev, cellShadow: sh.id }))}
+                className={`py-1.5 px-1 rounded-lg text-[10px] font-semibold transition-all cursor-pointer truncate ${
+                  state.cellShadow === sh.id
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'bg-neutral-950 border border-neutral-800 text-neutral-400 hover:text-white'
                 }`}
               >
-                {shadow}
+                {sh.label}
               </button>
-            )
-          )}
+            ))}
+          </div>
         </div>
       </div>
     </div>

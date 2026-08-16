@@ -2,13 +2,17 @@ import React from 'react';
 import { CollageState } from '../../../types';
 import { ASPECT_RATIOS } from '../../../core/layoutEngine';
 import { Ratio, Check, Smartphone, Monitor, Printer, Sliders, Square, Video } from 'lucide-react';
+import { Language, TRANSLATIONS } from '../../../core/i18n';
 
 interface RatioTabProps {
   state: CollageState;
   onChangeState: (updater: (prev: CollageState) => CollageState) => void;
+  language: Language;
 }
 
-export const RatioTab: React.FC<RatioTabProps> = ({ state, onChangeState }) => {
+export const RatioTab: React.FC<RatioTabProps> = ({ state, onChangeState, language }) => {
+  const t = TRANSLATIONS[language];
+
   const getIcon = (id: string) => {
     if (id === '1:1' || id === '4:5') return Square;
     if (id === '9:16') return Smartphone;
@@ -23,9 +27,9 @@ export const RatioTab: React.FC<RatioTabProps> = ({ state, onChangeState }) => {
       <div>
         <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1 flex items-center gap-1.5">
           <Ratio className="w-3.5 h-3.5 text-indigo-400" />
-          Canvas Size & Aspect Ratio
+          {t.canvasSizeTitle}
         </h3>
-        <p className="text-xs text-neutral-500">Choose a preset format or enter custom dimensions.</p>
+        <p className="text-xs text-neutral-500">{t.canvasSizeSubtitle}</p>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -58,27 +62,38 @@ export const RatioTab: React.FC<RatioTabProps> = ({ state, onChangeState }) => {
 
       {state.aspectRatio === 'custom' && (
         <div className="p-4 bg-neutral-950 rounded-2xl border border-neutral-800 space-y-3">
-          <div className="text-xs font-semibold text-white flex items-center gap-1.5">
-            <Sliders className="w-3.5 h-3.5 text-indigo-400" />
-            Custom dimensions
-          </div>
+          <div className="text-xs font-bold text-white">{t.customDimensions}</div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] text-neutral-400 block mb-1">Width (px)</label>
+              <label className="text-[10px] uppercase font-bold text-neutral-400 block mb-1">
+                {t.widthLabel}
+              </label>
               <input
                 type="number"
                 value={state.customWidth || 1200}
-                onChange={e => onChangeState(prev => ({ ...prev, customWidth: Math.max(200, Number(e.target.value)) }))}
-                className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500"
+                onChange={e =>
+                  onChangeState(prev => ({
+                    ...prev,
+                    customWidth: Math.max(200, Math.min(4000, Number(e.target.value))),
+                  }))
+                }
+                className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-1.5 text-xs text-white"
               />
             </div>
             <div>
-              <label className="text-[10px] text-neutral-400 block mb-1">Height (px)</label>
+              <label className="text-[10px] uppercase font-bold text-neutral-400 block mb-1">
+                {t.heightLabel}
+              </label>
               <input
                 type="number"
                 value={state.customHeight || 800}
-                onChange={e => onChangeState(prev => ({ ...prev, customHeight: Math.max(200, Number(e.target.value)) }))}
-                className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500"
+                onChange={e =>
+                  onChangeState(prev => ({
+                    ...prev,
+                    customHeight: Math.max(200, Math.min(4000, Number(e.target.value))),
+                  }))
+                }
+                className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-1.5 text-xs text-white"
               />
             </div>
           </div>

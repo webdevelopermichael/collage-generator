@@ -100,12 +100,72 @@ export interface Translations {
   tabAi: string;
   tabBadges: string;
   
-  // Cell Action Toolbar
+  // Layout Tab
+  gridLayoutTemplates: string;
+  gridLayoutSubtitle: string;
+  photoWord: string;
+  photosWord: string;
+  optionsCount: string;
+
+  // Style Tab
+  canvasBackground: string;
+  outerPadding: string;
+  cellSpacingGap: string;
+  cellRounding: string;
+  borderStroke: string;
+  dropShadow: string;
+  shadowNone: string;
+  shadowSubtle: string;
+  shadowMedium: string;
+  shadowDeep: string;
+  shadowGlow: string;
+
+  // Photos Tab
+  photosHeader: string;
+  photosSubtitle: string;
+  uploadBatchPhotos: string;
+  uploadBatchDesc: string;
+  stockPhotosTitle: string;
+  stockPhotosSubtitle: string;
+  clickToInsert: string;
+
+  // AI Composer Tab
+  aiStudioTitle: string;
+  aiStudioSubtitle: string;
+  promptPlaceholder: string;
+  generateCollageBtn: string;
+  categoryAll: string;
+  categorySocial: string;
+  categorySaas: string;
+  categoryArt: string;
+  autoSynthesize: string;
+
+  // Badges Tab
+  badgesHeader: string;
+  badgesSubtitle: string;
+  addCustomBadge: string;
+  badgeTitleLabel: string;
+  badgeValueLabel: string;
+  badgeColorLabel: string;
+  addBadgeBtn: string;
+  templateBadgesTitle: string;
+  dragBadgeHint: string;
+  
+  // Canvas Size / Ratio Tab
+  canvasSizeTitle: string;
+  canvasSizeSubtitle: string;
+  customDimensions: string;
+  widthLabel: string;
+  heightLabel: string;
+  applyDimensions: string;
+
+  // Cell Action Toolbar & Stage
   replacePhoto: string;
   zoomIn: string;
   zoomOut: string;
   removePhoto: string;
   addPhoto: string;
+  gestureHint: string;
 
   // Export Modal
   exportTitle: string;
@@ -210,11 +270,65 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     tabAi: 'AI',
     tabBadges: 'Badges',
 
+    gridLayoutTemplates: 'Grid Layout Templates',
+    gridLayoutSubtitle: 'Choose a balanced template based on how many photos or screenshots you want to showcase.',
+    photoWord: 'Photo',
+    photosWord: 'Photos',
+    optionsCount: 'options',
+
+    canvasBackground: 'Canvas Background',
+    outerPadding: 'Outer Padding',
+    cellSpacingGap: 'Cell Spacing (Gap)',
+    cellRounding: 'Corner Rounding',
+    borderStroke: 'Cell Border',
+    dropShadow: 'Drop Shadow',
+    shadowNone: 'None',
+    shadowSubtle: 'Subtle',
+    shadowMedium: 'Medium',
+    shadowDeep: 'Deep',
+    shadowGlow: 'Glow',
+
+    photosHeader: 'Photo Manager',
+    photosSubtitle: 'Upload photos into your collage or pick aesthetic stock images.',
+    uploadBatchPhotos: 'Upload Multiple Photos',
+    uploadBatchDesc: 'Drop or select JPG, PNG, WebP files',
+    stockPhotosTitle: 'Aesthetic Stock Photos',
+    stockPhotosSubtitle: 'Click any photo to insert into an empty slot',
+    clickToInsert: 'Click to insert',
+
+    aiStudioTitle: 'AI Composer & Magic Templates',
+    aiStudioSubtitle: 'Describe the scene or choose one of our handcrafted viral layouts.',
+    promptPlaceholder: 'E.g., "3 SaaS screenshots with MRR badge and dark gradient"',
+    generateCollageBtn: 'Generate with AI',
+    categoryAll: 'All Templates',
+    categorySocial: 'Social',
+    categorySaas: 'SaaS & Apps',
+    categoryArt: 'Aesthetic',
+    autoSynthesize: 'Auto-compose',
+
+    badgesHeader: 'Metric Badges & Social Proof',
+    badgesSubtitle: 'Attach floating MRR stats, rating stars, and status tags to your collage.',
+    addCustomBadge: 'Create Custom Badge',
+    badgeTitleLabel: 'Badge Title',
+    badgeValueLabel: 'Metric Value (optional)',
+    badgeColorLabel: 'Accent Color',
+    addBadgeBtn: 'Add Badge to Canvas',
+    templateBadgesTitle: 'Quick Preset Badges',
+    dragBadgeHint: 'Drag badges on the canvas to reposition or scale them.',
+
+    canvasSizeTitle: 'Canvas Size & Aspect Ratio',
+    canvasSizeSubtitle: 'Choose a preset format or enter custom dimensions.',
+    customDimensions: 'Custom Dimensions',
+    widthLabel: 'Width (px)',
+    heightLabel: 'Height (px)',
+    applyDimensions: 'Apply Size',
+
     replacePhoto: 'Replace',
     zoomIn: 'Zoom In',
     zoomOut: 'Zoom Out',
     removePhoto: 'Delete',
     addPhoto: 'Add Photo',
+    gestureHint: 'Scroll / pinch to zoom · Drag background to pan',
 
     exportTitle: 'Export Ultra-HD Collage',
     exportSubtitle: 'Select resolution and file format. Hardware-accelerated canvas rasterizer preserves crisp subpixels.',
@@ -316,11 +430,65 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     tabAi: 'AI',
     tabBadges: 'Бейджи',
 
+    gridLayoutTemplates: 'Шаблоны сеток',
+    gridLayoutSubtitle: 'Выберите подходящую сетку в зависимости от количества фотографий или скриншотов.',
+    photoWord: 'Фото',
+    photosWord: 'Фото',
+    optionsCount: 'варианта',
+
+    canvasBackground: 'Фон холста',
+    outerPadding: 'Внешние отступы',
+    cellSpacingGap: 'Расстояние между фото (Gap)',
+    cellRounding: 'Скругление углов',
+    borderStroke: 'Обводка ячеек',
+    dropShadow: 'Тень ячеек',
+    shadowNone: 'Без тени',
+    shadowSubtle: 'Легкая',
+    shadowMedium: 'Средняя',
+    shadowDeep: 'Глубокая',
+    shadowGlow: 'Неоновое свечение',
+
+    photosHeader: 'Менеджер фото',
+    photosSubtitle: 'Загрузите свои фото в коллаж или выберите из готовой эстетичной коллекции.',
+    uploadBatchPhotos: 'Загрузить несколько фото',
+    uploadBatchDesc: 'Перетащите или выберите файлы JPG, PNG, WebP',
+    stockPhotosTitle: 'Коллекция фото',
+    stockPhotosSubtitle: 'Нажмите на фото, чтобы вставить его в пустой слот',
+    clickToInsert: 'Нажмите для вставки',
+
+    aiStudioTitle: 'AI Генератор и Шаблоны',
+    aiStudioSubtitle: 'Опишите желаемую композицию текстом или примените вирусный шаблон.',
+    promptPlaceholder: 'Например: "3 скриншота приложения с бейджем MRR и темным градиентом"',
+    generateCollageBtn: 'Сгенерировать с AI',
+    categoryAll: 'Все шаблоны',
+    categorySocial: 'Соцсети',
+    categorySaas: 'SaaS и Приложения',
+    categoryArt: 'Эстетика',
+    autoSynthesize: 'Автокомпозиция',
+
+    badgesHeader: 'Бейджи метрик и Соцдоказательства',
+    badgesSubtitle: 'Добавляйте на холст стикеры показателей выручки, звездные рейтинги и плашки статусов.',
+    addCustomBadge: 'Создать свой бейдж',
+    badgeTitleLabel: 'Заголовок бейджа',
+    badgeValueLabel: 'Значение метрики (опционально)',
+    badgeColorLabel: 'Цвет акцента',
+    addBadgeBtn: 'Добавить бейдж на холст',
+    templateBadgesTitle: 'Быстрые готовые бейджи',
+    dragBadgeHint: 'Перетаскивайте бейджи прямо по холсту для изменения позиции и размера.',
+
+    canvasSizeTitle: 'Размер холста и пропорции',
+    canvasSizeSubtitle: 'Выберите готовый формат для соцсетей или задайте произвольные пиксели.',
+    customDimensions: 'Произвольный размер',
+    widthLabel: 'Ширина (px)',
+    heightLabel: 'Высота (px)',
+    applyDimensions: 'Применить размер',
+
     replacePhoto: 'Заменить',
     zoomIn: 'Приблизить',
     zoomOut: 'Отдалить',
     removePhoto: 'Удалить',
     addPhoto: 'Добавить фото',
+    gestureHint: 'Скролл / щипок для зума · Перетащите фон для панорамирования',
 
     exportTitle: 'Экспорт в Ultra-HD',
     exportSubtitle: 'Выберите разрешение и формат файла. Аппаратный рендеринг сохраняет четкость каждого пикселя.',
@@ -422,11 +590,65 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     tabAi: 'AI',
     tabBadges: 'Бейджі',
 
+    gridLayoutTemplates: 'Шаблони сіток',
+    gridLayoutSubtitle: 'Оберіть збалансований шаблон відповідно до кількості фото або скріншотів.',
+    photoWord: 'Фото',
+    photosWord: 'Фото',
+    optionsCount: 'варіанти',
+
+    canvasBackground: 'Фон полотна',
+    outerPadding: 'Зовнішні відступи',
+    cellSpacingGap: 'Відстань між фото (Gap)',
+    cellRounding: 'Заокруглення кутів',
+    borderStroke: 'Обводка комірок',
+    dropShadow: 'Тінь комірок',
+    shadowNone: 'Без тіні',
+    shadowSubtle: 'Легка',
+    shadowMedium: 'Середня',
+    shadowDeep: 'Глибока',
+    shadowGlow: 'Неонове сяйво',
+
+    photosHeader: 'Менеджер фото',
+    photosSubtitle: 'Завантажуйте свої фото в колаж або обирайте з готової колекції.',
+    uploadBatchPhotos: 'Завантажити кілька фото',
+    uploadBatchDesc: 'Перетягніть або виберіть файли JPG, PNG, WebP',
+    stockPhotosTitle: 'Колекція фото',
+    stockPhotosSubtitle: 'Натисніть на фото, щоб вставити його в порожній слот',
+    clickToInsert: 'Натисніть для вставки',
+
+    aiStudioTitle: 'AI Генератор та Шаблони',
+    aiStudioSubtitle: 'Опишіть бажану композицію або застосуйте вірусний шаблон.',
+    promptPlaceholder: 'Наприклад: "3 скріншоти додатку з бейджем MRR та темним градієнтом"',
+    generateCollageBtn: 'Згенерувати з AI',
+    categoryAll: 'Усі шаблони',
+    categorySocial: 'Соцмережі',
+    categorySaas: 'SaaS та Додатки',
+    categoryArt: 'Естетика',
+    autoSynthesize: 'Автокомпозиція',
+
+    badgesHeader: 'Бейджі метрик та Соцдоказу',
+    badgesSubtitle: 'Додавайте на полотно стікери показників прибутку, зіркові рейтинги та плашки статусів.',
+    addCustomBadge: 'Створити власний бейдж',
+    badgeTitleLabel: 'Заголовок бейджа',
+    badgeValueLabel: 'Значення метрики (опціонально)',
+    badgeColorLabel: 'Колір акценту',
+    addBadgeBtn: 'Додати бейдж на полотно',
+    templateBadgesTitle: 'Швидкі готові бейджі',
+    dragBadgeHint: 'Перетягуйте бейджі прямо по полотну для зміни позиції та розміру.',
+
+    canvasSizeTitle: 'Розмір полотна та пропорції',
+    canvasSizeSubtitle: 'Оберіть готовий формат для соцмереж або задайте довільні пікселі.',
+    customDimensions: 'Довільний розмір',
+    widthLabel: 'Ширина (px)',
+    heightLabel: 'Висота (px)',
+    applyDimensions: 'Застосувати розмір',
+
     replacePhoto: 'Замінити',
     zoomIn: 'Збільшити',
     zoomOut: 'Зменшити',
     removePhoto: 'Видалити',
     addPhoto: 'Додати фото',
+    gestureHint: 'Скрол / щипок для зуму · Перетягніть фон для панорамування',
 
     exportTitle: 'Експорт у Ultra-HD',
     exportSubtitle: 'Оберіть роздільну здатність та формат файлу. Апаратний рендеринг зберігає чіткість кожного пікселя.',

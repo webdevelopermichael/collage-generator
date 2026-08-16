@@ -117,12 +117,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Desktop Tab Content Area */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 overscroll-contain">
-          {activeTab === 'layouts' && <LayoutTab state={state} onChangeState={onChangeState} />}
-          {activeTab === 'styles' && <StyleTab state={state} onChangeState={onChangeState} />}
-          {activeTab === 'images' && <ImagesTab state={state} onChangeState={onChangeState} onSelectCell={onSelectCell} />}
-          {activeTab === 'ai' && <AiComposerTab state={state} onChangeState={onChangeState} />}
-          {activeTab === 'badges' && <TextBadgesTab state={state} selectedBadgeId={selectedBadgeId} onSelectBadge={onSelectBadge} onChangeState={onChangeState} />}
-          {activeTab === 'ratios' && <RatioTab state={state} onChangeState={onChangeState} />}
+          {activeTab === 'layouts' && <LayoutTab state={state} onChangeState={onChangeState} language={language} />}
+          {activeTab === 'styles' && <StyleTab state={state} onChangeState={onChangeState} language={language} />}
+          {activeTab === 'images' && <ImagesTab state={state} onChangeState={onChangeState} onSelectCell={onSelectCell} language={language} />}
+          {activeTab === 'ai' && <AiComposerTab state={state} onChangeState={onChangeState} language={language} />}
+          {activeTab === 'badges' && <TextBadgesTab state={state} selectedBadgeId={selectedBadgeId} onSelectBadge={onSelectBadge} onChangeState={onChangeState} language={language} />}
+          {activeTab === 'ratios' && <RatioTab state={state} onChangeState={onChangeState} language={language} />}
         </div>
       </aside>
 
@@ -174,12 +174,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Mobile Drawer content */}
         {isOpen && (
           <div className="flex-1 overflow-y-auto p-4 overscroll-contain">
-            {activeTab === 'ratios' && <RatioTab state={state} onChangeState={onChangeState} />}
-            {activeTab === 'layouts' && <LayoutTab state={state} onChangeState={onChangeState} />}
-            {activeTab === 'styles' && <StyleTab state={state} onChangeState={onChangeState} />}
-            {activeTab === 'images' && <ImagesTab state={state} onChangeState={onChangeState} onSelectCell={onSelectCell} />}
-            {activeTab === 'ai' && <AiComposerTab state={state} onChangeState={onChangeState} />}
-            {activeTab === 'badges' && <TextBadgesTab state={state} selectedBadgeId={selectedBadgeId} onSelectBadge={onSelectBadge} onChangeState={onChangeState} />}
+            {activeTab === 'ratios' && <RatioTab state={state} onChangeState={onChangeState} language={language} />}
+            {activeTab === 'layouts' && <LayoutTab state={state} onChangeState={onChangeState} language={language} />}
+            {activeTab === 'styles' && <StyleTab state={state} onChangeState={onChangeState} language={language} />}
+            {activeTab === 'images' && <ImagesTab state={state} onChangeState={onChangeState} onSelectCell={onSelectCell} language={language} />}
+            {activeTab === 'ai' && <AiComposerTab state={state} onChangeState={onChangeState} language={language} />}
+            {activeTab === 'badges' && <TextBadgesTab state={state} selectedBadgeId={selectedBadgeId} onSelectBadge={onSelectBadge} onChangeState={onChangeState} language={language} />}
           </div>
         )}
       </aside>

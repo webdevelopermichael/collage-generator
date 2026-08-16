@@ -12,6 +12,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { CollageState } from '../../types';
+import { Language, TRANSLATIONS } from '../../core/i18n';
 
 interface CanvasStageProps {
   state: CollageState;
@@ -22,6 +23,7 @@ interface CanvasStageProps {
   onChangeState: (updater: (prev: CollageState) => CollageState) => void;
   zoomLevel: number;
   setZoomLevel: React.Dispatch<React.SetStateAction<number>>;
+  language: Language;
 }
 
 export const CanvasStage: React.FC<CanvasStageProps> = ({
@@ -33,11 +35,14 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
   onChangeState,
   zoomLevel,
   setZoomLevel,
+  language,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const activeCellTargetRef = useRef<string | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  const t = TRANSLATIONS[language];
 
   // Pan
   const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
@@ -309,7 +314,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
 
       {/* Gesture hint */}
       <div data-pan-target="1" className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 z-10 text-[10px] text-neutral-600 hidden sm:block">
-        Scroll / pinch to zoom · Drag background to pan
+        {t.gestureHint}
       </div>
 
       {/* Transformed canvas wrapper */}
@@ -321,7 +326,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
         }}
         className="shrink-0 relative flex items-center justify-center"
       >
-        {/* Main Canvas Container (overflow: visible on outer so floating action bars never clip) */}
+        {/* Main Canvas Container */}
         <div
           ref={canvasRef}
           id="collage-main-canvas"
@@ -381,7 +386,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                       <div className="w-8 h-8 rounded-full bg-neutral-800 text-neutral-400 group-hover:text-indigo-400 flex items-center justify-center mb-1 transition-colors">
                         <Upload className="w-4 h-4" />
                       </div>
-                      <span className="text-[10px] font-semibold text-neutral-400 group-hover:text-white">Add Photo</span>
+                      <span className="text-[10px] font-semibold text-neutral-400 group-hover:text-white">{t.addPhoto}</span>
                     </div>
                   )}
                 </div>
@@ -449,19 +454,19 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                   className="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors"
                 >
                   <ImageIcon className="w-3.5 h-3.5" />
-                  Replace
+                  {t.replacePhoto}
                 </button>
                 <button
                   onClick={() => onChangeState(prev => ({ ...prev, cells: prev.cells.map(c => c.id === activeCell.id ? { ...c, zoom: Math.min(3, (c.zoom || 1) + 0.2) } : c) }))}
-                  className="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors" title="Zoom in photo"
+                  className="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors" title={t.zoomIn}
                 ><ZoomIn className="w-4 h-4" /></button>
                 <button
                   onClick={() => onChangeState(prev => ({ ...prev, cells: prev.cells.map(c => c.id === activeCell.id ? { ...c, zoom: Math.max(1, (c.zoom || 1) - 0.2) } : c) }))}
-                  className="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors" title="Zoom out photo"
+                  className="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors" title={t.zoomOut}
                 ><ZoomOut className="w-4 h-4" /></button>
                 <button
                   onClick={() => { onChangeState(prev => ({ ...prev, cells: prev.cells.map(c => c.id === activeCell.id ? { ...c, imageUrl: undefined } : c) })); setActionCellId(null); }}
-                  className="p-1.5 bg-rose-950/80 hover:bg-rose-900 text-rose-300 rounded-xl cursor-pointer transition-colors" title="Remove photo"
+                  className="p-1.5 bg-rose-950/80 hover:bg-rose-900 text-rose-300 rounded-xl cursor-pointer transition-colors" title={t.removePhoto}
                 ><Trash2 className="w-4 h-4" /></button>
                 <button
                   onClick={() => setActionCellId(null)}
@@ -501,7 +506,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                 <button
                   onPointerDown={e => { e.stopPropagation(); e.preventDefault(); onChangeState(prev => ({ ...prev, badges: prev.badges.filter(b => b.id !== selectedBadge.id) })); onSelectBadge(null); }}
                   className="p-1 hover:bg-rose-900/80 text-rose-400 hover:text-rose-200 rounded-lg transition-colors cursor-pointer"
-                  title="Delete badge"
+                  title={t.delete}
                 ><Trash2 className="w-3.5 h-3.5" /></button>
                 <button
                   onPointerDown={e => { e.stopPropagation(); e.preventDefault(); onSelectBadge(null); }}

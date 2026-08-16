@@ -300,6 +300,7 @@ export function App() {
                 onChangeState={handleUpdateCollageState}
                 zoomLevel={zoomLevel}
                 setZoomLevel={setZoomLevel}
+                language={language}
               />
             </div>
           </div>
