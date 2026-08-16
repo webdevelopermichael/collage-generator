@@ -35,7 +35,7 @@ export function App() {
   const [collageState, setCollageState] = useState<CollageState>(loadCurrentProject());
 
   // Editor UI state
-  const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTabId>('layouts');
+  const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTabId>('ratios');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default hidden at bottom
   const [selectedCellId, setSelectedCellId] = useState<string | null>(null);
   const [selectedBadgeId, setSelectedBadgeId] = useState<string | null>(null);
@@ -81,17 +81,28 @@ export function App() {
     }
   };
 
+  // Create new project with empty initial state & save current into list
   const handleNewProject = () => {
     const freshState: CollageState = {
       ...DEFAULT_INITIAL_STATE,
       id: `proj-${Date.now()}`,
-      name: 'New Collage Project',
+      name: `Collage #${Date.now().toString().slice(-4)}`,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      cells: [
+        { id: `c-${Date.now()}-1`, x: 0, y: 0, w: 0.5, h: 0.5, imageUrl: undefined, zoom: 1, offsetX: 0, offsetY: 0, rotate: 0, filter: 'none' },
+        { id: `c-${Date.now()}-2`, x: 0.5, y: 0, w: 0.5, h: 0.5, imageUrl: undefined, zoom: 1, offsetX: 0, offsetY: 0, rotate: 0, filter: 'none' },
+        { id: `c-${Date.now()}-3`, x: 0, y: 0.5, w: 0.5, h: 0.5, imageUrl: undefined, zoom: 1, offsetX: 0, offsetY: 0, rotate: 0, filter: 'none' },
+        { id: `c-${Date.now()}-4`, x: 0.5, y: 0.5, w: 0.5, h: 0.5, imageUrl: undefined, zoom: 1, offsetX: 0, offsetY: 0, rotate: 0, filter: 'none' },
+      ],
+      badges: [],
     };
+    saveCurrentProject(freshState);
     setCollageState(freshState);
     setHistory([freshState]);
     setHistoryIndex(0);
+    setSelectedCellId(null);
+    setSelectedBadgeId(null);
     setCurrentView('editor');
   };
 

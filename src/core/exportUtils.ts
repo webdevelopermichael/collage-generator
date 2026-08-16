@@ -17,7 +17,7 @@ export async function renderCollageToCanvas(
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Could not create 2D rendering context');
 
-  // Calculate resolution
+  // Calculate base resolution
   let baseWidth = 1920;
   let baseHeight = 1080;
 
@@ -73,7 +73,7 @@ export async function renderCollageToCanvas(
   const innerW = targetW - scaledPadding * 2;
   const innerH = targetH - scaledPadding * 2;
 
-  // Pre-load images
+  // Pre-load current user images exactly as set in state
   const loadedImages: Map<string, HTMLImageElement> = new Map();
   await Promise.all(
     state.cells
@@ -87,13 +87,13 @@ export async function renderCollageToCanvas(
               loadedImages.set(c.imageUrl!, img);
               resolve();
             };
-            img.onerror = () => resolve(); // Resolve anyway on failure
+            img.onerror = () => resolve(); // Resolve on failure
             img.src = c.imageUrl!;
           })
       )
   );
 
-  // 2. Draw Cells
+  // 2. Draw Exact Current Cells
   for (const cell of state.cells) {
     const cellX = scaledPadding + cell.x * innerW + (cell.x > 0 ? scaledGap / 2 : 0);
     const cellY = scaledPadding + cell.y * innerH + (cell.y > 0 ? scaledGap / 2 : 0);
@@ -119,13 +119,35 @@ export async function renderCollageToCanvas(
 
     ctx.clip();
 
-    // Draw Image if available
+    // Draw User's Image if present in this slot
     if (cell.imageUrl && loadedImages.has(cell.imageUrl)) {
       const img = loadedImages.get(cell.imageUrl)!;
-      drawImageProp(ctx, img, cellX, cellY, cellW, cellH, cell.offsetX, cell.offsetY, cell.zoom);
+      
+      // Apply filters if set
+      if (cell.filter === 'grayscale') {
+        ctx.filter = 'grayscale(100%)';
+      } else if (cell.filter === 'sepia') {
+        ctx.filter = 'sepia(80%)';
+      } else if (cell.filter === 'vibrant') {
+        ctx.filter = 'saturate(150%) contrast(110%)';
+      }
+
+      drawImageProp(
+        ctx,
+        img,
+        cellX,
+        cellY,
+        cellW,
+        cellH,
+        (cell.offsetX || 0) * scaleFactor,
+        (cell.offsetY || 0) * scaleFactor,
+        cell.zoom || 1,
+        cell.rotate || 0
+      );
+      ctx.filter = 'none';
     } else {
-      // Placeholder cell
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      // Empty slot placeholder
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
       ctx.fillRect(cellX, cellY, cellW, cellH);
     }
 
@@ -143,7 +165,7 @@ export async function renderCollageToCanvas(
     }
   }
 
-  // 3. Draw Metric Badges
+  // 3. Draw User's Metric Badges
   for (const badge of state.badges || []) {
     drawMetricBadge(ctx, badge, targetW, targetH, scaleFactor);
   }
@@ -183,7 +205,8 @@ function drawImageProp(
   h: number,
   offsetX: number = 0,
   offsetY: number = 0,
-  zoom: number = 1
+  zoom: number = 1,
+  rotate: number = 0
 ) {
   const iw = img.naturalWidth || img.width;
   const ih = img.naturalHeight || img.height;
@@ -204,10 +227,19 @@ function drawImageProp(
     nw = nw * cy;
   }
 
-  const posX = x + (w - nw) * 0.5 + (offsetX || 0);
-  const posY = y + (h - nh) * 0.5 + (offsetY || 0);
+  const posX = x + (w - nw) * 0.5 + offsetX;
+  const posY = y + (h - nh) * 0.5 + offsetY;
 
+  ctx.save();
+  if (rotate !== 0) {
+    const centerX = x + w / 2;
+    const centerY = y + h / 2;
+    ctx.translate(centerX, centerY);
+    ctx.rotate((rotate * Math.PI) / 180);
+    ctx.translate(-centerX, -centerY);
+  }
   ctx.drawImage(img, 0, 0, iw, ih, posX, posY, nw, nh);
+  ctx.restore();
 }
 
 function drawMetricBadge(
@@ -308,7 +340,7 @@ export function downloadCanvas(
   const mimeType = format === 'jpeg' ? 'image/jpeg' : format === 'webp' ? 'image/webp' : 'image/png';
   const dataUrl = canvas.toDataURL(mimeType, quality);
   const link = document.createElement('a');
-  link.download = `${filename}.${format}`;
+  link.download = `${filename.replace(/[^a-zA-Z0-9_-]/g, '_') || 'collage'}.${format}`;
   link.href = dataUrl;
   link.click();
 }

@@ -1,14 +1,14 @@
 import { CollageState, UserAccount, ProjectSummary } from '../types';
 
 const STORAGE_KEYS = {
-  CURRENT_PROJECT: 'collagenie_current_project_v1',
-  PROJECT_LIST: 'collagenie_projects_list_v1',
-  AUTH_USER: 'collagenie_auth_user_v1',
+  CURRENT_PROJECT: 'collagenie_current_project_v2',
+  PROJECT_LIST: 'collagenie_projects_list_v2',
+  AUTH_USER: 'collagenie_auth_user_v2',
 };
 
 export const DEFAULT_INITIAL_STATE: CollageState = {
   id: 'project-default',
-  name: 'Untitled Aesthetic Collage',
+  name: 'New Collage',
   createdAt: Date.now(),
   updatedAt: Date.now(),
   aspectRatio: '16:9',
@@ -39,7 +39,7 @@ export const DEFAULT_INITIAL_STATE: CollageState = {
       y: 0,
       w: 0.5,
       h: 0.5,
-      imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+      imageUrl: undefined,
       zoom: 1,
       offsetX: 0,
       offsetY: 0,
@@ -52,7 +52,7 @@ export const DEFAULT_INITIAL_STATE: CollageState = {
       y: 0,
       w: 0.5,
       h: 0.5,
-      imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&auto=format&fit=crop&q=80',
+      imageUrl: undefined,
       zoom: 1,
       offsetX: 0,
       offsetY: 0,
@@ -65,7 +65,7 @@ export const DEFAULT_INITIAL_STATE: CollageState = {
       y: 0.5,
       w: 0.5,
       h: 0.5,
-      imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80',
+      imageUrl: undefined,
       zoom: 1,
       offsetX: 0,
       offsetY: 0,
@@ -78,7 +78,7 @@ export const DEFAULT_INITIAL_STATE: CollageState = {
       y: 0.5,
       w: 0.5,
       h: 0.5,
-      imageUrl: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800&auto=format&fit=crop&q=80',
+      imageUrl: undefined,
       zoom: 1,
       offsetX: 0,
       offsetY: 0,
@@ -86,28 +86,7 @@ export const DEFAULT_INITIAL_STATE: CollageState = {
       filter: 'none',
     },
   ],
-  badges: [
-    {
-      id: 'badge-1',
-      type: 'metric',
-      title: 'Growth Metric',
-      value: '🚀 +185% Engagement',
-      color: 'emerald',
-      x: 8,
-      y: 12,
-      scale: 1,
-    },
-    {
-      id: 'badge-2',
-      type: 'rating',
-      title: 'Aesthetic Score',
-      value: '⭐ 5.0 Perfect Grid',
-      color: 'amber',
-      x: 65,
-      y: 84,
-      scale: 0.95,
-    },
-  ],
+  badges: [],
   textOverlays: [],
 };
 
@@ -121,7 +100,13 @@ export function loadCurrentProject(): CollageState {
   } catch (err) {
     console.error('Failed to load project from localStorage', err);
   }
-  return DEFAULT_INITIAL_STATE;
+  return {
+    ...DEFAULT_INITIAL_STATE,
+    id: `proj-${Date.now()}`,
+    name: 'New Collage Project',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
 }
 
 export function saveCurrentProject(state: CollageState) {
@@ -161,15 +146,7 @@ export function getAllProjects(): ProjectSummary[] {
   } catch (err) {
     console.error('Failed to parse project list', err);
   }
-  return [
-    {
-      id: DEFAULT_INITIAL_STATE.id,
-      name: DEFAULT_INITIAL_STATE.name,
-      updatedAt: DEFAULT_INITIAL_STATE.updatedAt,
-      photoCount: 4,
-      aspectRatio: '16:9',
-    },
-  ];
+  return [];
 }
 
 export function loadProjectById(id: string): CollageState | null {
@@ -209,7 +186,7 @@ export function getStoredUser(): UserAccount {
   return {
     id: 'guest',
     email: '',
-    name: 'Guest Creator',
+    name: 'Creator',
     isLoggedIn: false,
   };
 }

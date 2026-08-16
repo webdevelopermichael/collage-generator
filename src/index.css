@@ -9,17 +9,16 @@
   html, body {
     font-family: var(--font-sans);
     overscroll-behavior: none;
-    overflow: hidden;
     height: 100%;
-    /* Prevent iOS Safari address bar bounce */
-    position: fixed;
     width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #090a0f;
   }
 
   #root {
-    height: 100%;
-    overflow: auto;
-    overscroll-behavior: none;
+    min-height: 100%;
+    width: 100%;
   }
   
   h1, h2, h3, .font-heading {
@@ -43,26 +42,12 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.7);
+  background: rgba(100, 116, 139, 0.7);
 }
 
-/* Canvas checkerboard pattern for transparency */
+/* Checkerboard pattern for transparent canvas areas */
 .canvas-checkerboard {
-  background-image: 
-    linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.05) 75%),
-    linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.05) 75%);
-  background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-}
-
-/* Subtle animation pulses */
-@keyframes soft-float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-6px) rotate(0.5deg); }
-}
-
-.animate-soft-float {
-  animation: soft-float 6s ease-in-out infinite;
+  background-color: #090a0f;
+  background-image: radial-gradient(circle, #1e2238 1px, transparent 1px);
+  background-size: 24px 24px;
 }
