@@ -53,7 +53,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
   return (
     <header className="h-12 sm:h-14 bg-neutral-900/95 backdrop-blur-md border-b border-neutral-800 px-2 sm:px-4 flex items-center justify-between shrink-0 select-none z-30">
-      {/* Left section: Back Button & Project Name */}
+      {/* Left section: Back Button & CollaGenie Logo (Name hidden on mobile) */}
       <div className="flex items-center gap-1.5 sm:gap-2">
         <button
           onClick={onBackToLanding}
@@ -63,8 +63,13 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           <ArrowLeft className="w-4 h-4" />
         </button>
 
-        {/* Project Name Editor */}
-        <div className="flex items-center gap-1.5">
+        {/* Brand Icon Logo (Always visible) */}
+        <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md">
+          <Sparkles className="w-3.5 h-3.5" />
+        </div>
+
+        {/* Project Name Editor (Hidden on small mobile screens to keep header ultra-clean, visible on sm+) */}
+        <div className="hidden sm:flex items-center gap-1.5 ml-1">
           {isEditingTitle ? (
             <input
               type="text"
@@ -73,7 +78,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               onChange={e => setTitle(e.target.value)}
               onBlur={handleTitleSubmit}
               onKeyDown={e => e.key === 'Enter' && handleTitleSubmit()}
-              className="bg-neutral-950 border border-indigo-500 text-xs text-white rounded-lg px-2 py-0.5 focus:outline-none max-w-[120px] sm:max-w-[200px]"
+              className="bg-neutral-950 border border-indigo-500 text-xs text-white rounded-lg px-2 py-0.5 focus:outline-none max-w-[140px] md:max-w-[200px]"
             />
           ) : (
             <button
@@ -81,7 +86,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 setTitle(state.name);
                 setIsEditingTitle(true);
               }}
-              className="text-xs sm:text-sm font-semibold text-neutral-200 hover:text-indigo-400 px-1.5 py-0.5 rounded-md hover:bg-neutral-800 transition-colors max-w-[110px] sm:max-w-[200px] truncate text-left cursor-pointer"
+              className="text-xs font-semibold text-neutral-300 hover:text-indigo-400 px-1.5 py-0.5 rounded-md hover:bg-neutral-800 transition-colors max-w-[130px] md:max-w-[200px] truncate text-left cursor-pointer"
               title="Click to rename project"
             >
               {state.name || 'Collage'}

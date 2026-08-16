@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ProjectSummary, CollageState } from '../../types';
 import { getAllProjects, loadProjectById, deleteProjectById } from '../../core/storage';
 import { FolderOpen, Plus, Trash2, Clock, Check, X, ArrowRight } from 'lucide-react';
@@ -18,7 +18,14 @@ export const ProjectsModal: React.FC<ProjectsModalProps> = ({
   onSelectProject,
   onNewProject,
 }) => {
-  const [projects, setProjects] = useState<ProjectSummary[]>(getAllProjects());
+  const [projects, setProjects] = useState<ProjectSummary[]>([]);
+
+  // Always refresh latest project list every time modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setProjects(getAllProjects());
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
