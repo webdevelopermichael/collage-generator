@@ -240,21 +240,21 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
   const getRatioStyle = (): React.CSSProperties => {
     switch (state.aspectRatio) {
       case '1:1':
-        return { aspectRatio: '1 / 1', width: 'min(82vw, calc(100dvh - 160px), 520px)' };
+        return { aspectRatio: '1 / 1', width: 'min(82vw, calc(100dvh - 180px), 520px)' };
       case '4:5':
-        return { aspectRatio: '4 / 5', width: 'min(76vw, calc(100dvh - 160px), 460px)' };
+        return { aspectRatio: '4 / 5', width: 'min(76vw, calc(100dvh - 180px), 460px)' };
       case '9:16':
-        return { aspectRatio: '9 / 16', width: 'min(60vw, calc(100dvh - 160px), 380px)' };
+        return { aspectRatio: '9 / 16', width: 'min(60vw, calc(100dvh - 180px), 380px)' };
       case '16:9':
-        return { aspectRatio: '16 / 9', width: 'min(88vw, calc(100dvh - 160px), 640px)' };
+        return { aspectRatio: '16 / 9', width: 'min(88vw, calc(100dvh - 180px), 640px)' };
       case '4:3':
-        return { aspectRatio: '4 / 3', width: 'min(84vw, calc(100dvh - 160px), 560px)' };
+        return { aspectRatio: '4 / 3', width: 'min(84vw, calc(100dvh - 180px), 560px)' };
       case '3:2':
-        return { aspectRatio: '3 / 2', width: 'min(86vw, calc(100dvh - 160px), 580px)' };
+        return { aspectRatio: '3 / 2', width: 'min(86vw, calc(100dvh - 180px), 580px)' };
       case 'A4':
-        return { aspectRatio: '1 / 1.414', width: 'min(66vw, calc(100dvh - 160px), 440px)' };
+        return { aspectRatio: '1 / 1.414', width: 'min(66vw, calc(100dvh - 180px), 440px)' };
       default:
-        return { aspectRatio: '16 / 9', width: 'min(86vw, calc(100dvh - 160px), 580px)' };
+        return { aspectRatio: '16 / 9', width: 'min(86vw, calc(100dvh - 180px), 580px)' };
     }
   };
 
@@ -315,7 +315,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
           transformOrigin: 'center center',
           transition: draggingBadgeId ? 'none' : 'transform 0.08s ease-out',
         }}
-        className="shrink-0 relative"
+        className="shrink-0 relative flex items-center justify-center"
       >
         {/* Main Canvas with Box-Sizing */}
         <div
@@ -328,16 +328,15 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
             borderRadius: `${state.canvasRadius}px`,
             boxSizing: 'border-box',
           }}
-          className="relative shadow-2xl overflow-hidden border border-neutral-800/60 transition-all duration-150"
+          className="relative shadow-2xl overflow-hidden border border-neutral-800/60 transition-all duration-150 flex flex-col"
           data-pan-target="1"
           onClick={() => { onSelectCell(null); onSelectBadge(null); setActionCellId(null); }}
         >
-          {/* Inner Cells Grid Layer (Matches Canvas Internal Dimension exactly) */}
-          <div className="w-full h-full relative" data-pan-target="1">
+          {/* Inner Cells Grid Layer (Matches Canvas Internal Dimension exactly with absolute bounds) */}
+          <div className="w-full h-full relative" style={{ width: '100%', height: '100%', minHeight: 0, position: 'relative' }} data-pan-target="1">
             {state.cells.map(cell => {
               const isSelected = selectedCellId === cell.id || actionCellId === cell.id;
               
-              // Exact mathematical distribution matching exportEngine
               const gapPx = state.gap || 0;
 
               return (
@@ -346,8 +345,8 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                   onClick={e => handleCellClick(e, cell.id)}
                   style={{
                     position: 'absolute',
-                    left: `calc(${cell.x * 100}% + ${cell.x > 0 ? (gapPx / 2) : 0}px)`,
-                    top: `calc(${cell.y * 100}% + ${cell.y > 0 ? (gapPx / 2) : 0}px)`,
+                    left: `calc(${cell.x * 100}% + ${cell.x > 0 ? (gapPx * (1 - cell.x)) : 0}px)`,
+                    top: `calc(${cell.y * 100}% + ${cell.y > 0 ? (gapPx * (1 - cell.y)) : 0}px)`,
                     width: `calc(${cell.w * 100}% - ${gapPx > 0 ? gapPx * (1 - cell.w) : 0}px)`,
                     height: `calc(${cell.h * 100}% - ${gapPx > 0 ? gapPx * (1 - cell.h) : 0}px)`,
                     borderRadius: `${state.cellRadius}px`,

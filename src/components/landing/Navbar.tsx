@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles, ArrowRight, UserCircle, LogOut, Menu, X, LogIn } from 'lucide-react';
 import { UserAccount } from '../../types';
 
@@ -17,6 +17,21 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Lock body scroll when mobile hamburger is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
+  }, [mobileMenuOpen]);
+
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-neutral-950/85 border-b border-neutral-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
@@ -29,11 +44,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <span className="font-heading font-bold text-lg sm:text-xl tracking-tight text-white flex items-center gap-1.5">
+            <span className="font-heading font-bold text-lg sm:text-xl tracking-tight text-white">
               CollaGenie
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                AI
-              </span>
             </span>
           </div>
         </div>
@@ -57,8 +69,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right CTA Actions */}
         <div className="flex items-center gap-2.5 sm:gap-3">
+          {/* Desktop Sign In */}
           {user.isLoggedIn ? (
-            <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="hidden md:flex items-center gap-1.5 sm:gap-2">
               <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-neutral-900 border border-neutral-800 rounded-xl text-xs text-neutral-200">
                 {user.avatarUrl ? (
                   <img src={user.avatarUrl} alt={user.name} className="w-4 h-4 rounded-full" />
@@ -80,74 +93,116 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <button
               onClick={onOpenAuth}
-              className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-neutral-200 hover:text-white px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition-all cursor-pointer shadow-sm"
+              className="hidden md:flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-neutral-200 hover:text-white px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition-all cursor-pointer shadow-sm"
             >
               <LogIn className="w-3.5 h-3.5 text-indigo-400" />
               <span>Sign In</span>
             </button>
           )}
 
+          {/* Open Studio Button */}
           <button
             onClick={onOpenEditor}
-            className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] cursor-pointer"
+            className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white text-xs sm:text-sm font-semibold px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] cursor-pointer"
           >
             <span>Open Studio</span>
             <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
 
-          {/* Mobile hamburger */}
+          {/* Mobile hamburger button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-neutral-800 md:hidden transition-colors"
+            className="p-2 text-neutral-400 hover:text-white rounded-xl hover:bg-neutral-800 md:hidden transition-colors cursor-pointer"
+            aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Fullscreen Overlay Mobile Drawer (Overlays without pushing page content) */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-neutral-800/80 bg-neutral-950/95 px-4 py-4 space-y-3 animate-in fade-in">
-          <a
-            href="#features"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-medium text-neutral-300 hover:text-white py-1"
-          >
-            Features
-          </a>
-          <a
-            href="#ai-generator"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-medium text-pink-400 hover:text-pink-300 py-1"
-          >
-            AI Composer & Templates
-          </a>
-          <a
-            href="#live-demo"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-medium text-neutral-300 hover:text-white py-1"
-          >
-            Live Sandbox
-          </a>
-          <a
-            href="#faq"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-medium text-neutral-300 hover:text-white py-1"
-          >
-            FAQ & Guide
-          </a>
-          {!user.isLoggedIn && (
+        <div className="fixed inset-0 top-14 z-50 bg-neutral-950/98 backdrop-blur-2xl px-6 py-8 flex flex-col justify-between animate-in fade-in duration-200 md:hidden">
+          <nav className="space-y-5">
+            <a
+              href="#features"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-lg font-semibold text-neutral-200 hover:text-white py-1"
+            >
+              Features
+            </a>
+            <a
+              href="#ai-generator"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-lg font-semibold text-pink-400 hover:text-pink-300 py-1"
+            >
+              AI Composer & Templates
+            </a>
+            <a
+              href="#live-demo"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-lg font-semibold text-neutral-200 hover:text-white py-1"
+            >
+              Live Sandbox
+            </a>
+            <a
+              href="#faq"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-lg font-semibold text-neutral-200 hover:text-white py-1"
+            >
+              FAQ & Guide
+            </a>
+          </nav>
+
+          <div className="pt-6 border-t border-neutral-800/80 space-y-3">
+            {user.isLoggedIn ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-neutral-900 border border-neutral-800">
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt={user.name} className="w-8 h-8 rounded-full" />
+                  ) : (
+                    <UserCircle className="w-8 h-8 text-indigo-400" />
+                  )}
+                  <div>
+                    <div className="text-sm font-bold text-white">{user.name}</div>
+                    <div className="text-xs text-neutral-400 truncate max-w-[200px]">{user.email}</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onLogout();
+                  }}
+                  className="w-full py-3 px-4 bg-rose-950/40 border border-rose-900/50 text-rose-300 rounded-xl text-sm font-semibold flex items-center justify-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenAuth();
+                }}
+                className="w-full py-3.5 px-4 bg-neutral-900 border border-neutral-800 text-indigo-400 font-semibold rounded-2xl text-sm flex items-center justify-center gap-2"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Sign In / Register</span>
+              </button>
+            )}
+
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                onOpenAuth();
+                onOpenEditor();
               }}
-              className="w-full text-left text-sm font-semibold text-indigo-400 py-1.5 flex items-center gap-2"
+              className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-500 to-pink-500 text-white font-bold rounded-2xl text-sm flex items-center justify-center gap-2 shadow-lg"
             >
-              <LogIn className="w-4 h-4" />
-              <span>Sign In / Register</span>
+              <span>Launch Studio</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
-          )}
+          </div>
         </div>
       )}
     </header>

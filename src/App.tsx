@@ -30,13 +30,18 @@ import { ProjectsModal } from './components/editor/ProjectsModal';
 import { AuthModal } from './components/auth/AuthModal';
 
 export function App() {
-  const [currentView, setCurrentView] = useState<'landing' | 'editor'>('landing');
+  // Check URL pathname for /editor routing support
+  const getInitialView = (): 'landing' | 'editor' => {
+    return window.location.pathname.startsWith('/editor') ? 'editor' : 'landing';
+  };
+
+  const [currentView, setCurrentView] = useState<'landing' | 'editor'>(getInitialView);
   const [user, setUser] = useState<UserAccount>(getStoredUser());
   const [collageState, setCollageState] = useState<CollageState>(loadCurrentProject());
 
   // Editor UI state
   const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTabId>('ratios');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default hidden at bottom
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedCellId, setSelectedCellId] = useState<string | null>(null);
   const [selectedBadgeId, setSelectedBadgeId] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -50,12 +55,30 @@ export function App() {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
 
+  // Synchronize browser URL bar (/editor vs /)
+  const navigateTo = (view: 'landing' | 'editor') => {
+    setCurrentView(view);
+    const targetPath = view === 'editor' ? '/editor' : '/';
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState({}, '', targetPath);
+    }
+  };
+
+  // Listen to popstate (browser Back / Forward buttons)
+  useEffect(() => {
+    const onPopState = () => {
+      setCurrentView(window.location.pathname.startsWith('/editor') ? 'editor' : 'landing');
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
   // Autosave whenever collageState changes
   useEffect(() => {
     saveCurrentProject(collageState);
   }, [collageState]);
 
-  // State update wrapper with history tracking
+  // State update wrapper with history tracking & autosave
   const handleUpdateCollageState = (updater: (prev: CollageState) => CollageState) => {
     setCollageState(prev => {
       const nextState = updater(prev);
@@ -103,7 +126,7 @@ export function App() {
     setHistoryIndex(0);
     setSelectedCellId(null);
     setSelectedBadgeId(null);
-    setCurrentView('editor');
+    navigateTo('editor');
   };
 
   const handleOpenAiWithPreset = (templateId: string) => {
@@ -115,7 +138,7 @@ export function App() {
     }));
     setActiveSidebarTab('ai');
     setIsSidebarOpen(true);
-    setCurrentView('editor');
+    navigateTo('editor');
   };
 
   const handleOpenPresetFromLanding = (presetId: string) => {
@@ -138,7 +161,7 @@ export function App() {
     }
     setActiveSidebarTab('layouts');
     setIsSidebarOpen(true);
-    setCurrentView('editor');
+    navigateTo('editor');
   };
 
   const handleAuthSuccess = (authUser: UserAccount) => {
@@ -151,7 +174,7 @@ export function App() {
     setUser({
       id: 'guest',
       email: '',
-      name: 'Guest Creator',
+      name: 'Creator',
       isLoggedIn: false,
     });
   };
@@ -161,7 +184,7 @@ export function App() {
       {currentView === 'landing' ? (
         <>
           <Navbar
-            onOpenEditor={() => setCurrentView('editor')}
+            onOpenEditor={() => navigateTo('editor')}
             onOpenAuth={() => setIsAuthOpen(true)}
             user={user}
             onLogout={handleLogout}
@@ -169,11 +192,11 @@ export function App() {
 
           <main className="flex-1 overflow-x-hidden">
             <Hero
-              onOpenEditor={() => setCurrentView('editor')}
+              onOpenEditor={() => navigateTo('editor')}
               onOpenAiTab={() => {
                 setActiveSidebarTab('ai');
                 setIsSidebarOpen(true);
-                setCurrentView('editor');
+                navigateTo('editor');
               }}
             />
             <LiveDemo onOpenEditorWithPreset={handleOpenPresetFromLanding} />
@@ -183,7 +206,7 @@ export function App() {
             <Faq />
           </main>
 
-          <Footer onOpenEditor={() => setCurrentView('editor')} />
+          <Footer onOpenEditor={() => navigateTo('editor')} />
         </>
       ) : (
         <div
@@ -193,11 +216,12 @@ export function App() {
           <EditorHeader
             state={collageState}
             onChangeState={handleUpdateCollageState}
-            onBackToLanding={() => setCurrentView('landing')}
+            onBackToLanding={() => navigateTo('landing')}
             onOpenExport={() => setIsExportOpen(true)}
             onOpenProjects={() => setIsProjectsOpen(true)}
             onOpenAuth={() => setIsAuthOpen(true)}
             user={user}
+            onLogout={handleLogout}
             canUndo={historyIndex > 0}
             canRedo={historyIndex < history.length - 1}
             onUndo={handleUndo}
@@ -250,6 +274,7 @@ export function App() {
       <ProjectsModal
         isOpen={isProjectsOpen}
         onClose={() => setIsProjectsOpen(false)}
+        currentProjectId={collageState.id}
         onSelectProject={proj => {
           setCollageState(proj);
           setHistory([proj]);
