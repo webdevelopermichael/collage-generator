@@ -53,7 +53,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
   const [draggingBadgeId, setDraggingBadgeId] = useState<string | null>(null);
   const badgeDragRef = useRef<{ mouseX: number; mouseY: number; badgeX: number; badgeY: number } | null>(null);
 
-  // Active cell action popup - separate from selection
+  // Active cell action popup
   const [actionCellId, setActionCellId] = useState<string | null>(null);
 
   // ── Mouse wheel zoom ───────────────────────────────────────────────────────
@@ -169,7 +169,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
     return () => { window.removeEventListener('mousemove', onMouseMove); window.removeEventListener('mouseup', onMouseUp); };
   }, [draggingBadgeId, onChangeState]);
 
-  // Touch badge drag
+  // ── Touch badge drag ───────────────────────────────────────────────────────
   useEffect(() => {
     if (!draggingBadgeId) return;
     const onTouchMove = (e: TouchEvent) => {
@@ -237,16 +237,24 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
     setActionCellId(null);
   };
 
-  const getRatioClass = () => {
+  const getRatioStyle = (): React.CSSProperties => {
     switch (state.aspectRatio) {
-      case '1:1': return 'aspect-square w-[300px] sm:w-[440px] md:w-[520px]';
-      case '4:5': return 'aspect-[4/5] w-[280px] sm:w-[400px] md:w-[460px]';
-      case '9:16': return 'aspect-[9/16] w-[240px] sm:w-[320px] md:w-[360px]';
-      case '16:9': return 'aspect-[16/9] w-[320px] sm:w-[520px] md:w-[660px]';
-      case '4:3': return 'aspect-[4/3] w-[300px] sm:w-[460px] md:w-[560px]';
-      case '3:2': return 'aspect-[3/2] w-[300px] sm:w-[480px] md:w-[600px]';
-      case 'A4': return 'aspect-[1/1.414] w-[260px] sm:w-[380px] md:w-[440px]';
-      default: return 'aspect-[4/3] w-[300px] sm:w-[460px] md:w-[540px]';
+      case '1:1':
+        return { aspectRatio: '1 / 1', width: 'min(78vw, 68vh, 520px)' };
+      case '4:5':
+        return { aspectRatio: '4 / 5', width: 'min(72vw, 68vh, 460px)' };
+      case '9:16':
+        return { aspectRatio: '9 / 16', width: 'min(58vw, 68vh, 380px)' };
+      case '16:9':
+        return { aspectRatio: '16 / 9', width: 'min(86vw, 64vh, 640px)' };
+      case '4:3':
+        return { aspectRatio: '4 / 3', width: 'min(82vw, 68vh, 560px)' };
+      case '3:2':
+        return { aspectRatio: '3 / 2', width: 'min(84vw, 66vh, 580px)' };
+      case 'A4':
+        return { aspectRatio: '1 / 1.414', width: 'min(64vw, 68vh, 440px)' };
+      default:
+        return { aspectRatio: '16 / 9', width: 'min(84vw, 65vh, 580px)' };
     }
   };
 
@@ -274,12 +282,13 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
       ref={stageRef}
       onMouseDown={handleMouseDown}
       data-pan-target="1"
-      className="flex-1 w-full h-full flex items-center justify-center overflow-hidden relative select-none"
+      className="w-full h-full flex items-center justify-center overflow-hidden relative select-none"
       style={{
         backgroundImage: 'radial-gradient(circle, #1e2030 1px, transparent 1px)',
         backgroundSize: '28px 28px',
         backgroundColor: '#0f1117',
         cursor: 'grab',
+        touchAction: 'none',
       }}
     >
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
@@ -287,7 +296,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
       {/* Reset button */}
       <button
         onClick={() => { setZoomLevel(1); setPanPosition({ x: 0, y: 0 }); panRef.current = { x: 0, y: 0 }; }}
-        className="absolute top-3 right-3 z-30 flex items-center gap-1.5 px-2.5 py-1.5 bg-neutral-900/85 backdrop-blur-md border border-neutral-800 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors shadow text-[11px] font-mono"
+        className="absolute top-3 right-3 z-30 flex items-center gap-1.5 px-2.5 py-1.5 bg-neutral-900/85 backdrop-blur-md border border-neutral-800 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors shadow text-[11px] font-mono cursor-pointer"
         title="Reset view"
       >
         <RotateCcw className="w-3.5 h-3.5" />
@@ -312,8 +321,13 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
         <div
           ref={canvasRef}
           id="collage-main-canvas"
-          style={{ ...getBgStyle(), padding: `${state.padding}px`, borderRadius: `${state.canvasRadius}px` }}
-          className={`${getRatioClass()} relative shadow-2xl overflow-hidden border border-neutral-800/60`}
+          style={{
+            ...getBgStyle(),
+            ...getRatioStyle(),
+            padding: `${state.padding}px`,
+            borderRadius: `${state.canvasRadius}px`,
+          }}
+          className="relative shadow-2xl overflow-hidden border border-neutral-800/60 transition-all duration-150"
           data-pan-target="1"
           onClick={() => { onSelectCell(null); onSelectBadge(null); setActionCellId(null); }}
         >
@@ -321,20 +335,27 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
           <div className="w-full h-full relative" data-pan-target="1">
             {state.cells.map(cell => {
               const isSelected = selectedCellId === cell.id || actionCellId === cell.id;
+              
+              // Correct CSS Grid / absolute cell dimensions accounting for gap
+              const gapX = state.gap > 0 ? `${state.gap}px` : '0px';
+              const gapY = state.gap > 0 ? `${state.gap}px` : '0px';
+
               return (
                 <div
                   key={cell.id}
                   onClick={e => handleCellClick(e, cell.id)}
                   style={{
-                    left: `calc(${cell.x * 100}% + ${cell.x > 0 ? state.gap / 2 : 0}px)`,
-                    top: `calc(${cell.y * 100}% + ${cell.y > 0 ? state.gap / 2 : 0}px)`,
-                    width: `calc(${cell.w * 100}% - ${state.gap > 0 ? state.gap * (1 - cell.w) : 0}px)`,
-                    height: `calc(${cell.h * 100}% - ${state.gap > 0 ? state.gap * (1 - cell.h) : 0}px)`,
+                    position: 'absolute',
+                    left: `calc(${cell.x * 100}% + ${cell.x > 0 ? `(${gapX} / 2)` : '0px'})`,
+                    top: `calc(${cell.y * 100}% + ${cell.y > 0 ? `(${gapY} / 2)` : '0px'})`,
+                    width: `calc(${cell.w * 100}% - ${cell.w < 1 ? `(${gapX} / 2)` : '0px'})`,
+                    height: `calc(${cell.h * 100}% - ${cell.h < 1 ? `(${gapY} / 2)` : '0px'})`,
                     borderRadius: `${state.cellRadius}px`,
                     borderWidth: `${state.cellBorderWidth}px`,
                     borderColor: state.cellBorderColor,
+                    boxSizing: 'border-box',
                   }}
-                  className={`absolute overflow-hidden group cursor-pointer transition-all ${getShadowClass()} ${isSelected ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-neutral-900 z-20' : 'hover:ring-1 hover:ring-white/30'}`}
+                  className={`overflow-hidden group cursor-pointer transition-all ${getShadowClass()} ${isSelected ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-neutral-900 z-20' : 'hover:ring-1 hover:ring-white/30'}`}
                 >
                   {cell.imageUrl ? (
                     <div className="w-full h-full relative overflow-hidden bg-neutral-900">
@@ -346,7 +367,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                           transform: `scale(${cell.zoom || 1}) translate(${cell.offsetX || 0}px, ${cell.offsetY || 0}px) rotate(${cell.rotate || 0}deg)`,
                           filter: cell.filter === 'grayscale' ? 'grayscale(100%)' : cell.filter === 'sepia' ? 'sepia(80%)' : cell.filter === 'vibrant' ? 'saturate(150%) contrast(110%)' : 'none',
                         }}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover pointer-events-none"
                       />
                     </div>
                   ) : (
@@ -366,19 +387,16 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
             })}
           </div>
 
-          {/* ─ Floating Cell Action Toolbar ─
-              Rendered OUTSIDE overflow:hidden cells, positioned on the canvas root.
-              Calculates position from selected cell's x/y/w/h percentages. */}
+          {/* ─ Floating Cell Action Toolbar ─ */}
           {actionCellId && (() => {
             const cell = state.cells.find(c => c.id === actionCellId);
             if (!cell) return null;
-            // Toolbar appears at top-center of the selected cell
             const leftPct = (cell.x + cell.w / 2) * 100;
             const topPct = cell.y * 100;
             return (
               <div
                 className="absolute z-50 pointer-events-auto"
-                style={{ left: `${leftPct}%`, top: `${topPct}%`, transform: 'translate(-50%, -110%)' }}
+                style={{ left: `${leftPct}%`, top: `${topPct}%`, transform: 'translate(-50%, -115%)' }}
                 onClick={e => e.stopPropagation()}
               >
                 <div className="flex items-center gap-1 bg-neutral-950/95 backdrop-blur-md p-1.5 rounded-2xl border border-neutral-700 shadow-2xl">
@@ -406,7 +424,6 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                     className="p-1.5 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors"
                   ><X className="w-3.5 h-3.5" /></button>
                 </div>
-                {/* Arrow pointer */}
                 <div className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-neutral-700" />
               </div>
             );
@@ -440,7 +457,6 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                 style={{ left: `${badge.x}%`, top: `${badge.y}%`, transform: `scale(${badge.scale || 1})`, transformOrigin: 'top left' }}
                 className={`absolute z-30 cursor-grab active:cursor-grabbing select-none ${isDragging ? 'opacity-90 z-50' : ''}`}
               >
-                {/* Badge chip */}
                 <div className={`bg-neutral-950/90 backdrop-blur-md px-2.5 py-1.5 rounded-xl shadow-2xl border transition-all ${
                   badge.color === 'emerald' ? 'border-emerald-500/60' : badge.color === 'rose' ? 'border-rose-500/60' : badge.color === 'amber' ? 'border-amber-500/60' : 'border-indigo-500/60'
                 } ${isSel ? 'ring-2 ring-pink-400 ring-offset-1 ring-offset-neutral-950' : ''}`}>
@@ -453,7 +469,6 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                   </div>
                 </div>
 
-                {/* Badge edit controls — visible when selected (works on touch too) */}
                 {isSel && (
                   <div
                     className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-0.5 bg-neutral-900/95 border border-neutral-700 rounded-xl p-1 shadow-2xl backdrop-blur-md pointer-events-auto"
