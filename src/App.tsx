@@ -30,9 +30,27 @@ import { ExportModal } from './components/editor/ExportModal';
 import { ProjectsModal } from './components/editor/ProjectsModal';
 import { AuthModal } from './components/auth/AuthModal';
 
-// Helpers to parse route and language from URL path
-// Supported paths: /, /ru, /ua, /editor, /ru/editor, /ua/editor
-function parseRouteAndLang(pathname: string): { view: 'landing' | 'editor'; lang: Language } {
+// Dedicated Content Pages
+import { AboutPage } from './components/pages/AboutPage';
+import { PlatformHubPage } from './components/pages/PlatformHubPage';
+import { GuidesPage } from './components/pages/GuidesPage';
+import { LegalPages } from './components/pages/LegalPages';
+
+export type AppView =
+  | 'landing'
+  | 'editor'
+  | 'about'
+  | 'guides'
+  | 'platform-instagram'
+  | 'platform-tiktok'
+  | 'platform-saas-mockup'
+  | 'platform-pinterest'
+  | 'privacy'
+  | 'terms'
+  | 'dmca'
+  | 'contact';
+
+function parseRouteAndLang(pathname: string): { view: AppView; lang: Language; guideSlug?: string } {
   let lang: Language = 'en';
   const clean = pathname.toLowerCase();
 
@@ -42,14 +60,41 @@ function parseRouteAndLang(pathname: string): { view: 'landing' | 'editor'; lang
     lang = 'ua';
   }
 
-  const isEditor = clean.includes('/editor');
-  return { view: isEditor ? 'editor' : 'landing', lang };
+  if (clean.includes('/editor')) return { view: 'editor', lang };
+  if (clean.includes('/about')) return { view: 'about', lang };
+  if (clean.includes('/privacy')) return { view: 'privacy', lang };
+  if (clean.includes('/terms')) return { view: 'terms', lang };
+  if (clean.includes('/dmca')) return { view: 'dmca', lang };
+  if (clean.includes('/contact')) return { view: 'contact', lang };
+  if (clean.includes('/platforms/instagram') || clean.includes('platform-instagram')) return { view: 'platform-instagram', lang };
+  if (clean.includes('/platforms/tiktok') || clean.includes('platform-tiktok')) return { view: 'platform-tiktok', lang };
+  if (clean.includes('/platforms/saas') || clean.includes('platform-saas-mockup')) return { view: 'platform-saas-mockup', lang };
+  if (clean.includes('/platforms/pinterest') || clean.includes('platform-pinterest')) return { view: 'platform-pinterest', lang };
+  
+  if (clean.includes('/guides') || clean.includes('/blog')) {
+    const parts = pathname.split('/').filter(Boolean);
+    const lastPart = parts[parts.length - 1];
+    const guideSlug = (lastPart !== 'guides' && lastPart !== 'blog' && lastPart !== 'ru' && lastPart !== 'ua') ? lastPart : undefined;
+    return { view: 'guides', lang, guideSlug };
+  }
+
+  return { view: 'landing', lang };
 }
 
-function constructPath(view: 'landing' | 'editor', lang: Language): string {
+function constructPath(view: AppView, lang: Language, guideSlug?: string): string {
   const langPrefix = lang === 'en' ? '' : `/${lang}`;
-  if (view === 'editor') {
-    return `${langPrefix}/editor`;
+  if (view === 'editor') return `${langPrefix}/editor`;
+  if (view === 'about') return `${langPrefix}/about`;
+  if (view === 'privacy') return `${langPrefix}/privacy-policy`;
+  if (view === 'terms') return `${langPrefix}/terms-of-service`;
+  if (view === 'dmca') return `${langPrefix}/dmca`;
+  if (view === 'contact') return `${langPrefix}/contact`;
+  if (view === 'platform-instagram') return `${langPrefix}/platforms/instagram-collages`;
+  if (view === 'platform-tiktok') return `${langPrefix}/platforms/tiktok-mosaic`;
+  if (view === 'platform-saas-mockup') return `${langPrefix}/platforms/saas-mockups`;
+  if (view === 'platform-pinterest') return `${langPrefix}/platforms/pinterest-grids`;
+  if (view === 'guides') {
+    return guideSlug ? `${langPrefix}/guides/${guideSlug}` : `${langPrefix}/guides`;
   }
   return langPrefix || '/';
 }
@@ -57,7 +102,9 @@ function constructPath(view: 'landing' | 'editor', lang: Language): string {
 export function App() {
   const initial = parseRouteAndLang(window.location.pathname);
 
-  const [currentView, setCurrentView] = useState<'landing' | 'editor'>(initial.view);
+  const [currentView, setCurrentView] = useState<AppView>(initial.view);
+  const [activeGuideSlug, setActiveGuideSlug] = useState<string | undefined>(initial.guideSlug);
+
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem('collagenie_lang') as Language;
     if (saved && (saved === 'en' || saved === 'ru' || saved === 'ua')) {
@@ -69,7 +116,6 @@ export function App() {
   const [user, setUser] = useState<UserAccount>(getStoredUser());
   const [collageState, setCollageState] = useState<CollageState>(() => {
     const loaded = loadCurrentProject();
-    // Check if user has a preferred saved ratio or dimensions
     const savedRatio = localStorage.getItem('collagenie_preferred_ratio') as CollageState['aspectRatio'];
     const savedW = localStorage.getItem('collagenie_custom_w');
     const savedH = localStorage.getItem('collagenie_custom_h');
@@ -100,9 +146,12 @@ export function App() {
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
 
   // Navigation with URL updates
-  const navigateTo = (view: 'landing' | 'editor', nextLang: Language = language) => {
+  const navigateTo = (view: AppView, nextLang: Language = language, guideSlug?: string) => {
     setCurrentView(view);
-    const targetPath = constructPath(view, nextLang);
+    setActiveGuideSlug(guideSlug);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const targetPath = constructPath(view, nextLang, guideSlug);
     if (window.location.pathname !== targetPath) {
       window.history.pushState({}, '', targetPath);
     }
@@ -111,7 +160,7 @@ export function App() {
   const handleSelectLanguage = (newLang: Language) => {
     setLanguage(newLang);
     localStorage.setItem('collagenie_lang', newLang);
-    const targetPath = constructPath(currentView, newLang);
+    const targetPath = constructPath(currentView, newLang, activeGuideSlug);
     if (window.location.pathname !== targetPath) {
       window.history.pushState({}, '', targetPath);
     }
@@ -122,6 +171,7 @@ export function App() {
     const onPopState = () => {
       const parsed = parseRouteAndLang(window.location.pathname);
       setCurrentView(parsed.view);
+      setActiveGuideSlug(parsed.guideSlug);
       setLanguage(parsed.lang);
     };
     window.addEventListener('popstate', onPopState);
@@ -139,6 +189,7 @@ export function App() {
       const nextState = updater(prev);
       const newHistory = history.slice(0, historyIndex + 1);
       newHistory.push(nextState);
+      if (newHistory.length > 30) newHistory.shift();
       setHistory(newHistory);
       setHistoryIndex(newHistory.length - 1);
       return nextState;
@@ -147,84 +198,18 @@ export function App() {
 
   const handleUndo = () => {
     if (historyIndex > 0) {
-      setHistoryIndex(historyIndex - 1);
-      setCollageState(history[historyIndex - 1]);
+      const prevIdx = historyIndex - 1;
+      setHistoryIndex(prevIdx);
+      setCollageState(history[prevIdx]);
     }
   };
 
   const handleRedo = () => {
     if (historyIndex < history.length - 1) {
-      setHistoryIndex(historyIndex + 1);
-      setCollageState(history[historyIndex + 1]);
+      const nextIdx = historyIndex + 1;
+      setHistoryIndex(nextIdx);
+      setCollageState(history[nextIdx]);
     }
-  };
-
-  // Create new project - preserves preferred ratio and dimensions
-  const handleNewProject = () => {
-    const savedRatio = (localStorage.getItem('collagenie_preferred_ratio') as CollageState['aspectRatio']) || '16:9';
-    const savedW = localStorage.getItem('collagenie_custom_w');
-    const savedH = localStorage.getItem('collagenie_custom_h');
-
-    const freshState: CollageState = {
-      ...DEFAULT_INITIAL_STATE,
-      id: `proj-${Date.now()}`,
-      name: `Collage #${Date.now().toString().slice(-4)}`,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      aspectRatio: savedRatio,
-      customWidth: savedW ? parseInt(savedW, 10) : 1920,
-      customHeight: savedH ? parseInt(savedH, 10) : 1080,
-      canvasRadius: 24,
-      cells: [
-        { id: `c-${Date.now()}-1`, x: 0, y: 0, w: 0.5, h: 0.5, imageUrl: undefined, zoom: 1, offsetX: 0, offsetY: 0, rotate: 0, filter: 'none' },
-        { id: `c-${Date.now()}-2`, x: 0.5, y: 0, w: 0.5, h: 0.5, imageUrl: undefined, zoom: 1, offsetX: 0, offsetY: 0, rotate: 0, filter: 'none' },
-        { id: `c-${Date.now()}-3`, x: 0, y: 0.5, w: 0.5, h: 0.5, imageUrl: undefined, zoom: 1, offsetX: 0, offsetY: 0, rotate: 0, filter: 'none' },
-        { id: `c-${Date.now()}-4`, x: 0.5, y: 0.5, w: 0.5, h: 0.5, imageUrl: undefined, zoom: 1, offsetX: 0, offsetY: 0, rotate: 0, filter: 'none' },
-      ],
-      badges: [],
-    };
-    saveCurrentProject(freshState);
-    setCollageState(freshState);
-    setHistory([freshState]);
-    setHistoryIndex(0);
-    setSelectedCellId(null);
-    setSelectedBadgeId(null);
-    navigateTo('editor');
-  };
-
-  const handleOpenAiWithPreset = (templateId: string) => {
-    const existingImages = collageState.cells.map(c => c.imageUrl).filter(Boolean) as string[];
-    const synthesized = applyPopularTemplate(templateId, existingImages);
-    handleUpdateCollageState(prev => ({
-      ...prev,
-      ...synthesized,
-    }));
-    setActiveSidebarTab('ai');
-    setIsSidebarOpen(true);
-    navigateTo('editor');
-  };
-
-  const handleOpenPresetFromLanding = (presetId: string) => {
-    const preset = LAYOUT_PRESETS.find(p => p.id === presetId);
-    if (preset) {
-      handleUpdateCollageState(prev => ({
-        ...prev,
-        layoutTemplateId: preset.id,
-        cells: preset.cells.map((cg, i) => ({
-          id: `cell-${Date.now()}-${i}`,
-          ...cg,
-          imageUrl: prev.cells[i]?.imageUrl,
-          zoom: 1,
-          offsetX: 0,
-          offsetY: 0,
-          rotate: 0,
-          filter: 'none',
-        })),
-      }));
-    }
-    setActiveSidebarTab('layouts');
-    setIsSidebarOpen(true);
-    navigateTo('editor');
   };
 
   const handleAuthSuccess = (authUser: UserAccount) => {
@@ -234,17 +219,41 @@ export function App() {
 
   const handleLogout = () => {
     clearStoredUser();
-    setUser({
-      id: 'guest',
-      email: '',
-      name: 'Creator',
-      isLoggedIn: false,
-    });
+    setUser({ id: 'guest', email: '', name: 'Guest Creator', isLoggedIn: false });
+  };
+
+  const handleNewProject = () => {
+    const newProj: CollageState = {
+      ...DEFAULT_INITIAL_STATE,
+      id: `proj_${Date.now()}`,
+      name: 'Untitled Collage',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      cells: LAYOUT_PRESETS[0].cells.map((c, i) => ({
+        id: `c_${i + 1}`,
+        x: c.x,
+        y: c.y,
+        w: c.w,
+        h: c.h,
+        zoom: 1,
+        offsetX: 0,
+        offsetY: 0,
+        rotate: 0,
+        fitMode: 'contain',
+      })),
+      badges: [],
+      textOverlays: [],
+    };
+    setCollageState(newProj);
+    setHistory([newProj]);
+    setHistoryIndex(0);
+    setIsProjectsOpen(false);
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col selection:bg-indigo-500 selection:text-white">
-      {currentView === 'landing' ? (
+    <div className="min-h-screen bg-neutral-950 text-neutral-100 font-sans flex flex-col selection:bg-indigo-500 selection:text-white">
+      {/* ── LANDING VIEW ──────────────────────────────────────────────────────── */}
+      {currentView === 'landing' && (
         <>
           <Navbar
             onOpenEditor={() => navigateTo('editor')}
@@ -254,31 +263,175 @@ export function App() {
             language={language}
             onSelectLanguage={handleSelectLanguage}
           />
-
-          <main className="flex-1 overflow-x-hidden">
+          <main className="flex-grow">
             <Hero
               onOpenEditor={() => navigateTo('editor')}
               onOpenAiTab={() => {
                 setActiveSidebarTab('ai');
-                setIsSidebarOpen(true);
                 navigateTo('editor');
               }}
               language={language}
             />
-            <LiveDemo onOpenEditorWithPreset={handleOpenPresetFromLanding} language={language} />
+            <LiveDemo
+              onOpenEditorWithPreset={presetId => {
+                const preset = LAYOUT_PRESETS.find(p => p.id === presetId) || LAYOUT_PRESETS[0];
+                handleUpdateCollageState(prev => ({
+                  ...prev,
+                  layoutTemplateId: preset.id,
+                  cells: preset.cells.map((c, i) => ({
+                    id: `c_${i + 1}`,
+                    x: c.x,
+                    y: c.y,
+                    w: c.w,
+                    h: c.h,
+                    zoom: 1,
+                    offsetX: 0,
+                    offsetY: 0,
+                    rotate: 0,
+                    fitMode: 'contain',
+                    imageUrl: prev.cells[i]?.imageUrl,
+                  })),
+                }));
+                navigateTo('editor');
+              }}
+              language={language}
+            />
             <Features language={language} />
-            <AiSection onSelectAiPreset={handleOpenAiWithPreset} language={language} />
+            <AiSection
+              onSelectAiPreset={templateId => {
+                const templated = applyPopularTemplate(templateId, []);
+                handleUpdateCollageState(prev => ({
+                  ...prev,
+                  ...templated,
+                }));
+                navigateTo('editor');
+              }}
+              language={language}
+            />
             <SeoContent language={language} />
             <Faq language={language} />
           </main>
-
-          <Footer onOpenEditor={() => navigateTo('editor')} language={language} />
+          <Footer
+            onOpenEditor={() => navigateTo('editor')}
+            onNavigatePage={(page: string) => navigateTo(page as AppView)}
+            language={language}
+          />
         </>
-      ) : (
-        <div
-          className="flex flex-col bg-neutral-950"
-          style={{ height: '100dvh', overflow: 'hidden', position: 'fixed', inset: 0 }}
-        >
+      )}
+
+      {/* ── ABOUT PAGE ───────────────────────────────────────────────────────── */}
+      {currentView === 'about' && (
+        <>
+          <Navbar
+            onOpenEditor={() => navigateTo('editor')}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            user={user}
+            onLogout={handleLogout}
+            language={language}
+            onSelectLanguage={handleSelectLanguage}
+          />
+          <AboutPage
+            onOpenEditor={() => navigateTo('editor')}
+            onNavigateHome={() => navigateTo('landing')}
+            language={language}
+          />
+          <Footer
+            onOpenEditor={() => navigateTo('editor')}
+            onNavigatePage={(page: string) => navigateTo(page as AppView)}
+            language={language}
+          />
+        </>
+      )}
+
+      {/* ── PLATFORM HUBS ────────────────────────────────────────────────────── */}
+      {(currentView === 'platform-instagram' ||
+        currentView === 'platform-tiktok' ||
+        currentView === 'platform-saas-mockup' ||
+        currentView === 'platform-pinterest') && (
+        <>
+          <Navbar
+            onOpenEditor={() => navigateTo('editor')}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            user={user}
+            onLogout={handleLogout}
+            language={language}
+            onSelectLanguage={handleSelectLanguage}
+          />
+          <PlatformHubPage
+            platformId={
+              currentView === 'platform-instagram'
+                ? 'instagram'
+                : currentView === 'platform-tiktok'
+                ? 'tiktok'
+                : currentView === 'platform-saas-mockup'
+                ? 'saas-mockup'
+                : 'pinterest'
+            }
+            onOpenEditor={() => navigateTo('editor')}
+            onNavigateHome={() => navigateTo('landing')}
+            language={language}
+          />
+          <Footer
+            onOpenEditor={() => navigateTo('editor')}
+            onNavigatePage={(page: string) => navigateTo(page as AppView)}
+            language={language}
+          />
+        </>
+      )}
+
+      {/* ── GUIDES & BLOG ────────────────────────────────────────────────────── */}
+      {currentView === 'guides' && (
+        <>
+          <Navbar
+            onOpenEditor={() => navigateTo('editor')}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            user={user}
+            onLogout={handleLogout}
+            language={language}
+            onSelectLanguage={handleSelectLanguage}
+          />
+          <GuidesPage
+            selectedSlug={activeGuideSlug}
+            onOpenArticle={(slug: string) => navigateTo('guides', language, slug)}
+            onOpenEditor={() => navigateTo('editor')}
+            onNavigateHome={() => navigateTo('landing')}
+            language={language}
+          />
+          <Footer
+            onOpenEditor={() => navigateTo('editor')}
+            onNavigatePage={(page: string) => navigateTo(page as AppView)}
+            language={language}
+          />
+        </>
+      )}
+
+      {/* ── LEGAL & TRUST PAGES (Privacy, Terms, DMCA, Contact) ──────────────── */}
+      {(currentView === 'privacy' || currentView === 'terms' || currentView === 'dmca' || currentView === 'contact') && (
+        <>
+          <Navbar
+            onOpenEditor={() => navigateTo('editor')}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            user={user}
+            onLogout={handleLogout}
+            language={language}
+            onSelectLanguage={handleSelectLanguage}
+          />
+          <LegalPages
+            view={currentView}
+            onNavigateHome={() => navigateTo('landing')}
+            language={language}
+          />
+          <Footer
+            onOpenEditor={() => navigateTo('editor')}
+            onNavigatePage={(page: string) => navigateTo(page as AppView)}
+            language={language}
+          />
+        </>
+      )}
+
+      {/* ── STUDIO EDITOR VIEW ────────────────────────────────────────────────── */}
+      {currentView === 'editor' && (
+        <div className="flex-1 flex flex-col h-screen overflow-hidden">
           <EditorHeader
             state={collageState}
             onChangeState={handleUpdateCollageState}
@@ -296,7 +449,6 @@ export function App() {
             onSelectLanguage={handleSelectLanguage}
           />
 
-          {/* Main Workspace: Desktop Left Sidebar + Canvas, Mobile Canvas + Bottom Dock */}
           <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
             <Sidebar
               state={collageState}
