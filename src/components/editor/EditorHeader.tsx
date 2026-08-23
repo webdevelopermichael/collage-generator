@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import {
+  Sparkles,
   ArrowLeft,
-  Download,
-  FolderOpen,
-  UserCircle,
   Undo2,
   Redo2,
-  MoreVertical,
+  FolderOpen,
   LogIn,
   LogOut,
-  Sparkles,
+  UserCircle,
+  Download,
   Ratio,
-  Check,
   Globe,
+  Check,
+  MoreVertical,
 } from 'lucide-react';
 import { CollageState, UserAccount } from '../../types';
 import { ASPECT_RATIOS } from '../../core/layoutEngine';
@@ -70,6 +70,13 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
     onChangeState(prev => ({ ...prev, name: title || 'Untitled Collage' }));
   };
 
+  const getDisplayRatio = () => {
+    if (state.aspectRatio === 'custom') {
+      return `${state.customWidth || 1200}×${state.customHeight || 800}`;
+    }
+    return state.aspectRatio;
+  };
+
   return (
     <header className="h-12 sm:h-14 bg-neutral-900/95 backdrop-blur-md border-b border-neutral-800 px-2 sm:px-4 flex items-center justify-between shrink-0 select-none z-30">
       {/* Left section: Back Button, Logo & Project Name */}
@@ -92,7 +99,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           CollaGenie
         </span>
 
-        {/* Project Name Editor (Hidden on small mobile screens to keep header clean, visible on sm+) */}
+        {/* Project Name Editor */}
         <div className="hidden sm:flex items-center gap-1.5 ml-1 border-l border-neutral-800 pl-2 sm:pl-3">
           {isEditingTitle ? (
             <input
@@ -141,14 +148,14 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           </button>
         </div>
 
-        {/* Aspect Ratio Selector Dropdown (Shown on Desktop md+) */}
+        {/* Aspect Ratio Selector Dropdown */}
         <div className="relative hidden md:block">
           <button
             onClick={() => setShowRatiosDropdown(!showRatiosDropdown)}
             className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 rounded-xl text-[11px] sm:text-xs font-medium text-neutral-300 transition-colors cursor-pointer"
           >
             <Ratio className="w-3.5 h-3.5 text-indigo-400" />
-            <span>{state.aspectRatio}</span>
+            <span>{getDisplayRatio()}</span>
           </button>
 
           {showRatiosDropdown && (
@@ -160,6 +167,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 <button
                   key={ratio.id}
                   onClick={() => {
+                    localStorage.setItem('collagenie_preferred_ratio', ratio.id);
                     onChangeState(prev => ({ ...prev, aspectRatio: ratio.id }));
                     setShowRatiosDropdown(false);
                   }}

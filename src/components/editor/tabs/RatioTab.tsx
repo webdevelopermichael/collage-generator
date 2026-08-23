@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CollageState } from '../../../types';
 import { ASPECT_RATIOS } from '../../../core/layoutEngine';
 import { Ratio, Check, Smartphone, Monitor, Printer, Sliders, Square, Video } from 'lucide-react';
@@ -12,6 +12,18 @@ interface RatioTabProps {
 
 export const RatioTab: React.FC<RatioTabProps> = ({ state, onChangeState, language }) => {
   const t = TRANSLATIONS[language];
+
+  // Local string inputs so the user can freely edit, clear, and type any number without it resetting
+  const [localWidth, setLocalWidth] = useState<string>(() => (state.customWidth || 1200).toString());
+  const [localHeight, setLocalHeight] = useState<string>(() => (state.customHeight || 800).toString());
+
+  useEffect(() => {
+    if (state.customWidth) setLocalWidth(state.customWidth.toString());
+  }, [state.customWidth]);
+
+  useEffect(() => {
+    if (state.customHeight) setLocalHeight(state.customHeight.toString());
+  }, [state.customHeight]);
 
   const getIcon = (id: string) => {
     if (id === '1:1' || id === '4:5') return Square;
@@ -27,14 +39,20 @@ export const RatioTab: React.FC<RatioTabProps> = ({ state, onChangeState, langua
     onChangeState(prev => ({ ...prev, aspectRatio: ratioId }));
   };
 
-  const handleCustomWidthChange = (val: number) => {
-    localStorage.setItem('collagenie_custom_w', val.toString());
-    onChangeState(prev => ({ ...prev, customWidth: val }));
-  };
+  const handleApplyCustomDimensions = (wStr: string, hStr: string) => {
+    const numW = Math.max(50, Math.min(10000, parseInt(wStr, 10) || 1200));
+    const numH = Math.max(50, Math.min(10000, parseInt(hStr, 10) || 800));
 
-  const handleCustomHeightChange = (val: number) => {
-    localStorage.setItem('collagenie_custom_h', val.toString());
-    onChangeState(prev => ({ ...prev, customHeight: val }));
+    localStorage.setItem('collagenie_preferred_ratio', 'custom');
+    localStorage.setItem('collagenie_custom_w', numW.toString());
+    localStorage.setItem('collagenie_custom_h', numH.toString());
+
+    onChangeState(prev => ({
+      ...prev,
+      aspectRatio: 'custom',
+      customWidth: numW,
+      customHeight: numH,
+    }));
   };
 
   return (
@@ -82,7 +100,9 @@ export const RatioTab: React.FC<RatioTabProps> = ({ state, onChangeState, langua
       </div>
 
       {/* Custom pixel dimensions editor */}
-      <div className="p-4 bg-neutral-950 rounded-2xl border border-neutral-800 space-y-3">
+      <div className={`p-4 bg-neutral-950 rounded-2xl border transition-all space-y-3 ${
+        state.aspectRatio === 'custom' ? 'border-indigo-500/60 ring-1 ring-indigo-500/30' : 'border-neutral-800'
+      }`}>
         <div className="flex items-center justify-between">
           <div className="text-xs font-bold text-white flex items-center gap-1.5">
             <Sliders className="w-3.5 h-3.5 text-indigo-400" />
@@ -101,14 +121,18 @@ export const RatioTab: React.FC<RatioTabProps> = ({ state, onChangeState, langua
               {t.widthLabel}
             </label>
             <input
-              type="number"
-              value={state.customWidth || 1200}
-              onChange={e => handleCustomWidthChange(Math.max(200, Math.min(5000, Number(e.target.value))))}
-              onFocus={() => {
-                if (state.aspectRatio !== 'custom') {
-                  handleSelectRatio('custom');
+              type="text"
+              inputMode="numeric"
+              value={localWidth}
+              onChange={e => {
+                const val = e.target.value;
+                setLocalWidth(val);
+                if (val && !isNaN(Number(val))) {
+                  handleApplyCustomDimensions(val, localHeight);
                 }
               }}
+              onBlur={() => handleApplyCustomDimensions(localWidth, localHeight)}
+              placeholder="1200"
               className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-indigo-500 focus:outline-none"
             />
           </div>
@@ -117,27 +141,30 @@ export const RatioTab: React.FC<RatioTabProps> = ({ state, onChangeState, langua
               {t.heightLabel}
             </label>
             <input
-              type="number"
-              value={state.customHeight || 800}
-              onChange={e => handleCustomHeightChange(Math.max(200, Math.min(5000, Number(e.target.value))))}
-              onFocus={() => {
-                if (state.aspectRatio !== 'custom') {
-                  handleSelectRatio('custom');
+              type="text"
+              inputMode="numeric"
+              value={localHeight}
+              onChange={e => {
+                const val = e.target.value;
+                setLocalHeight(val);
+                if (val && !isNaN(Number(val))) {
+                  handleApplyCustomDimensions(localWidth, val);
                 }
               }}
+              onBlur={() => handleApplyCustomDimensions(localWidth, localHeight)}
+              placeholder="800"
               className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-indigo-500 focus:outline-none"
             />
           </div>
         </div>
 
-        {state.aspectRatio !== 'custom' && (
-          <button
-            onClick={() => handleSelectRatio('custom')}
-            className="w-full py-2 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white rounded-xl text-xs font-semibold border border-neutral-800 transition-colors cursor-pointer"
-          >
-            {t.applyDimensions}
-          </button>
-        )}
+        <button
+          onClick={() => handleApplyCustomDimensions(localWidth, localHeight)}
+          className="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
+        >
+          <Sliders className="w-3.5 h-3.5" />
+          <span>{t.applyDimensions}</span>
+        </button>
       </div>
     </div>
   );
