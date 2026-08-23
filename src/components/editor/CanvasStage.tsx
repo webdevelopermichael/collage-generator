@@ -371,7 +371,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
       const id = activeCellTargetRef.current;
       onChangeState(prev => ({
         ...prev,
-        cells: prev.cells.map(c => (c.id === id ? { ...c, imageUrl: url, offsetX: 0, offsetY: 0, zoom: 1 } : c)),
+        cells: prev.cells.map(c => (c.id === id ? { ...c, imageUrl: url, offsetX: 0, offsetY: 0, zoom: 1, fitMode: 'contain' } : c)),
       }));
     };
     reader.readAsDataURL(file);
@@ -393,7 +393,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
       ...prev,
       cells: prev.cells.map(c =>
         c.id === cellId
-          ? { ...c, fitMode: (c.fitMode || 'cover') === 'cover' ? 'contain' : 'cover', offsetX: 0, offsetY: 0 }
+          ? { ...c, fitMode: (c.fitMode || 'contain') === 'contain' ? 'cover' : 'contain', offsetX: 0, offsetY: 0 }
           : c
       ),
     }));
@@ -478,7 +478,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
       {/* Reset button */}
       <button
         onClick={() => { setZoomLevel(1); setPanPosition({ x: 0, y: 0 }); panRef.current = { x: 0, y: 0 }; }}
-        className="absolute top-3 right-3 z-30 flex items-center gap-1.5 px-2.5 py-1.5 bg-neutral-900/85 backdrop-blur-md border border-neutral-800 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors shadow text-[11px] font-mono cursor-pointer"
+        className="absolute top-3 right-3 z-30 flex items-center gap-1.5 px-2.5 py-1.5 bg-neutral-900/85 backdrop-blur-md border border-neutral-800 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800 transition-all duration-200 shadow text-[11px] font-mono cursor-pointer hover:scale-105 active:scale-95"
         title="Reset view"
       >
         <RotateCcw className="w-3.5 h-3.5" />
@@ -486,7 +486,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
       </button>
 
       {/* Gesture hint */}
-      <div data-pan-target="1" className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 z-10 text-[10px] text-neutral-500 hidden sm:block bg-neutral-950/80 px-3 py-1 rounded-full border border-neutral-800 backdrop-blur-md">
+      <div data-pan-target="1" className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 z-10 text-[10px] text-neutral-500 hidden sm:block bg-neutral-950/80 px-3 py-1 rounded-full border border-neutral-800 backdrop-blur-md transition-opacity duration-300">
         {t.gestureHint}
       </div>
 
@@ -495,7 +495,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
         style={{
           transform: `translate(${panPosition.x}px, ${panPosition.y}px) scale(${zoomLevel})`,
           transformOrigin: 'center center',
-          transition: draggingBadgeId || draggingPhotoCellId ? 'none' : 'transform 0.08s ease-out',
+          transition: draggingBadgeId || draggingPhotoCellId ? 'none' : 'transform 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
         className="shrink-0 relative flex items-center justify-center"
       >
@@ -510,7 +510,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
             borderRadius: `${state.canvasRadius ?? 24}px`,
             boxSizing: 'border-box',
           }}
-          className="relative shadow-2xl border border-neutral-800/60 transition-all duration-150 flex flex-col overflow-hidden"
+          className="relative shadow-2xl border border-neutral-800/60 transition-all duration-250 ease-out flex flex-col overflow-hidden"
           data-pan-target="1"
           onClick={e => {
             if ((e.target as HTMLElement).id === 'collage-main-canvas' || (e.target as HTMLElement).dataset.canvasBackground === '1') {
@@ -530,7 +530,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
             {state.cells.map(cell => {
               const isSelected = selectedCellId === cell.id || actionCellId === cell.id;
               const gapPx = state.gap || 0;
-              const fit = cell.fitMode || 'cover';
+              const fit = cell.fitMode || 'contain';
 
               return (
                 <div
@@ -546,7 +546,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                     borderColor: state.cellBorderColor,
                     boxSizing: 'border-box',
                   }}
-                  className={`overflow-hidden group cursor-pointer transition-all ${getShadowClass()} ${
+                  className={`overflow-hidden group cursor-pointer transition-all duration-200 ease-out ${getShadowClass()} ${
                     isSelected ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-neutral-900 z-20' : 'hover:ring-1 hover:ring-white/30'
                   }`}
                 >
@@ -554,7 +554,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                     <div
                       onMouseDown={e => handlePhotoMouseDown(e, cell.id, cell.offsetX || 0, cell.offsetY || 0)}
                       onTouchStart={e => handlePhotoTouchStart(e, cell.id, cell.offsetX || 0, cell.offsetY || 0)}
-                      className="w-full h-full relative overflow-hidden bg-neutral-950 flex items-center justify-center cursor-move select-none active:cursor-grabbing"
+                      className="w-full h-full relative overflow-hidden bg-neutral-950 flex items-center justify-center cursor-move select-none active:cursor-grabbing p-0 m-0"
                       title="Drag to reposition photo inside slot"
                     >
                       <img
@@ -573,16 +573,16 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                               ? 'saturate(150%) contrast(110%)'
                               : 'none',
                         }}
-                        className={`w-full h-full ${fit === 'contain' ? 'object-contain' : 'object-cover'} pointer-events-none transition-none`}
+                        className={`w-full h-full block ${fit === 'contain' ? 'object-contain' : 'object-cover'} pointer-events-none transition-none`}
                       />
                     </div>
                   ) : (
                     <div
                       onClick={() => handleImageUpload(cell.id)}
                       data-pan-target="0"
-                      className="w-full h-full bg-neutral-900/70 border border-dashed border-neutral-700/80 hover:border-indigo-500 flex flex-col items-center justify-center p-2 text-center transition-colors cursor-pointer"
+                      className="w-full h-full bg-neutral-900/70 border border-dashed border-neutral-700/80 hover:border-indigo-500 flex flex-col items-center justify-center p-2 text-center transition-all duration-200 ease-out cursor-pointer hover:bg-neutral-900/90"
                     >
-                      <div className="w-8 h-8 rounded-full bg-neutral-800 text-neutral-400 group-hover:text-indigo-400 flex items-center justify-center mb-1 transition-colors">
+                      <div className="w-8 h-8 rounded-full bg-neutral-800 text-neutral-400 group-hover:text-indigo-400 flex items-center justify-center mb-1 transition-transform duration-200 group-hover:scale-110">
                         <Upload className="w-4 h-4" />
                       </div>
                       <span className="text-[10px] font-semibold text-neutral-400 group-hover:text-white">
@@ -621,10 +621,10 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                   }
                 }}
                 style={{ left: `${badge.x}%`, top: `${badge.y}%`, transform: `scale(${badge.scale || 1})`, transformOrigin: 'top left' }}
-                className={`absolute z-30 cursor-grab active:cursor-grabbing select-none ${isDragging ? 'opacity-90 z-50' : ''}`}
+                className={`absolute z-30 cursor-grab active:cursor-grabbing select-none transition-transform duration-100 ${isDragging ? 'opacity-90 z-50' : ''}`}
               >
                 <div
-                  className={`bg-neutral-950/90 backdrop-blur-md px-2.5 py-1.5 rounded-xl shadow-2xl border transition-all ${
+                  className={`bg-neutral-950/90 backdrop-blur-md px-2.5 py-1.5 rounded-xl shadow-2xl border transition-all duration-200 ${
                     badge.color === 'emerald'
                       ? 'border-emerald-500/60'
                       : badge.color === 'rose'
@@ -632,7 +632,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                       : badge.color === 'amber'
                       ? 'border-amber-500/60'
                       : 'border-indigo-500/60'
-                  } ${isSel ? 'ring-2 ring-pink-400 ring-offset-1 ring-offset-neutral-950' : ''}`}>
+                  } ${isSel ? 'ring-2 ring-pink-400 ring-offset-1 ring-offset-neutral-950 scale-105' : ''}`}>
                   <div className="flex items-center gap-1.5">
                     <Move className="w-2.5 h-2.5 text-neutral-600" />
                     <div>
@@ -646,49 +646,45 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
           })}
         </div>
 
-        {/* ─ High Z-Index Floating Cell Action Toolbar (Placed Outside Canvas so it's not clipped) ─ */}
+        {/* ─ High Z-Index Floating Cell Action Toolbar (Icon-Only, Compact & Auto-expanding) ─ */}
         {activeCell && (
           <div
-            className="absolute z-50 pointer-events-auto"
+            className="absolute z-50 pointer-events-auto animate-in fade-in zoom-in-95 duration-150"
             style={{
               left: `${(activeCell.x + activeCell.w / 2) * 100}%`,
               top: `${activeCell.y * 100}%`,
-              transform: 'translate(-50%, -130%)',
+              transform: 'translate(-50%, -135%)',
             }}
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-center gap-1 bg-neutral-950/98 backdrop-blur-xl p-1.5 rounded-2xl border border-neutral-700 shadow-2xl">
+            <div className="flex items-center gap-1 bg-neutral-950/95 backdrop-blur-xl p-1.5 rounded-2xl border border-neutral-700/80 shadow-2xl transition-all duration-200">
+              {/* Replace Image Button (Compact Icon) */}
               <button
                 onClick={() => handleImageUpload(activeCell.id)}
-                className="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors"
+                className="p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm"
+                title={t.replacePhoto}
               >
-                <ImageIcon className="w-3.5 h-3.5" />
-                {t.replacePhoto}
+                <ImageIcon className="w-4 h-4" />
               </button>
 
-              {/* Toggle Fit / Fill Mode */}
+              {/* Toggle Fit / Fill Mode (Icon button) */}
               <button
                 onClick={() => handleToggleFitMode(activeCell.id)}
-                className={`flex items-center gap-1 px-2 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors border ${
-                  activeCell.fitMode === 'contain'
-                    ? 'bg-purple-600/30 border-purple-500 text-purple-300'
+                className={`p-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 border ${
+                  activeCell.fitMode === 'cover'
+                    ? 'bg-purple-600/30 border-purple-500 text-purple-300 shadow-sm'
                     : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-300 hover:text-white'
                 }`}
-                title={activeCell.fitMode === 'contain' ? t.fitModeFill : t.fitModeFull}
+                title={activeCell.fitMode === 'cover' ? t.fitModeFull : t.fitModeFill}
               >
-                {activeCell.fitMode === 'contain' ? (
-                  <>
-                    <Maximize2 className="w-3.5 h-3.5 text-purple-400" />
-                    <span>{t.fitModeFill}</span>
-                  </>
+                {activeCell.fitMode === 'cover' ? (
+                  <Minimize2 className="w-4 h-4 text-purple-400" />
                 ) : (
-                  <>
-                    <Minimize2 className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>{t.fitModeFull}</span>
-                  </>
+                  <Maximize2 className="w-4 h-4 text-indigo-400" />
                 )}
               </button>
 
+              {/* Zoom In */}
               <button
                 onClick={() =>
                   onChangeState(prev => ({
@@ -698,12 +694,13 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                     ),
                   }))
                 }
-                className="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors"
+                className="p-2 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
                 title={t.zoomIn}
               >
                 <ZoomIn className="w-4 h-4" />
               </button>
 
+              {/* Zoom Out */}
               <button
                 onClick={() =>
                   onChangeState(prev => ({
@@ -713,40 +710,44 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                     ),
                   }))
                 }
-                className="p-1.5 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors"
+                className="p-2 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
                 title={t.zoomOut}
               >
                 <ZoomOut className="w-4 h-4" />
               </button>
 
+              {/* Reset Center */}
               <button
                 onClick={() => handleCenterPhoto(activeCell.id)}
-                className="flex items-center gap-1 px-2 py-1.5 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors border border-neutral-800"
+                className="p-2 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 border border-neutral-800"
                 title={t.resetCenter}
               >
-                <Crosshair className="w-3.5 h-3.5 text-indigo-400" />
-                <span>{t.centerPhoto}</span>
+                <Crosshair className="w-4 h-4 text-indigo-400" />
               </button>
 
+              <div className="w-px h-4 bg-neutral-800 mx-0.5" />
+
+              {/* Remove Photo */}
               <button
                 onClick={() => {
                   onChangeState(prev => ({
                     ...prev,
-                    cells: prev.cells.map(c => (c.id === activeCell.id ? { ...c, imageUrl: undefined, offsetX: 0, offsetY: 0, fitMode: 'cover' } : c)),
+                    cells: prev.cells.map(c => (c.id === activeCell.id ? { ...c, imageUrl: undefined, offsetX: 0, offsetY: 0, fitMode: 'contain' } : c)),
                   }));
                   setActionCellId(null);
                 }}
-                className="p-1.5 bg-rose-950/80 hover:bg-rose-900 text-rose-300 rounded-xl cursor-pointer transition-colors"
+                className="p-2 bg-rose-950/70 hover:bg-rose-900 text-rose-300 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
                 title={t.removePhoto}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
 
+              {/* Close Toolbar */}
               <button
                 onClick={() => setActionCellId(null)}
-                className="p-1.5 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-colors"
+                className="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
             {/* Tooltip Down Arrow */}
@@ -754,20 +755,20 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
           </div>
         )}
 
-        {/* ─ High Z-Index Floating Badge Edit Toolbar (Placed Outside Canvas so it's not clipped) ─ */}
+        {/* ─ High Z-Index Floating Badge Edit Toolbar ─ */}
         {selectedBadge && (
           <div
-            className="absolute z-50 pointer-events-auto"
+            className="absolute z-50 pointer-events-auto animate-in fade-in zoom-in-95 duration-150"
             style={{
               left: `${selectedBadge.x}%`,
               top: `${selectedBadge.y}%`,
-              transform: 'translate(-10%, -130%)',
+              transform: 'translate(-10%, -135%)',
             }}
             onClick={e => e.stopPropagation()}
             onMouseDown={e => e.stopPropagation()}
             onTouchStart={e => e.stopPropagation()}
           >
-            <div className="flex items-center gap-1 bg-neutral-950/98 backdrop-blur-xl border border-neutral-700 rounded-2xl p-1.5 shadow-2xl">
+            <div className="flex items-center gap-1 bg-neutral-950/95 backdrop-blur-xl border border-neutral-700 rounded-2xl p-1.5 shadow-2xl transition-all duration-200">
               <button
                 onPointerDown={e => {
                   e.stopPropagation();
@@ -779,7 +780,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                     ),
                   }));
                 }}
-                className="p-1 hover:bg-neutral-800 text-neutral-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                className="p-1.5 hover:bg-neutral-800 text-neutral-400 hover:text-white rounded-lg transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95"
                 title="Shrink"
               >
                 <Minus className="w-3.5 h-3.5" />
@@ -795,7 +796,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                     ),
                   }));
                 }}
-                className="p-1 hover:bg-neutral-800 text-neutral-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                className="p-1.5 hover:bg-neutral-800 text-neutral-400 hover:text-white rounded-lg transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95"
                 title="Grow"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -808,7 +809,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                   onChangeState(prev => ({ ...prev, badges: prev.badges.filter(b => b.id !== selectedBadge.id) }));
                   onSelectBadge(null);
                 }}
-                className="p-1 hover:bg-rose-900/80 text-rose-400 hover:text-rose-200 rounded-lg transition-colors cursor-pointer"
+                className="p-1.5 hover:bg-rose-900/80 text-rose-400 hover:text-rose-200 rounded-lg transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95"
                 title={t.delete}
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -819,7 +820,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                   e.preventDefault();
                   onSelectBadge(null);
                 }}
-                className="p-1 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-lg transition-colors cursor-pointer"
+                className="p-1.5 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-lg transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95"
               >
                 <X className="w-3.5 h-3.5" />
               </button>

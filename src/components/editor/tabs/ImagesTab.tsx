@@ -36,12 +36,15 @@ export const ImagesTab: React.FC<ImagesTabProps> = ({ state, onChangeState, onSe
         urls.push(ev.target?.result as string);
         readCount++;
         if (readCount === files.length) {
-          // Assign to empty or existing cells
+          // Assign to empty or existing cells with default contain (no crop)
           onChangeState(prev => ({
             ...prev,
             cells: prev.cells.map((cell, idx) => ({
               ...cell,
               imageUrl: urls[idx] || cell.imageUrl,
+              fitMode: 'contain',
+              offsetX: 0,
+              offsetY: 0,
             })),
           }));
         }
@@ -53,13 +56,12 @@ export const ImagesTab: React.FC<ImagesTabProps> = ({ state, onChangeState, onSe
   };
 
   const handleUseStock = (url: string) => {
-    // Find first empty cell or replace first cell
     onChangeState(prev => {
       const emptyIdx = prev.cells.findIndex(c => !c.imageUrl);
       const targetIdx = emptyIdx >= 0 ? emptyIdx : 0;
       return {
         ...prev,
-        cells: prev.cells.map((c, i) => (i === targetIdx ? { ...c, imageUrl: url } : c)),
+        cells: prev.cells.map((c, i) => (i === targetIdx ? { ...c, imageUrl: url, fitMode: 'contain', offsetX: 0, offsetY: 0 } : c)),
       };
     });
   };
@@ -88,9 +90,9 @@ export const ImagesTab: React.FC<ImagesTabProps> = ({ state, onChangeState, onSe
       {/* Batch Upload Button */}
       <button
         onClick={() => multiFileInputRef.current?.click()}
-        className="w-full p-4 rounded-2xl bg-neutral-900/60 border border-dashed border-neutral-700 hover:border-indigo-500 hover:bg-neutral-900 transition-all flex flex-col items-center justify-center gap-2 text-center group cursor-pointer"
+        className="w-full p-4 rounded-2xl bg-neutral-900/60 border border-dashed border-neutral-700 hover:border-indigo-500 hover:bg-neutral-900 transition-all duration-200 flex flex-col items-center justify-center gap-2 text-center group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
       >
-        <div className="w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-400 group-hover:scale-110 flex items-center justify-center transition-transform">
+        <div className="w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-400 group-hover:scale-110 flex items-center justify-center transition-transform duration-200">
           <Upload className="w-5 h-5" />
         </div>
         <div>
@@ -114,14 +116,14 @@ export const ImagesTab: React.FC<ImagesTabProps> = ({ state, onChangeState, onSe
             <div
               key={cell.id}
               onClick={() => onSelectCell(cell.id)}
-              className="p-2 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-between gap-2 group hover:border-neutral-700 cursor-pointer"
+              className="p-2 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-between gap-2 group hover:border-neutral-700 cursor-pointer transition-all duration-200 hover:bg-neutral-850"
             >
               <div className="flex items-center gap-2 truncate">
                 {cell.imageUrl ? (
                   <img
                     src={cell.imageUrl}
                     alt={`Slot ${idx + 1}`}
-                    className="w-8 h-8 rounded-lg object-cover bg-neutral-950 shrink-0"
+                    className="w-8 h-8 rounded-lg object-contain bg-neutral-950 shrink-0 border border-neutral-800"
                   />
                 ) : (
                   <div className="w-8 h-8 rounded-lg bg-neutral-950 flex items-center justify-center text-neutral-600 shrink-0">
@@ -145,7 +147,7 @@ export const ImagesTab: React.FC<ImagesTabProps> = ({ state, onChangeState, onSe
                     onChangeState(prev => ({
                       ...prev,
                       cells: prev.cells.map(c =>
-                        c.id === cell.id ? { ...c, imageUrl: undefined } : c
+                        c.id === cell.id ? { ...c, imageUrl: undefined, fitMode: 'contain', offsetX: 0, offsetY: 0 } : c
                       ),
                     }));
                   }}
@@ -174,7 +176,7 @@ export const ImagesTab: React.FC<ImagesTabProps> = ({ state, onChangeState, onSe
             <button
               key={sample.name}
               onClick={() => handleUseStock(sample.url)}
-              className="group relative aspect-square rounded-xl overflow-hidden border border-neutral-800 hover:border-indigo-500 transition-all cursor-pointer"
+              className="group relative aspect-square rounded-xl overflow-hidden border border-neutral-800 hover:border-indigo-500 transition-all duration-200 cursor-pointer hover:scale-105"
             >
               <img
                 src={sample.url}
