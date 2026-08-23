@@ -171,6 +171,8 @@ export interface Translations {
   addPhoto: string;
   gestureHint: string;
   centerPhoto: string;
+  fitModeFull: string;
+  fitModeFill: string;
 
   // Export Modal
   exportTitle: string;
@@ -339,6 +341,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     addPhoto: 'Add Photo',
     gestureHint: 'Drag photo to pan inside cell · Scroll / pinch to zoom canvas',
     centerPhoto: 'Center',
+    fitModeFull: 'Show Full (Fit)',
+    fitModeFill: 'Fill Slot (Crop)',
 
     exportTitle: 'Export Ultra-HD Collage',
     exportSubtitle: 'Select resolution and file format. Hardware-accelerated canvas rasterizer preserves crisp subpixels.',
@@ -504,6 +508,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     addPhoto: 'Добавить фото',
     gestureHint: 'Перетаскивайте фото внутри ячейки · Скролл / щипок для зума холста',
     centerPhoto: 'По центру',
+    fitModeFull: 'Вместить полностью (без обрезки)',
+    fitModeFill: 'Заполнить ячейку',
 
     exportTitle: 'Экспорт в Ultra-HD',
     exportSubtitle: 'Выберите разрешение и формат файла. Аппаратный рендеринг сохраняет четкость каждого пикселя.',
@@ -669,6 +675,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     addPhoto: 'Додати фото',
     gestureHint: 'Перетягуйте фото всередині комірки · Скрол / щипок для зуму полотна',
     centerPhoto: 'По центру',
+    fitModeFull: 'Вмістити повністю (без обрізки)',
+    fitModeFill: 'Заповнити комірку',
 
     exportTitle: 'Експорт у Ultra-HD',
     exportSubtitle: 'Оберіть роздільну здатність та формат файлу. Апаратний рендеринг зберігає чіткість кожного пікселя.',

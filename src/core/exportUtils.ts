@@ -1,4 +1,4 @@
-import { CollageState } from '../types';
+import { CollageState, CollageCell } from '../types';
 import { ASPECT_RATIOS } from './layoutEngine';
 
 export interface ExportOptions {
@@ -40,6 +40,13 @@ export async function renderCollageToCanvas(
   canvas.height = targetH;
 
   const scaleFactor = targetW / baseWidth;
+  const canvasRounding = (state.canvasRadius ?? 24) * scaleFactor;
+
+  // Clip whole canvas to canvasRadius to ensure zero outside overflow
+  ctx.save();
+  ctx.beginPath();
+  roundRect(ctx, 0, 0, targetW, targetH, canvasRounding);
+  ctx.clip();
 
   // 1. Draw Canvas Background
   if (state.background.type === 'gradient' && state.background.gradient) {
@@ -73,7 +80,7 @@ export async function renderCollageToCanvas(
   const innerW = targetW - scaledPadding * 2;
   const innerH = targetH - scaledPadding * 2;
 
-  // Pre-load current user images safely (timeout fallback to avoid locking)
+  // Pre-load current user images safely
   const loadedImages: Map<string, HTMLImageElement> = new Map();
   await Promise.all(
     state.cells
@@ -82,11 +89,10 @@ export async function renderCollageToCanvas(
         c =>
           new Promise<void>(resolve => {
             const img = new Image();
-            // Do not force crossOrigin for data URIs or local blobs
             if (c.imageUrl!.startsWith('http')) {
               img.crossOrigin = 'anonymous';
             }
-            const timer = setTimeout(() => resolve(), 3000); // 3s fallback timeout
+            const timer = setTimeout(() => resolve(), 3000);
             img.onload = () => {
               clearTimeout(timer);
               loadedImages.set(c.imageUrl!, img);
@@ -94,7 +100,7 @@ export async function renderCollageToCanvas(
             };
             img.onerror = () => {
               clearTimeout(timer);
-              resolve(); // Continue even if an image fails to load
+              resolve();
             };
             img.src = c.imageUrl!;
           })
@@ -150,7 +156,8 @@ export async function renderCollageToCanvas(
         (cell.offsetX || 0) * scaleFactor,
         (cell.offsetY || 0) * scaleFactor,
         cell.zoom || 1,
-        cell.rotate || 0
+        cell.rotate || 0,
+        cell.fitMode || 'cover'
       );
       ctx.filter = 'none';
     } else {
@@ -183,6 +190,8 @@ export async function renderCollageToCanvas(
     drawTextOverlay(ctx, txt, targetW, targetH, scaleFactor);
   }
 
+  ctx.restore();
+
   return canvas;
 }
 
@@ -214,26 +223,23 @@ function drawImageProp(
   offsetX: number = 0,
   offsetY: number = 0,
   zoom: number = 1,
-  rotate: number = 0
+  rotate: number = 0,
+  fitMode: 'cover' | 'contain' = 'cover'
 ) {
   const iw = img.naturalWidth || img.width;
   const ih = img.naturalHeight || img.height;
-  const r = Math.min(w / iw, h / ih) * (zoom || 1);
-  let nw = iw * r;
-  let nh = ih * r;
-  let cx = 1;
-  let cy = 1;
 
-  if (nw < w) {
-    cx = w / nw;
-    nw = w;
-    nh = nh * cx;
+  let r = 1;
+  if (fitMode === 'contain') {
+    // Show full image without cropping
+    r = Math.min(w / iw, h / ih) * (zoom || 1);
+  } else {
+    // Fill slot (cover)
+    r = Math.max(w / iw, h / ih) * (zoom || 1);
   }
-  if (nh < h) {
-    cy = h / nh;
-    nh = h;
-    nw = nw * cy;
-  }
+
+  const nw = iw * r;
+  const nh = ih * r;
 
   const posX = x + (w - nw) * 0.5 + offsetX;
   const posY = y + (h - nh) * 0.5 + offsetY;
@@ -252,69 +258,57 @@ function drawImageProp(
 
 function drawMetricBadge(
   ctx: CanvasRenderingContext2D,
-  badge: { title: string; value?: string; color?: string; x: number; y: number; scale?: number },
-  canvasW: number,
-  canvasH: number,
+  badge: { type: string; title: string; value?: string; color?: string; x: number; y: number; scale?: number },
+  targetW: number,
+  targetH: number,
   scaleFactor: number
 ) {
-  const bx = (badge.x / 100) * canvasW;
-  const by = (badge.y / 100) * canvasH;
-  const badgeScale = (badge.scale || 1) * scaleFactor;
+  const bx = (badge.x / 100) * targetW;
+  const by = (badge.y / 100) * targetH;
+  const bscale = (badge.scale || 1) * scaleFactor;
 
   ctx.save();
   ctx.translate(bx, by);
-  ctx.scale(badgeScale, badgeScale);
+  ctx.scale(bscale, bscale);
 
-  // Badge background card
-  const padX = 14;
-  const padY = 8;
-  const fontSizeTitle = 11;
-  const fontSizeVal = 14;
+  // Measure text
+  ctx.font = 'bold 10px Inter, sans-serif';
+  const titleW = ctx.measureText(badge.title).width;
+  ctx.font = 'bold 13px Inter, sans-serif';
+  const valW = badge.value ? ctx.measureText(badge.value).width : 0;
+  const maxTextW = Math.max(titleW, valW);
+  const padH = 14;
+  const padV = 8;
+  const boxW = maxTextW + padH * 2 + 16;
+  const boxH = badge.value ? 44 : 26;
 
-  ctx.font = `600 ${fontSizeVal}px 'Space Grotesk', system-ui, sans-serif`;
-  const valWidth = badge.value ? ctx.measureText(badge.value).width : 0;
-  ctx.font = `500 ${fontSizeTitle}px 'Plus Jakarta Sans', system-ui, sans-serif`;
-  const titleWidth = ctx.measureText(badge.title).width;
-
-  const cardW = Math.max(valWidth, titleWidth) + padX * 2 + 16;
-  const cardH = badge.value ? 48 : 32;
-
-  // Shadow
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-  ctx.shadowBlur = 12;
-  ctx.shadowOffsetY = 6;
-
-  // Pill / Card fill
-  ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-  ctx.beginPath();
-  roundRect(ctx, 0, 0, cardW, cardH, 12);
-  ctx.fill();
-
-  // Border highlight
-  ctx.strokeStyle = badge.color === 'emerald'
-    ? 'rgba(16, 185, 129, 0.4)'
-    : badge.color === 'rose'
-    ? 'rgba(244, 63, 94, 0.4)'
-    : badge.color === 'amber'
-    ? 'rgba(245, 158, 11, 0.4)'
-    : 'rgba(99, 102, 241, 0.4)';
+  // Background Box
+  ctx.fillStyle = 'rgba(10, 10, 12, 0.95)';
+  ctx.strokeStyle =
+    badge.color === 'emerald'
+      ? 'rgba(16, 185, 129, 0.8)'
+      : badge.color === 'rose'
+      ? 'rgba(244, 63, 94, 0.8)'
+      : badge.color === 'amber'
+      ? 'rgba(245, 158, 11, 0.8)'
+      : 'rgba(99, 102, 241, 0.8)';
   ctx.lineWidth = 1.5;
+
+  ctx.beginPath();
+  roundRect(ctx, 0, 0, boxW, boxH, 12);
+  ctx.fill();
   ctx.stroke();
 
-  // Draw texts
-  ctx.shadowColor = 'transparent';
-  if (badge.value) {
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = `600 ${fontSizeTitle}px 'Plus Jakarta Sans', sans-serif`;
-    ctx.fillText(badge.title.toUpperCase(), padX, padY + 10);
+  // Title Text
+  ctx.fillStyle = 'rgba(161, 161, 170, 1)';
+  ctx.font = 'bold 9px Inter, sans-serif';
+  ctx.fillText(badge.title.toUpperCase(), 12, badge.value ? 16 : 17);
 
+  // Value Text
+  if (badge.value) {
     ctx.fillStyle = '#ffffff';
-    ctx.font = `700 ${fontSizeVal}px 'Space Grotesk', sans-serif`;
-    ctx.fillText(badge.value, padX, padY + 28);
-  } else {
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `600 13px 'Plus Jakarta Sans', sans-serif`;
-    ctx.fillText(badge.title, padX, 20);
+    ctx.font = 'bold 12px Inter, sans-serif';
+    ctx.fillText(badge.value, 12, 33);
   }
 
   ctx.restore();
@@ -322,92 +316,80 @@ function drawMetricBadge(
 
 function drawTextOverlay(
   ctx: CanvasRenderingContext2D,
-  txt: { text: string; x: number; y: number; fontSize: number; color: string; fontWeight?: string; align?: string },
-  canvasW: number,
-  canvasH: number,
+  txt: { text: string; x: number; y: number; fontSize?: number; fontWeight?: string; color?: string; align?: string },
+  targetW: number,
+  targetH: number,
   scaleFactor: number
 ) {
-  const tx = (txt.x / 100) * canvasW;
-  const ty = (txt.y / 100) * canvasH;
+  const tx = (txt.x / 100) * targetW;
+  const ty = (txt.y / 100) * targetH;
   const size = (txt.fontSize || 24) * scaleFactor;
 
   ctx.save();
-  ctx.font = `${txt.fontWeight || 'bold'} ${size}px 'Space Grotesk', sans-serif`;
+  ctx.font = `${txt.fontWeight || 'bold'} ${size}px Inter, sans-serif`;
   ctx.fillStyle = txt.color || '#ffffff';
   ctx.textAlign = (txt.align as CanvasTextAlign) || 'left';
   ctx.fillText(txt.text, tx, ty);
   ctx.restore();
 }
 
-/**
- * Universal cross-platform downloader supporting Web Share API (Mobile Safari/Chrome)
- * and Blob / dataUrl fallback for desktop.
- */
 export async function downloadCanvas(
   canvas: HTMLCanvasElement,
   filename: string,
-  format: 'png' | 'jpeg' | 'webp' = 'png',
-  quality: number = 0.95
-): Promise<void> {
+  format: 'png' | 'jpeg' | 'webp',
+  quality = 0.95
+) {
   const mimeType = format === 'jpeg' ? 'image/jpeg' : format === 'webp' ? 'image/webp' : 'image/png';
-  const cleanFilename = `${filename.replace(/[^a-zA-Z0-9_-]/g, '_') || 'collage'}.${format}`;
+  const extension = format === 'jpeg' ? 'jpg' : format;
 
-  // 1. Try Mobile Native Web Share API first (Native iOS / Android Photos sheet)
-  if (navigator.share && navigator.canShare && canvas.toBlob) {
-    try {
-      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, mimeType, quality));
-      if (blob) {
-        const file = new File([blob], cleanFilename, { type: mimeType });
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: filename,
-          });
+  return new Promise<void>((resolve, reject) => {
+    canvas.toBlob(
+      async blob => {
+        if (!blob) {
+          reject(new Error('Canvas blob conversion failed'));
           return;
         }
-      }
-    } catch (shareErr) {
-      // If user canceled sheet or share failed, fallback to anchor download
-      console.warn('Native share canceled or failed, using fallback download', shareErr);
-    }
-  }
 
-  // 2. Blob URL download (Best for Mobile Chrome & Desktop)
-  if (canvas.toBlob) {
-    canvas.toBlob(blob => {
-      if (blob) {
+        const safeFilename = `${filename.replace(/[^a-zA-Z0-9_-]/g, '_')}_4k.${extension}`;
+        const file = new File([blob], safeFilename, { type: mimeType });
+
+        // Mobile Web Share API
+        if (
+          navigator.canShare &&
+          navigator.canShare({ files: [file] }) &&
+          /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+        ) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'My Collage',
+            });
+            resolve();
+            return;
+          } catch (shareErr: any) {
+            if (shareErr.name === 'AbortError') {
+              resolve();
+              return;
+            }
+          }
+        }
+
+        // Standard blob download
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = cleanFilename;
-        link.href = url;
-        document.body.appendChild(link);
-        link.click();
-        setTimeout(() => {
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-        }, 1000);
-        return;
-      }
-      fallbackDataUrlDownload(canvas, cleanFilename, mimeType, quality);
-    }, mimeType, quality);
-  } else {
-    fallbackDataUrlDownload(canvas, cleanFilename, mimeType, quality);
-  }
-}
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = safeFilename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
 
-function fallbackDataUrlDownload(
-  canvas: HTMLCanvasElement,
-  filename: string,
-  mimeType: string,
-  quality: number
-) {
-  const dataUrl = canvas.toDataURL(mimeType, quality);
-  const link = document.createElement('a');
-  link.download = filename;
-  link.href = dataUrl;
-  document.body.appendChild(link);
-  link.click();
-  setTimeout(() => {
-    document.body.removeChild(link);
-  }, 1000);
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+          resolve();
+        }, 1500);
+      },
+      mimeType,
+      quality
+    );
+  });
 }

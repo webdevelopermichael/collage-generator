@@ -21,6 +21,7 @@ export interface CollageCell {
   offsetY: number; // -100 to 100
   rotate: number; // -180 to 180
   filter?: 'none' | 'grayscale' | 'sepia' | 'vintage' | 'vibrant' | 'dramatic' | 'soft';
+  fitMode?: 'cover' | 'contain';
 }
 
 export interface MetricBadge {
@@ -59,6 +60,21 @@ export interface BackgroundConfig {
     via?: string;
     direction: 'to-r' | 'to-b' | 'to-br' | 'radial';
   };
+  meshColors?: string[];
+  blurImage?: string;
+}
+
+export interface LayoutPreset {
+  id: string;
+  name: string;
+  photoCount: number;
+  category: 'grid' | 'hero' | 'bento' | 'split' | 'polaroid' | 'masonry';
+  cells: Array<{
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  }>;
 }
 
 export interface CollageState {
@@ -67,43 +83,36 @@ export interface CollageState {
   createdAt: number;
   updatedAt: number;
   aspectRatio: AspectRatioId;
-  customWidth: number;
-  customHeight: number;
+  customWidth?: number;
+  customHeight?: number;
   layoutTemplateId: string;
+  gap: number; // px
+  padding: number; // px
+  cellRadius: number; // px
+  canvasRadius: number; // px
+  cellShadow: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'glow';
+  cellBorderWidth: number; // px
+  cellBorderColor: string;
+  background: BackgroundConfig;
   cells: CollageCell[];
   badges: MetricBadge[];
-  textOverlays: TextOverlay[];
-  background: BackgroundConfig;
-  gap: number; // 0 to 48
-  padding: number; // 0 to 64
-  cellRadius: number; // 0 to 36
-  canvasRadius: number; // 0 to 36
-  cellShadow: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'glow';
-  cellBorderWidth: number; // 0 to 8
-  cellBorderColor: string;
-}
-
-export interface LayoutPreset {
-  id: string;
-  name: string;
-  photoCount: number;
-  category: 'grid' | 'masonry' | 'hero' | 'bento' | 'split' | 'polaroid';
-  cells: Array<{ x: number; y: number; w: number; h: number }>;
+  textOverlays?: TextOverlay[];
 }
 
 export interface UserAccount {
   id: string;
   email: string;
   name: string;
-  isLoggedIn: boolean;
   avatarUrl?: string;
+  isLoggedIn: boolean;
+  projectsCount?: number;
 }
 
 export interface ProjectSummary {
   id: string;
   name: string;
-  thumbnail?: string;
   updatedAt: number;
+  thumbnail?: string;
   photoCount: number;
   aspectRatio: string;
 }

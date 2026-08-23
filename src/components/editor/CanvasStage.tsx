@@ -11,6 +11,8 @@ import {
   Minus,
   RotateCcw,
   Crosshair,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import { CollageState } from '../../types';
 import { Language, TRANSLATIONS } from '../../core/i18n';
@@ -385,6 +387,18 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
     }));
   };
 
+  // Toggle between Fit (contain - no crop) and Fill (cover - fill slot)
+  const handleToggleFitMode = (cellId: string) => {
+    onChangeState(prev => ({
+      ...prev,
+      cells: prev.cells.map(c =>
+        c.id === cellId
+          ? { ...c, fitMode: (c.fitMode || 'cover') === 'cover' ? 'contain' : 'cover', offsetX: 0, offsetY: 0 }
+          : c
+      ),
+    }));
+  };
+
   const getRatioStyle = (): React.CSSProperties => {
     if (state.aspectRatio === 'custom') {
       const w = state.customWidth || 1200;
@@ -516,6 +530,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
             {state.cells.map(cell => {
               const isSelected = selectedCellId === cell.id || actionCellId === cell.id;
               const gapPx = state.gap || 0;
+              const fit = cell.fitMode || 'cover';
 
               return (
                 <div
@@ -539,7 +554,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                     <div
                       onMouseDown={e => handlePhotoMouseDown(e, cell.id, cell.offsetX || 0, cell.offsetY || 0)}
                       onTouchStart={e => handlePhotoTouchStart(e, cell.id, cell.offsetX || 0, cell.offsetY || 0)}
-                      className="w-full h-full relative overflow-hidden bg-neutral-900 cursor-move select-none active:cursor-grabbing"
+                      className="w-full h-full relative overflow-hidden bg-neutral-950 flex items-center justify-center cursor-move select-none active:cursor-grabbing"
                       title="Drag to reposition photo inside slot"
                     >
                       <img
@@ -558,7 +573,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                               ? 'saturate(150%) contrast(110%)'
                               : 'none',
                         }}
-                        className="w-full h-full object-cover pointer-events-none transition-none"
+                        className={`w-full h-full ${fit === 'contain' ? 'object-contain' : 'object-cover'} pointer-events-none transition-none`}
                       />
                     </div>
                   ) : (
@@ -617,8 +632,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                       : badge.color === 'amber'
                       ? 'border-amber-500/60'
                       : 'border-indigo-500/60'
-                  } ${isSel ? 'ring-2 ring-pink-400 ring-offset-1 ring-offset-neutral-950' : ''}`}
-                >
+                  } ${isSel ? 'ring-2 ring-pink-400 ring-offset-1 ring-offset-neutral-950' : ''}`}>
                   <div className="flex items-center gap-1.5">
                     <Move className="w-2.5 h-2.5 text-neutral-600" />
                     <div>
@@ -652,6 +666,29 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                 {t.replacePhoto}
               </button>
 
+              {/* Toggle Fit / Fill Mode */}
+              <button
+                onClick={() => handleToggleFitMode(activeCell.id)}
+                className={`flex items-center gap-1 px-2 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors border ${
+                  activeCell.fitMode === 'contain'
+                    ? 'bg-purple-600/30 border-purple-500 text-purple-300'
+                    : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-300 hover:text-white'
+                }`}
+                title={activeCell.fitMode === 'contain' ? t.fitModeFill : t.fitModeFull}
+              >
+                {activeCell.fitMode === 'contain' ? (
+                  <>
+                    <Maximize2 className="w-3.5 h-3.5 text-purple-400" />
+                    <span>{t.fitModeFill}</span>
+                  </>
+                ) : (
+                  <>
+                    <Minimize2 className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>{t.fitModeFull}</span>
+                  </>
+                )}
+              </button>
+
               <button
                 onClick={() =>
                   onChangeState(prev => ({
@@ -672,7 +709,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                   onChangeState(prev => ({
                     ...prev,
                     cells: prev.cells.map(c =>
-                      c.id === activeCell.id ? { ...c, zoom: Math.max(1, Number(((c.zoom || 1) - 0.2).toFixed(2))) } : c
+                      c.id === activeCell.id ? { ...c, zoom: Math.max(0.5, Number(((c.zoom || 1) - 0.2).toFixed(2))) } : c
                     ),
                   }))
                 }
@@ -695,7 +732,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                 onClick={() => {
                   onChangeState(prev => ({
                     ...prev,
-                    cells: prev.cells.map(c => (c.id === activeCell.id ? { ...c, imageUrl: undefined, offsetX: 0, offsetY: 0 } : c)),
+                    cells: prev.cells.map(c => (c.id === activeCell.id ? { ...c, imageUrl: undefined, offsetX: 0, offsetY: 0, fitMode: 'cover' } : c)),
                   }));
                   setActionCellId(null);
                 }}
