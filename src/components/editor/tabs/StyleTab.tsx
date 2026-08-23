@@ -1,6 +1,6 @@
 import React from 'react';
 import { CollageState, BackgroundConfig } from '../../../types';
-import { Palette, BoxSelect } from 'lucide-react';
+import { Palette, BoxSelect, Square, Sparkles } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../../../core/i18n';
 
 interface StyleTabProps {
@@ -166,9 +166,34 @@ export const StyleTab: React.FC<StyleTabProps> = ({ state, onChangeState, langua
           />
         </div>
 
+        {/* Canvas Edge Rounding Slider */}
         <div>
           <div className="flex justify-between text-xs font-medium text-neutral-300 mb-1.5">
-            <span>{t.cellRounding}</span>
+            <span className="flex items-center gap-1.5">
+              <Square className="w-3.5 h-3.5 text-indigo-400" />
+              {t.canvasRounding}
+            </span>
+            <span className="font-mono text-neutral-400">{state.canvasRadius ?? 24}px</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="64"
+            value={state.canvasRadius ?? 24}
+            onChange={e =>
+              onChangeState(prev => ({ ...prev, canvasRadius: Number(e.target.value) }))
+            }
+            className="w-full accent-indigo-500 cursor-pointer"
+          />
+        </div>
+
+        {/* Photo Corner Rounding Slider */}
+        <div>
+          <div className="flex justify-between text-xs font-medium text-neutral-300 mb-1.5">
+            <span className="flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+              {t.cellRounding}
+            </span>
             <span className="font-mono text-neutral-400">{state.cellRadius}px</span>
           </div>
           <input

@@ -67,7 +67,21 @@ export function App() {
   });
 
   const [user, setUser] = useState<UserAccount>(getStoredUser());
-  const [collageState, setCollageState] = useState<CollageState>(loadCurrentProject());
+  const [collageState, setCollageState] = useState<CollageState>(() => {
+    const loaded = loadCurrentProject();
+    // Check if user has a preferred saved ratio or dimensions
+    const savedRatio = localStorage.getItem('collagenie_preferred_ratio') as CollageState['aspectRatio'];
+    const savedW = localStorage.getItem('collagenie_custom_w');
+    const savedH = localStorage.getItem('collagenie_custom_h');
+
+    return {
+      ...loaded,
+      aspectRatio: savedRatio || loaded.aspectRatio || '16:9',
+      customWidth: savedW ? parseInt(savedW, 10) : (loaded.customWidth || 1920),
+      customHeight: savedH ? parseInt(savedH, 10) : (loaded.customHeight || 1080),
+      canvasRadius: loaded.canvasRadius ?? 24,
+    };
+  });
 
   // Editor UI state
   const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTabId>('layouts');
@@ -145,14 +159,22 @@ export function App() {
     }
   };
 
-  // Create new project
+  // Create new project - preserves preferred ratio and dimensions
   const handleNewProject = () => {
+    const savedRatio = (localStorage.getItem('collagenie_preferred_ratio') as CollageState['aspectRatio']) || '16:9';
+    const savedW = localStorage.getItem('collagenie_custom_w');
+    const savedH = localStorage.getItem('collagenie_custom_h');
+
     const freshState: CollageState = {
       ...DEFAULT_INITIAL_STATE,
       id: `proj-${Date.now()}`,
       name: `Collage #${Date.now().toString().slice(-4)}`,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      aspectRatio: savedRatio,
+      customWidth: savedW ? parseInt(savedW, 10) : 1920,
+      customHeight: savedH ? parseInt(savedH, 10) : 1080,
+      canvasRadius: 24,
       cells: [
         { id: `c-${Date.now()}-1`, x: 0, y: 0, w: 0.5, h: 0.5, imageUrl: undefined, zoom: 1, offsetX: 0, offsetY: 0, rotate: 0, filter: 'none' },
         { id: `c-${Date.now()}-2`, x: 0.5, y: 0, w: 0.5, h: 0.5, imageUrl: undefined, zoom: 1, offsetX: 0, offsetY: 0, rotate: 0, filter: 'none' },
@@ -301,6 +323,10 @@ export function App() {
                 zoomLevel={zoomLevel}
                 setZoomLevel={setZoomLevel}
                 language={language}
+                onCanvasClick={() => {
+                  setActiveSidebarTab('ratios');
+                  setIsSidebarOpen(true);
+                }}
               />
             </div>
           </div>

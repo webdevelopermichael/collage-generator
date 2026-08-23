@@ -112,6 +112,7 @@ export interface Translations {
   outerPadding: string;
   cellSpacingGap: string;
   cellRounding: string;
+  canvasRounding: string;
   borderStroke: string;
   dropShadow: string;
   shadowNone: string;
@@ -158,6 +159,9 @@ export interface Translations {
   widthLabel: string;
   heightLabel: string;
   applyDimensions: string;
+  presetRatios: string;
+  resetCenter: string;
+  dragMoveHint: string;
 
   // Cell Action Toolbar & Stage
   replacePhoto: string;
@@ -166,6 +170,7 @@ export interface Translations {
   removePhoto: string;
   addPhoto: string;
   gestureHint: string;
+  centerPhoto: string;
 
   // Export Modal
   exportTitle: string;
@@ -279,7 +284,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     canvasBackground: 'Canvas Background',
     outerPadding: 'Outer Padding',
     cellSpacingGap: 'Cell Spacing (Gap)',
-    cellRounding: 'Corner Rounding',
+    cellRounding: 'Photo Corner Rounding',
+    canvasRounding: 'Canvas Edge Rounding',
     borderStroke: 'Cell Border',
     dropShadow: 'Drop Shadow',
     shadowNone: 'None',
@@ -316,19 +322,23 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     templateBadgesTitle: 'Quick Preset Badges',
     dragBadgeHint: 'Drag badges on the canvas to reposition or scale them.',
 
-    canvasSizeTitle: 'Canvas Size & Aspect Ratio',
-    canvasSizeSubtitle: 'Choose a preset format or enter custom dimensions.',
-    customDimensions: 'Custom Dimensions',
+    canvasSizeTitle: 'Canvas Dimensions & Ratio',
+    canvasSizeSubtitle: 'Select standard social ratios or specify custom pixel size.',
+    presetRatios: 'Standard Preset Ratios',
+    customDimensions: 'Custom Pixel Dimensions',
     widthLabel: 'Width (px)',
     heightLabel: 'Height (px)',
     applyDimensions: 'Apply Size',
+    resetCenter: 'Center Photo',
+    dragMoveHint: 'Drag photo to reposition inside slot',
 
     replacePhoto: 'Replace',
     zoomIn: 'Zoom In',
     zoomOut: 'Zoom Out',
     removePhoto: 'Delete',
     addPhoto: 'Add Photo',
-    gestureHint: 'Scroll / pinch to zoom · Drag background to pan',
+    gestureHint: 'Drag photo to pan inside cell · Scroll / pinch to zoom canvas',
+    centerPhoto: 'Center',
 
     exportTitle: 'Export Ultra-HD Collage',
     exportSubtitle: 'Select resolution and file format. Hardware-accelerated canvas rasterizer preserves crisp subpixels.',
@@ -439,7 +449,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     canvasBackground: 'Фон холста',
     outerPadding: 'Внешние отступы',
     cellSpacingGap: 'Расстояние между фото (Gap)',
-    cellRounding: 'Скругление углов',
+    cellRounding: 'Скругление фото в ячейках',
+    canvasRounding: 'Скругление краев холста',
     borderStroke: 'Обводка ячеек',
     dropShadow: 'Тень ячеек',
     shadowNone: 'Без тени',
@@ -476,19 +487,23 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     templateBadgesTitle: 'Быстрые готовые бейджи',
     dragBadgeHint: 'Перетаскивайте бейджи прямо по холсту для изменения позиции и размера.',
 
-    canvasSizeTitle: 'Размер холста и пропорции',
-    canvasSizeSubtitle: 'Выберите готовый формат для соцсетей или задайте произвольные пиксели.',
-    customDimensions: 'Произвольный размер',
+    canvasSizeTitle: 'Размеры холста и формат',
+    canvasSizeSubtitle: 'Выберите готовый формат для соцсетей или задайте точные пиксели.',
+    presetRatios: 'Стандартные форматы',
+    customDimensions: 'Точный размер в пикселях',
     widthLabel: 'Ширина (px)',
     heightLabel: 'Высота (px)',
     applyDimensions: 'Применить размер',
+    resetCenter: 'Центрировать фото',
+    dragMoveHint: 'Тяните фото внутри слота для перемещения',
 
     replacePhoto: 'Заменить',
     zoomIn: 'Приблизить',
     zoomOut: 'Отдалить',
     removePhoto: 'Удалить',
     addPhoto: 'Добавить фото',
-    gestureHint: 'Скролл / щипок для зума · Перетащите фон для панорамирования',
+    gestureHint: 'Перетаскивайте фото внутри ячейки · Скролл / щипок для зума холста',
+    centerPhoto: 'По центру',
 
     exportTitle: 'Экспорт в Ultra-HD',
     exportSubtitle: 'Выберите разрешение и формат файла. Аппаратный рендеринг сохраняет четкость каждого пикселя.',
@@ -599,7 +614,8 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     canvasBackground: 'Фон полотна',
     outerPadding: 'Зовнішні відступи',
     cellSpacingGap: 'Відстань між фото (Gap)',
-    cellRounding: 'Заокруглення кутів',
+    cellRounding: 'Заокруглення фото в комірках',
+    canvasRounding: 'Заокруглення країв полотна',
     borderStroke: 'Обводка комірок',
     dropShadow: 'Тінь комірок',
     shadowNone: 'Без тіні',
@@ -630,25 +646,29 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     badgesSubtitle: 'Додавайте на полотно стікери показників прибутку, зіркові рейтинги та плашки статусів.',
     addCustomBadge: 'Створити власний бейдж',
     badgeTitleLabel: 'Заголовок бейджа',
-    badgeValueLabel: 'Значення метрики (опціонально)',
+    badgeValueLabel: 'Значение метрики (опционально)',
     badgeColorLabel: 'Колір акценту',
     addBadgeBtn: 'Додати бейдж на полотно',
     templateBadgesTitle: 'Швидкі готові бейджі',
     dragBadgeHint: 'Перетягуйте бейджі прямо по полотну для зміни позиції та розміру.',
 
-    canvasSizeTitle: 'Розмір полотна та пропорції',
-    canvasSizeSubtitle: 'Оберіть готовий формат для соцмереж або задайте довільні пікселі.',
-    customDimensions: 'Довільний розмір',
+    canvasSizeTitle: 'Розміри полотна та формат',
+    canvasSizeSubtitle: 'Оберіть готовий формат для соцмереж або задайте точні пікселі.',
+    presetRatios: 'Стандартні формати',
+    customDimensions: 'Точний розмір у пікселях',
     widthLabel: 'Ширина (px)',
     heightLabel: 'Висота (px)',
     applyDimensions: 'Застосувати розмір',
+    resetCenter: 'Центрувати фото',
+    dragMoveHint: 'Тягніть фото всередині слота для переміщення',
 
     replacePhoto: 'Замінити',
     zoomIn: 'Збільшити',
     zoomOut: 'Зменшити',
     removePhoto: 'Видалити',
     addPhoto: 'Додати фото',
-    gestureHint: 'Скрол / щипок для зуму · Перетягніть фон для панорамування',
+    gestureHint: 'Перетягуйте фото всередині комірки · Скрол / щипок для зуму полотна',
+    centerPhoto: 'По центру',
 
     exportTitle: 'Експорт у Ultra-HD',
     exportSubtitle: 'Оберіть роздільну здатність та формат файлу. Апаратний рендеринг зберігає чіткість кожного пікселя.',
