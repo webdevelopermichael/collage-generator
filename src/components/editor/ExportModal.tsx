@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { CollageState } from '../../types';
 import { renderCollageToCanvas, downloadCanvas } from '../../core/exportUtils';
-import { X, Download, RefreshCw, ExternalLink } from 'lucide-react';
+import { X, Download, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Language, TRANSLATIONS } from '../../core/i18n';
+import { AdSenseSlot } from '../common/AdSenseSlot';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -56,7 +57,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-      <div className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl p-6 overflow-hidden">
+      <div className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl p-6 overflow-hidden max-h-[95vh] flex flex-col">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -71,104 +72,99 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state
           </div>
           <h2 className="text-xl font-heading font-bold text-white">{t.exportTitle}</h2>
         </div>
-        <p className="text-xs text-neutral-400 mb-5">
+        <p className="text-xs text-neutral-400 mb-4">
           {t.exportSubtitle}
         </p>
 
-        {/* Resolution Scale Selector */}
-        <div className="mb-4">
-          <label className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block mb-2">
-            {t.resolutionScale}
-          </label>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { s: 1 as const, label: t.scale1x, desc: 'Web & Preview' },
-              { s: 2 as const, label: t.scale2x, desc: 'Retina & Social' },
-              { s: 4 as const, label: t.scale4x, desc: '4K & Print' },
-            ].map(opt => (
-              <button
-                key={opt.s}
-                onClick={() => setScale(opt.s)}
-                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                  scale === opt.s
-                    ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-sm ring-1 ring-indigo-500/50'
-                    : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
-                }`}
-              >
-                <div className="text-xs font-bold text-white">{opt.label}</div>
-                <div className="text-[10px] text-neutral-500">{opt.desc}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Format Selector */}
-        <div className="mb-5">
-          <label className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block mb-2">
-            {t.fileFormat}
-          </label>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { id: 'png' as const, label: 'PNG', desc: 'Lossless crisp' },
-              { id: 'jpeg' as const, label: 'JPEG', desc: 'Compressed' },
-              { id: 'webp' as const, label: 'WebP', desc: 'Modern web' },
-            ].map(f => (
-              <button
-                key={f.id}
-                onClick={() => setFormat(f.id)}
-                className={`py-2 px-3 rounded-xl border text-center transition-all cursor-pointer ${
-                  format === f.id
-                    ? 'bg-indigo-600/20 border-indigo-500 text-white font-bold'
-                    : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
-                }`}
-              >
-                <span className="text-xs">{f.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* AdSense Interstitial Sponsor Box */}
-        <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 mb-5 relative">
-          <div className="flex items-center justify-between text-[9px] uppercase font-bold text-neutral-500 mb-1.5">
-            <span>Google AdSense Partner Ad</span>
-            <span className="text-emerald-400">Verified Sponsor</span>
-          </div>
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-left">
-              <div className="text-xs font-bold text-white">Host & Scale Next-Gen AI Workloads</div>
-              <div className="text-[10px] text-neutral-400">Get $200 free cloud credits today.</div>
+        <div className="flex-1 overflow-y-auto pr-1 space-y-4">
+          {/* Resolution Scale Selector */}
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block mb-2">
+              {t.resolutionScale}
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { s: 1 as const, label: t.scale1x, desc: 'Web & Preview' },
+                { s: 2 as const, label: t.scale2x, desc: 'Retina & Social' },
+                { s: 4 as const, label: t.scale4x, desc: '4K & Print' },
+              ].map(opt => (
+                <button
+                  key={opt.s}
+                  onClick={() => setScale(opt.s)}
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                    scale === opt.s
+                      ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-sm ring-1 ring-indigo-500/50'
+                      : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  <div className="text-xs font-bold text-white">{opt.label}</div>
+                  <div className="text-[10px] text-neutral-500">{opt.desc}</div>
+                </button>
+              ))}
             </div>
-            <a
-              href="https://google.com/adsense"
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs font-semibold bg-neutral-800 hover:bg-neutral-700 text-indigo-400 px-3 py-1.5 rounded-lg shrink-0 flex items-center gap-1"
-            >
-              <span>Visit</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
+          </div>
+
+          {/* Format Selector */}
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block mb-2">
+              {t.fileFormat}
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { id: 'png' as const, label: 'PNG', desc: 'Lossless crisp' },
+                { id: 'jpeg' as const, label: 'JPEG', desc: 'Compressed' },
+                { id: 'webp' as const, label: 'WebP', desc: 'Modern web' },
+              ].map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => setFormat(f.id)}
+                  className={`py-2 px-3 rounded-xl border text-center transition-all cursor-pointer ${
+                    format === f.id
+                      ? 'bg-indigo-600/20 border-indigo-500 text-white font-bold'
+                      : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  <span className="text-xs">{f.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Real Google AdSense Block (Extract Slot: 7994067288) */}
+          <div className="p-3 rounded-xl bg-neutral-950/90 border border-neutral-800 overflow-hidden text-center">
+            <div className="flex items-center justify-between text-[9px] uppercase font-bold text-neutral-500 mb-2 px-1">
+              <span>Advertisement</span>
+              <span className="text-indigo-400/80">Google AdSense</span>
+            </div>
+            
+            <AdSenseSlot
+              slot="7994067288"
+              client="ca-pub-9711840143228374"
+              className="rounded-lg bg-neutral-900/50"
+            />
           </div>
         </div>
 
         {/* Download Trigger */}
-        <button
-          onClick={handleDownload}
-          disabled={isExporting}
-          className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 hover:scale-[1.01]"
-        >
-          {isExporting ? (
-            <>
-              <RefreshCw className="w-4 h-4 animate-spin" />
-              <span>{t.generatingImage}</span>
-            </>
-          ) : (
-            <>
-              <Download className="w-4 h-4" />
-              <span>{t.saveAndDownload} ({format.toUpperCase()} • {scale}x)</span>
-            </>
-          )}
-        </button>
+        <div className="pt-4 mt-2 border-t border-neutral-800">
+          <button
+            onClick={handleDownload}
+            disabled={isExporting}
+            className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 hover:scale-[1.01]"
+          >
+            {isExporting ? (
+              <>
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                <span>{t.generatingImage}</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4" />
+                <span>{t.saveAndDownload} ({format.toUpperCase()} • {scale}x)</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
