@@ -1,7 +1,6 @@
 import React from 'react';
-import { Sparkles, Heart, ExternalLink } from 'lucide-react';
+import { Sparkles, Heart, Lock } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../../core/i18n';
-import { PlatformId } from '../pages/PlatformHubPage';
 
 interface FooterProps {
   onOpenEditor: () => void;
@@ -109,6 +108,12 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEditor, onNavigatePage, la
               <li>
                 <button onClick={() => onNavigatePage('contact')} className="hover:text-white transition-colors cursor-pointer">
                   Support & Contact
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigatePage('admin')} className="hover:text-indigo-400 transition-colors cursor-pointer flex items-center gap-1">
+                  <Lock className="w-3 h-3 text-neutral-500" />
+                  <span>Admin Console</span>
                 </button>
               </li>
             </ul>

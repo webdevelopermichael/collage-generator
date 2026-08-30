@@ -35,6 +35,7 @@ import { AboutPage } from './components/pages/AboutPage';
 import { PlatformHubPage } from './components/pages/PlatformHubPage';
 import { GuidesPage } from './components/pages/GuidesPage';
 import { LegalPages } from './components/pages/LegalPages';
+import { AdminDashboard } from './components/admin/AdminDashboard';
 
 export type AppView =
   | 'landing'
@@ -48,7 +49,8 @@ export type AppView =
   | 'privacy'
   | 'terms'
   | 'dmca'
-  | 'contact';
+  | 'contact'
+  | 'admin';
 
 function parseRouteAndLang(pathname: string): { view: AppView; lang: Language; guideSlug?: string } {
   let lang: Language = 'en';
@@ -60,6 +62,7 @@ function parseRouteAndLang(pathname: string): { view: AppView; lang: Language; g
     lang = 'ua';
   }
 
+  if (clean.includes('/admin')) return { view: 'admin', lang };
   if (clean.includes('/editor')) return { view: 'editor', lang };
   if (clean.includes('/about')) return { view: 'about', lang };
   if (clean.includes('/privacy')) return { view: 'privacy', lang };
@@ -83,6 +86,7 @@ function parseRouteAndLang(pathname: string): { view: AppView; lang: Language; g
 
 function constructPath(view: AppView, lang: Language, guideSlug?: string): string {
   const langPrefix = lang === 'en' ? '' : `/${lang}`;
+  if (view === 'admin') return '/admin';
   if (view === 'editor') return `${langPrefix}/editor`;
   if (view === 'about') return `${langPrefix}/about`;
   if (view === 'privacy') return `${langPrefix}/privacy-policy`;
@@ -252,6 +256,14 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 font-sans flex flex-col selection:bg-indigo-500 selection:text-white">
+      {/* ── ADMIN VIEW ────────────────────────────────────────────────────────── */}
+      {currentView === 'admin' && (
+        <AdminDashboard
+          onNavigateHome={() => navigateTo('landing')}
+          onOpenEditor={() => navigateTo('editor')}
+        />
+      )}
+
       {/* ── LANDING VIEW ──────────────────────────────────────────────────────── */}
       {currentView === 'landing' && (
         <>
