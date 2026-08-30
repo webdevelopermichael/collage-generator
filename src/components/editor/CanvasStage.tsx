@@ -418,6 +418,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
     }));
   };
 
+  // Responsive Canvas Sizing (maximizes viewport usage, eliminates huge dead bottom zone)
   const getRatioStyle = (): React.CSSProperties => {
     if (state.aspectRatio === 'custom') {
       const w = state.customWidth || 1200;
@@ -426,29 +427,29 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
       return {
         aspectRatio: `${w} / ${h}`,
         width: aspect >= 1
-          ? `min(76vw, calc((100dvh - 120px) * ${aspect}), 600px)`
-          : `min(calc((100dvh - 120px) * ${aspect}), 72vw, 440px)`,
-        maxHeight: 'calc(100dvh - 110px)',
+          ? `min(86vw, calc((100dvh - 90px) * ${aspect}), 920px)`
+          : `min(calc((100dvh - 90px) * ${aspect}), 82vw, 680px)`,
+        maxHeight: 'calc(100dvh - 80px)',
       };
     }
 
     switch (state.aspectRatio) {
       case '1:1':
-        return { aspectRatio: '1 / 1', width: 'min(76vw, calc(100dvh - 120px), 500px)', maxHeight: 'calc(100dvh - 110px)' };
+        return { aspectRatio: '1 / 1', width: 'min(86vw, calc(100dvh - 90px), 740px)', maxHeight: 'calc(100dvh - 80px)' };
       case '4:5':
-        return { aspectRatio: '4 / 5', width: 'min(70vw, calc(100dvh - 120px), 440px)', maxHeight: 'calc(100dvh - 110px)' };
+        return { aspectRatio: '4 / 5', width: 'min(80vw, calc(100dvh - 90px), 640px)', maxHeight: 'calc(100dvh - 80px)' };
       case '9:16':
-        return { aspectRatio: '9 / 16', width: 'min(55vw, calc(100dvh - 120px), 360px)', maxHeight: 'calc(100dvh - 110px)' };
+        return { aspectRatio: '9 / 16', width: 'min(64vw, calc(100dvh - 90px), 480px)', maxHeight: 'calc(100dvh - 80px)' };
       case '16:9':
-        return { aspectRatio: '16 / 9', width: 'min(82vw, calc(100dvh - 120px), 620px)', maxHeight: 'calc(100dvh - 110px)' };
+        return { aspectRatio: '16 / 9', width: 'min(90vw, calc(100dvh - 90px), 940px)', maxHeight: 'calc(100dvh - 80px)' };
       case '4:3':
-        return { aspectRatio: '4 / 3', width: 'min(78vw, calc(100dvh - 120px), 540px)', maxHeight: 'calc(100dvh - 110px)' };
+        return { aspectRatio: '4 / 3', width: 'min(86vw, calc(100dvh - 90px), 820px)', maxHeight: 'calc(100dvh - 80px)' };
       case '3:2':
-        return { aspectRatio: '3 / 2', width: 'min(80vw, calc(100dvh - 120px), 560px)', maxHeight: 'calc(100dvh - 110px)' };
+        return { aspectRatio: '3 / 2', width: 'min(88vw, calc(100dvh - 90px), 860px)', maxHeight: 'calc(100dvh - 80px)' };
       case 'A4':
-        return { aspectRatio: '1 / 1.414', width: 'min(62vw, calc(100dvh - 120px), 420px)', maxHeight: 'calc(100dvh - 110px)' };
+        return { aspectRatio: '1 / 1.414', width: 'min(72vw, calc(100dvh - 90px), 600px)', maxHeight: 'calc(100dvh - 80px)' };
       default:
-        return { aspectRatio: '16 / 9', width: 'min(80vw, calc(100dvh - 120px), 560px)', maxHeight: 'calc(100dvh - 110px)' };
+        return { aspectRatio: '16 / 9', width: 'min(90vw, calc(100dvh - 90px), 880px)', maxHeight: 'calc(100dvh - 80px)' };
     }
   };
 
@@ -517,7 +518,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
           transformOrigin: 'center center',
           transition: draggingBadgeId || draggingPhotoCellId ? 'none' : 'transform 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
-        className="shrink-0 relative flex items-center justify-center p-4"
+        className="shrink-0 relative flex items-center justify-center p-2 sm:p-4"
       >
         {/* ── Main Canvas Container ── */}
         <div
@@ -690,7 +691,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
           style={{
             animation: 'fadeInUp 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
-          className="absolute bottom-16 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 bg-neutral-900/95 backdrop-blur-xl border border-neutral-700/80 shadow-2xl rounded-2xl px-2 py-1.5 flex items-center gap-1 sm:gap-1.5 text-xs select-none max-w-[94vw] overflow-x-auto"
+          className="absolute bottom-6 sm:bottom-4 left-1/2 -translate-x-1/2 z-40 bg-neutral-900/95 backdrop-blur-xl border border-neutral-700/80 shadow-2xl rounded-2xl px-2 py-1.5 flex items-center gap-1 sm:gap-1.5 text-xs select-none max-w-[94vw] overflow-x-auto"
         >
           {/* Zoom controls */}
           <div className="flex items-center gap-0.5 bg-neutral-950 p-0.5 rounded-xl border border-neutral-800">
