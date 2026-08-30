@@ -106,8 +106,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
 
-        {/* Desktop Tab Content Area (Ensures smooth scroll with custom scrollbar) */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 overscroll-contain pb-20">
+        {/* Desktop Tab Content Area */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 overscroll-contain pb-20" style={{ WebkitOverflowScrolling: 'touch' }}>
           {activeTab === 'ratios' && <RatioTab state={state} onChangeState={onChangeState} language={language} />}
           {activeTab === 'layouts' && <LayoutTab state={state} onChangeState={onChangeState} language={language} />}
           {activeTab === 'styles' && <StyleTab state={state} onChangeState={onChangeState} language={language} />}

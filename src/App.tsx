@@ -255,7 +255,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 font-sans flex flex-col selection:bg-indigo-500 selection:text-white">
+    <div className={`${currentView === 'editor' ? 'h-screen overflow-hidden' : 'min-h-screen'} bg-neutral-950 text-neutral-100 font-sans flex flex-col selection:bg-indigo-500 selection:text-white`}>
       {/* ── ADMIN VIEW ────────────────────────────────────────────────────────── */}
       {currentView === 'admin' && (
         <AdminDashboard
@@ -461,7 +461,7 @@ export function App() {
             onSelectLanguage={handleSelectLanguage}
           />
 
-          <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+          <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative min-h-0">
             <Sidebar
               state={collageState}
               activeTab={activeSidebarTab}

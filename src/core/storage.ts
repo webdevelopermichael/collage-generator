@@ -23,14 +23,8 @@ export const DEFAULT_INITIAL_STATE: CollageState = {
   cellBorderWidth: 1,
   cellBorderColor: 'rgba(255, 255, 255, 0.15)',
   background: {
-    type: 'gradient',
-    color: '#0f172a',
-    gradient: {
-      from: '#0f172a',
-      via: '#1e1b4b',
-      to: '#311042',
-      direction: 'to-br',
-    },
+    type: 'transparent',
+    color: 'transparent',
   },
   cells: [
     {
