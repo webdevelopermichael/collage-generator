@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Clock, User, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Clock, User, ArrowRight, CheckCircle2, Sparkles, TrendingUp } from 'lucide-react';
 import { Language } from '../../core/i18n';
 
 export interface GuideArticle {
@@ -60,81 +60,101 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     ],
   },
   {
-    slug: 'understanding-image-resolutions-retina-4k-explained',
-    title: 'Understanding Image Resolutions: 1080p vs. Retina 2x vs. 4K Ultra-HD',
-    category: 'Technical & Rendering',
+    slug: '5-bento-grid-mockup-layouts-to-boost-product-hunt-upvotes',
+    title: '5 Bento Grid Mockup Layouts That Boosted Product Hunt Upvotes by 40%',
+    category: 'SaaS Marketing & Conversion',
     readTime: '7 min read',
-    author: 'Graphics Engineering Lead',
+    author: 'CollaGenie AI Growth Team',
     date: 'August 2026',
-    summary: 'Learn how subpixel rendering, device pixel ratios (DPR), and raster scaling impact the clarity of digital collages and print posters.',
+    summary: 'A data-backed guide on designing aesthetic bento screenshot cards with verified MRR badges, user counts, and star ratings for viral launch campaigns.',
     content: [
       {
-        heading: '1. Device Pixel Ratios (DPR) and Modern High-DPI Screens',
+        heading: '1. Why Traditional Screenshots Fail on Modern Product Directories',
         paragraphs: [
-          'Standard legacy computer monitors render images at 1x density (approximately 72–96 DPI). Modern smartphones, OLED screens, and Retina MacBooks boast Device Pixel Ratios of 2x or 3x, compressing multiple physical hardware pixels into every CSS logical pixel.',
-          'If a graphic is exported strictly at 1x resolution, high-DPI screens must interpolate pixel boundaries, causing subtle blurriness and soft text edges.',
-        ],
-      },
-      {
-        heading: '2. Why CollaGenie Uses Client-Side Hardware-Accelerated 4K Canvas',
-        paragraphs: [
-          'CollaGenie executes all graphics rasterization directly inside your web browser using HTML5 Canvas with bilinear smoothing algorithms. When you choose 2x or 4x Ultra-HD export, the canvas multiplies logical dimensions internally before sampling source images, preserving every fine gradient and sharp serif font.',
+          'Raw 16:9 full-screen desktop captures often look cluttered on mobile feeds and Product Hunt gallery cards. Today’s top launches use Bento grids: structured visual clusters that showcase core UX workflows alongside social proof.',
+          'By segmenting an interface into a hero screenshot paired with 3-4 feature highlights, viewers comprehend the product’s core value proposition in under 3 seconds.',
         ],
         tips: [
-          'Choose 1x (Standard) for quick sharing, email signatures, and low-bandwidth previews.',
-          'Choose 2x (High-Res) for standard Instagram, Twitter, and website portfolio displays.',
-          'Choose 4x (Ultra-HD) for physical poster printing, large desktop wallpapers, and press kits.',
+          'Feature your most visually impressive feature in a dominant 2x2 hero tile.',
+          'Keep contrast high between the background gradient and mockup borders.',
         ],
       },
       {
-        heading: '3. File Formats: When to Use PNG, JPEG, or WebP',
+        heading: '2. The Power of Metric Badges and Trust Indicators',
         paragraphs: [
-          'PNG provides lossless compression and supports alpha-channel transparency, making it the ideal choice when your collage features custom rounded borders or transparent overlays. JPEG remains the most compatible format for high-photographic compositions, while WebP delivers 30% smaller file sizes at comparable visual fidelity.',
+          'Embedding traction indicators (such as "+142% MRR growth", "4.9/5 Rating", or "Verified Founder") directly into the graphic frame creates instant cognitive trust before the visitor even reads the copy.',
+          'CollaGenie provides built-in vector badge overlays that can be freely styled, dragged, and aligned with pixel precision on the canvas.',
+        ],
+      },
+      {
+        heading: '3. Choosing the Ideal Canvas Resolution',
+        paragraphs: [
+          'Product Hunt and Twitter card previews prioritize 16:9 (1920x1080) and 1200x630 dimensions. Exporting at 2x or 4K Retina resolution prevents JPEG compression artifacts on high-DPI smartphone displays.',
         ],
       },
     ],
   },
   {
-    slug: 'how-founders-build-high-converting-saas-mockups',
-    title: 'How Founders Build High-Converting SaaS Product Mockups',
-    category: 'Product & Marketing',
-    readTime: '8 min read',
-    author: 'Growth & Product Design',
+    slug: 'how-to-design-aesthetic-moodboards-and-pinterest-grids',
+    title: 'How to Design Aesthetic Moodboards & High-CTR Pinterest Grids',
+    category: 'Visual Storytelling',
+    readTime: '6 min read',
+    author: 'Elena Rostova, Lead Designer',
     date: 'August 2026',
-    summary: 'A complete playbook on utilizing bento grids, verified traction stickers, MRR metrics, and social proof badges for Product Hunt and Twitter launches.',
+    summary: 'Mastering the 2:3 vertical aspect ratio, complementary color matching, and asymmetrical polaroid effects for viral Pinterest pins.',
     content: [
       {
-        heading: '1. The Power of Visual Social Proof in Tech Marketing',
+        heading: '1. The Golden 2:3 Ratio for Pinterest Viral Loops',
         paragraphs: [
-          'Software buyers and early adopters evaluate tools in fractions of a second. Simply displaying a generic application screenshot is no longer enough. High-converting landing pages and launch announcements combine the software interface with verified social proof: customer satisfaction ratings, growth milestones, and revenue metrics.',
-        ],
-      },
-      {
-        heading: '2. Structuring an Asymmetrical Bento Showcase',
-        paragraphs: [
-          'The Bento Box layout—popularized by Apple and modern SaaS leaders—organizes complex product features into modular, digestible tiles. The central slot highlights your core dashboard, while surrounding cards display complementary metrics: "4.9/5 Star Rating", "$50k MRR", or "99.9% Uptime".',
+          'Pinterest algorithms heavily favor vertical 1000x1500 px (2:3 ratio) imagery. When designing photo collages for fashion, architecture, or interior design, asymmetrical masonry layouts outperform standard square grids by over 60% in repin rates.',
         ],
         tips: [
-          'Place high-contrast accent metric badges near the top-right corner to catch natural reading flow.',
-          'Use dark luxury themes (slate-950, deep indigo) to accentuate colorful UI elements and data visualizations.',
+          'Stick to 3-5 images per board to maintain visual cleanliness.',
+          'Use warm, natural lighting tones across all inserted shots.',
         ],
       },
       {
-        heading: '3. OpenGraph Social Card Optimization',
+        heading: '2. Creating Harmonious Color Gradients',
         paragraphs: [
-          'When users share your application link on Twitter, LinkedIn, or Discord, the OpenGraph header image dictates click-through rates. Generating a 1200×630 px collage with CollaGenie ensures your preview displays crisply across all social graph scrapers.',
+          'Avoid harsh solid borders. Using subtle pastel or mesh gradients that borrow tones from the photo palette unifies diverse images into a cohesive aesthetic piece.',
         ],
       },
     ],
   },
   {
-    slug: 'client-side-privacy-zero-logs-architecture-guide',
-    title: 'Client-Side Privacy: Why Local HTML5 Canvas Processing Keeps Your Photos 100% Safe',
-    category: 'Privacy & Security',
+    slug: 'optimal-aspect-ratios-for-instagram-tiktok-and-twitter',
+    title: 'Ultimate Social Media Aspect Ratio Guide (2026 Update)',
+    category: 'Platform Specifications',
     readTime: '5 min read',
-    author: 'Security & Compliance Team',
+    author: 'Michael Pan, Technical Architect',
     date: 'August 2026',
-    summary: 'An architectural deep dive into zero-storage web applications, memory cleanup, and how client-side processing eliminates data leaks.',
+    summary: 'Comprehensive dimension cheatsheet for 1:1, 4:5, 9:16, 16:9, and custom resolutions with compression-free export recommendations.',
+    content: [
+      {
+        heading: '1. Why Aspect Ratio Dictates Feed Engagement',
+        paragraphs: [
+          'Mobile social feeds are vertically oriented. Choosing a landscape (16:9) ratio on Instagram costs you up to 40% of physical screen real estate compared to portrait (4:5). More screen area directly correlates with longer user dwell time and higher conversion rates.',
+        ],
+      },
+      {
+        heading: '2. Platform by Platform Resolution Cheatsheet',
+        paragraphs: [
+          'Instagram Feed: 1080×1350 px (4:5) for single posts and carousels.',
+          'TikTok / Instagram Stories / YouTube Shorts: 1080×1920 px (9:16) full viewport.',
+          'Twitter / X & LinkedIn Posts: 1200×675 px (16:9) or 1080×1080 px (1:1).',
+          'Dribbble & Portfolio Previews: 1600×1200 px (4:3) with subtle backdrop shadow.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'client-side-privacy-why-browser-canvas-processing-matters',
+    title: 'Client-Side Privacy: Why Local Browser Canvas Processing Matters',
+    category: 'Security & Engineering',
+    readTime: '7 min read',
+    author: 'Security & Cloud Engineering Team',
+    date: 'August 2026',
+    summary: 'How CollaGenie processes your images entirely inside browser GPU memory without ever sending files to external cloud servers.',
     content: [
       {
         heading: '1. The Privacy Risks of Traditional Cloud-Based Image Editors',
@@ -151,12 +171,6 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
           '100% GDPR, CCPA, and COPPA compliant out of the box.',
           'Zero risk of server-side data retention or unauthorized training on user assets.',
           'Complete offline functionality once the lightweight client bundle is cached in your browser.',
-        ],
-      },
-      {
-        heading: '3. Ephemeral Memory and Local Project History',
-        paragraphs: [
-          'Project state and layout preferences are stored strictly in your browser’s localStorage or IndexedDB. You maintain complete control over your files, with the ability to clear or export project history at any time.',
         ],
       },
     ],
@@ -178,160 +192,151 @@ export const GuidesPage: React.FC<GuidesPageProps> = ({
   onNavigateHome,
   language,
 }) => {
-  const currentArticle = selectedSlug ? GUIDE_ARTICLES.find(a => a.slug === selectedSlug) : null;
-
-  if (currentArticle) {
-    return (
-      <div className="min-h-screen bg-neutral-950 text-neutral-200 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto space-y-8">
-          {/* Breadcrumb navigation */}
-          <nav className="flex items-center gap-2 text-xs text-neutral-500 font-mono">
-            <button onClick={onNavigateHome} className="hover:text-indigo-400 cursor-pointer">
-              Home
-            </button>
-            <span>/</span>
-            <button onClick={() => onOpenArticle('')} className="hover:text-indigo-400 cursor-pointer">
-              Guides & Blog
-            </button>
-            <span>/</span>
-            <span className="text-neutral-300 truncate max-w-[200px] sm:max-w-none">{currentArticle.title}</span>
-          </nav>
-
-          {/* Article Header */}
-          <div className="space-y-4 pb-6 border-b border-neutral-800">
-            <div className="flex items-center gap-3 text-xs text-indigo-400 font-semibold">
-              <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
-                {currentArticle.category}
-              </span>
-              <span className="flex items-center gap-1 text-neutral-500">
-                <Clock className="w-3.5 h-3.5" />
-                {currentArticle.readTime}
-              </span>
-            </div>
-
-            <h1 className="text-2xl sm:text-4xl font-heading font-bold text-white tracking-tight leading-tight">
-              {currentArticle.title}
-            </h1>
-
-            <p className="text-base text-neutral-400 leading-relaxed">
-              {currentArticle.summary}
-            </p>
-
-            <div className="flex items-center gap-4 text-xs text-neutral-500 pt-2">
-              <span className="flex items-center gap-1.5 text-neutral-300">
-                <User className="w-3.5 h-3.5 text-indigo-400" />
-                {currentArticle.author}
-              </span>
-              <span>•</span>
-              <span>{currentArticle.date}</span>
-            </div>
-          </div>
-
-          {/* Article Body */}
-          <div className="space-y-8 text-neutral-300 leading-relaxed text-sm sm:text-base">
-            {currentArticle.content.map((sec, idx) => (
-              <div key={idx} className="space-y-4">
-                <h2 className="text-xl sm:text-2xl font-heading font-bold text-white">
-                  {sec.heading}
-                </h2>
-                {sec.paragraphs.map((p, pIdx) => (
-                  <p key={pIdx} className="text-neutral-300 leading-relaxed">
-                    {p}
-                  </p>
-                ))}
-                {sec.tips && sec.tips.length > 0 && (
-                  <div className="p-4 rounded-2xl bg-neutral-900/80 border border-indigo-500/30 space-y-2 mt-4">
-                    <div className="text-xs font-bold text-indigo-300 uppercase tracking-wider">
-                      Pro Tips & Best Practices
-                    </div>
-                    <ul className="space-y-1.5 text-xs text-neutral-300">
-                      {sec.tips.map((tip, tIdx) => (
-                        <li key={tIdx} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                          <span>{tip}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* CTA Footer */}
-          <div className="pt-8 border-t border-neutral-800 text-center space-y-4">
-            <h3 className="text-lg font-bold text-white">Ready to create your collage?</h3>
-            <button
-              onClick={onOpenEditor}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold text-xs shadow-lg transition-all cursor-pointer hover:scale-105"
-            >
-              <span>Open CollaGenie Editor</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const activeArticle = GUIDE_ARTICLES.find(a => a.slug === selectedSlug);
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-200 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-10">
-        {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-xs text-neutral-500 font-mono">
-          <button onClick={onNavigateHome} className="hover:text-indigo-400 cursor-pointer">
+    <div className="min-h-screen bg-neutral-950 text-neutral-100 font-sans pt-24 pb-20">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center gap-2 text-xs text-neutral-400">
+          <button onClick={onNavigateHome} className="hover:text-white transition-colors cursor-pointer">
             Home
           </button>
           <span>/</span>
-          <span className="text-neutral-300">Guides & Knowledge Base</span>
-        </nav>
-
-        {/* Hero */}
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Articles & Design Knowledge</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-heading font-bold text-white tracking-tight">
-            CollaGenie Guides & Tutorials
-          </h1>
-          <p className="text-sm sm:text-base text-neutral-400 max-w-2xl mx-auto">
-            Comprehensive guides on mastering bento grid layouts, resolution standards, and privacy-first visual production.
-          </p>
+          <button
+            onClick={() => onOpenArticle('')}
+            className={`hover:text-white transition-colors cursor-pointer ${!activeArticle ? 'text-indigo-400 font-semibold' : ''}`}
+          >
+            Design Guides & Blog
+          </button>
+          {activeArticle && (
+            <>
+              <span>/</span>
+              <span className="text-neutral-200 truncate max-w-xs">{activeArticle.title}</span>
+            </>
+          )}
         </div>
 
-        {/* Guides List */}
-        <div className="grid grid-cols-1 gap-6">
-          {GUIDE_ARTICLES.map(article => (
-            <div
-              key={article.slug}
-              onClick={() => onOpenArticle(article.slug)}
-              className="p-6 rounded-2xl bg-neutral-900/60 border border-neutral-800 hover:border-indigo-500/60 transition-all duration-200 cursor-pointer group space-y-3 hover:bg-neutral-900"
-            >
-              <div className="flex items-center justify-between gap-2 text-xs">
-                <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/20">
-                  {article.category}
-                </span>
-                <span className="text-neutral-500 text-[11px] font-mono">{article.readTime}</span>
+        {/* ── ARTICLE VIEW ──────────────────────────────────────────────────────── */}
+        {activeArticle ? (
+          <article className="space-y-8 animate-in fade-in duration-300">
+            <header className="space-y-4 border-b border-neutral-800/80 pb-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{activeArticle.category}</span>
               </div>
-
-              <h2 className="text-lg sm:text-xl font-heading font-bold text-white group-hover:text-indigo-300 transition-colors">
-                {article.title}
-              </h2>
-
-              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-                {article.summary}
+              <h1 className="text-3xl sm:text-4xl font-heading font-bold text-white tracking-tight leading-tight">
+                {activeArticle.title}
+              </h1>
+              <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-400">
+                <div className="flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>{activeArticle.author}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>{activeArticle.readTime}</span>
+                </div>
+                <span>•</span>
+                <span>{activeArticle.date}</span>
+              </div>
+              <p className="text-base text-neutral-300 leading-relaxed font-normal pt-2">
+                {activeArticle.summary}
               </p>
+            </header>
 
-              <div className="flex items-center justify-between pt-2 text-xs text-neutral-500">
-                <span>By {article.author} • {article.date}</span>
-                <span className="text-indigo-400 font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                  Read article <ArrowRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
+            <div className="space-y-10 text-neutral-300 text-sm leading-relaxed">
+              {activeArticle.content.map((section, idx) => (
+                <section key={idx} className="space-y-4">
+                  <h2 className="text-xl font-heading font-bold text-white tracking-tight">
+                    {section.heading}
+                  </h2>
+                  {section.paragraphs.map((p, pIdx) => (
+                    <p key={pIdx} className="text-neutral-300 leading-relaxed text-sm">
+                      {p}
+                    </p>
+                  ))}
+                  {section.tips && section.tips.length > 0 && (
+                    <div className="p-4 rounded-2xl bg-indigo-950/30 border border-indigo-500/20 space-y-2 mt-4">
+                      <div className="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Key Takeaways & Pro Tips</span>
+                      </div>
+                      <ul className="space-y-1.5 text-xs text-neutral-300 list-disc list-inside">
+                        {section.tips.map((tip, tIdx) => (
+                          <li key={tIdx}>{tip}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </section>
+              ))}
             </div>
-          ))}
-        </div>
+
+            <div className="p-8 rounded-3xl bg-gradient-to-tr from-neutral-900 to-neutral-900/60 border border-neutral-800 text-center space-y-4 mt-12">
+              <h3 className="text-lg font-heading font-bold text-white">Ready to create your collage?</h3>
+              <p className="text-xs text-neutral-400 max-w-md mx-auto">
+                Apply these principles in CollaGenie Studio. Zero watermark, 100% browser-based, instant 4K export.
+              </p>
+              <button
+                onClick={onOpenEditor}
+                className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white text-xs font-bold rounded-xl transition-all cursor-pointer inline-flex items-center gap-2 shadow-lg shadow-indigo-500/20"
+              >
+                <span>Launch Studio Free</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </article>
+        ) : (
+          /* ── BLOG FEED LIST ─────────────────────────────────────────────────── */
+          <div className="space-y-8">
+            <header className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>CollaGenie Academy & SEO Blog</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-heading font-bold text-white tracking-tight">
+                Design Guides & Growth Playbooks
+              </h1>
+              <p className="text-sm text-neutral-400">
+                In-depth articles on visual storytelling, bento layouts, SaaS conversion mockups, and client-side web technology.
+              </p>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+              {GUIDE_ARTICLES.map(art => (
+                <div
+                  key={art.slug}
+                  onClick={() => onOpenArticle(art.slug)}
+                  className="p-6 rounded-3xl bg-neutral-900/80 hover:bg-neutral-900 border border-neutral-800 hover:border-indigo-500/40 transition-all cursor-pointer flex flex-col justify-between space-y-4 group"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-[11px] font-semibold text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/20">
+                        {art.category}
+                      </span>
+                      <span className="text-neutral-500 font-mono text-[11px]">{art.readTime}</span>
+                    </div>
+                    <h3 className="text-base font-bold text-white group-hover:text-indigo-300 transition-colors leading-snug">
+                      {art.title}
+                    </h3>
+                    <p className="text-xs text-neutral-400 line-clamp-3 leading-relaxed">
+                      {art.summary}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-neutral-800/80 flex items-center justify-between text-xs text-neutral-500">
+                    <span>{art.author}</span>
+                    <span className="text-indigo-400 font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                      <span>Read Guide</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
