@@ -466,6 +466,15 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
   };
 
   const getBgStyle = (): React.CSSProperties => {
+    if (state.background.type === 'transparent') {
+      return {
+        backgroundImage:
+          'linear-gradient(45deg, #181926 25%, transparent 25%), linear-gradient(-45deg, #181926 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #181926 75%), linear-gradient(-45deg, transparent 75%, #181926 75%)',
+        backgroundSize: '16px 16px',
+        backgroundPosition: '0 0, 0 8px, 8px -8px, -8px 0px',
+        backgroundColor: '#0c0d14',
+      };
+    }
     if (state.background.type === 'gradient' && state.background.gradient) {
       const { from, to, via, direction } = state.background.gradient;
       if (direction === 'radial') {

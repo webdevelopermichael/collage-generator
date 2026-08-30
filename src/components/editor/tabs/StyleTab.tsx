@@ -1,6 +1,6 @@
 import React from 'react';
 import { CollageState, BackgroundConfig } from '../../../types';
-import { Palette, BoxSelect, Square, Sparkles } from 'lucide-react';
+import { Palette, BoxSelect, Square, Sparkles, Ban } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../../../core/i18n';
 
 interface StyleTabProps {
@@ -10,6 +10,22 @@ interface StyleTabProps {
 }
 
 const GRADIENT_PRESETS: BackgroundConfig[] = [
+  {
+    type: 'transparent',
+    color: 'transparent',
+  },
+  {
+    type: 'solid',
+    color: '#09090b',
+  },
+  {
+    type: 'solid',
+    color: '#0f172a',
+  },
+  {
+    type: 'solid',
+    color: '#ffffff',
+  },
   {
     type: 'gradient',
     color: '#0f172a',
@@ -59,18 +75,6 @@ const GRADIENT_PRESETS: BackgroundConfig[] = [
       direction: 'to-br',
     },
   },
-  {
-    type: 'solid',
-    color: '#0f172a',
-  },
-  {
-    type: 'solid',
-    color: '#09090b',
-  },
-  {
-    type: 'solid',
-    color: '#ffffff',
-  },
 ];
 
 export const StyleTab: React.FC<StyleTabProps> = ({ state, onChangeState, language }) => {
@@ -85,14 +89,27 @@ export const StyleTab: React.FC<StyleTabProps> = ({ state, onChangeState, langua
           {t.canvasBackground}
         </label>
 
-        <div className="grid grid-cols-4 gap-2 mb-3">
+        <div className="grid grid-cols-5 gap-2 mb-3">
           {GRADIENT_PRESETS.map((bg, idx) => {
-            let style = {};
+            const isTransparent = bg.type === 'transparent';
+            const isSelected =
+              state.background.type === bg.type &&
+              (isTransparent || state.background.color === bg.color);
+
+            let style: React.CSSProperties = {};
             if (bg.type === 'gradient' && bg.gradient) {
               style = {
                 background: `linear-gradient(135deg, ${bg.gradient.from}, ${
                   bg.gradient.via ? bg.gradient.via + ',' : ''
                 } ${bg.gradient.to})`,
+              };
+            } else if (isTransparent) {
+              style = {
+                backgroundImage:
+                  'linear-gradient(45deg, #1e293b 25%, transparent 25%), linear-gradient(-45deg, #1e293b 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1e293b 75%), linear-gradient(-45deg, transparent 75%, #1e293b 75%)',
+                backgroundSize: '10px 10px',
+                backgroundPosition: '0 0, 0 5px, 5px -5px, -5px 0px',
+                backgroundColor: '#090a0f',
               };
             } else {
               style = { backgroundColor: bg.color };
@@ -103,8 +120,13 @@ export const StyleTab: React.FC<StyleTabProps> = ({ state, onChangeState, langua
                 key={idx}
                 onClick={() => onChangeState(prev => ({ ...prev, background: bg }))}
                 style={style}
-                className="h-10 rounded-xl border border-neutral-700/80 hover:scale-105 transition-transform cursor-pointer shadow-sm"
-              />
+                title={isTransparent ? 'Transparent Background' : bg.color}
+                className={`h-10 rounded-xl border transition-all cursor-pointer shadow-sm relative flex items-center justify-center ${
+                  isSelected ? 'border-indigo-500 ring-2 ring-indigo-500/40 scale-105' : 'border-neutral-700/80 hover:scale-105'
+                }`}
+              >
+                {isTransparent && <Ban className="w-3.5 h-3.5 text-neutral-400" />}
+              </button>
             );
           })}
         </div>
@@ -113,7 +135,7 @@ export const StyleTab: React.FC<StyleTabProps> = ({ state, onChangeState, langua
         <div className="flex items-center gap-2 bg-neutral-950 p-2 rounded-xl border border-neutral-800">
           <input
             type="color"
-            value={state.background.color || '#0f172a'}
+            value={state.background.type === 'transparent' ? '#000000' : state.background.color || '#0f172a'}
             onChange={e =>
               onChangeState(prev => ({
                 ...prev,
@@ -123,7 +145,7 @@ export const StyleTab: React.FC<StyleTabProps> = ({ state, onChangeState, langua
             className="w-7 h-7 rounded-lg cursor-pointer bg-transparent border-0"
           />
           <span className="text-xs text-neutral-300 font-mono">
-            {state.background.color || '#0f172a'}
+            {state.background.type === 'transparent' ? 'Transparent (PNG Alpha)' : state.background.color || '#0f172a'}
           </span>
         </div>
       </div>

@@ -48,18 +48,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const t = TRANSLATIONS[language];
 
-  // Mobile tabs (includes Canvas size tab)
-  const mobileTabs = [
-    { id: 'ratios' as SidebarTabId, label: t.tabCanvas, icon: Ratio },
-    { id: 'layouts' as SidebarTabId, label: t.tabGrid, icon: LayoutGrid },
-    { id: 'styles' as SidebarTabId, label: t.tabStyle, icon: Palette },
-    { id: 'images' as SidebarTabId, label: t.tabPhotos, icon: ImageIcon },
-    { id: 'ai' as SidebarTabId, label: t.tabAi, icon: Wand2, highlight: true },
-    { id: 'badges' as SidebarTabId, label: t.tabBadges, icon: Tag },
-  ];
-
-  // Desktop sidebar tabs (now includes Canvas format tab for 1-click access)
-  const desktopTabs = [
+  // Tabs for navigation
+  const tabsList = [
     { id: 'ratios' as SidebarTabId, label: t.tabCanvas, icon: Ratio },
     { id: 'layouts' as SidebarTabId, label: t.tabGrid, icon: LayoutGrid },
     { id: 'styles' as SidebarTabId, label: t.tabStyle, icon: Palette },
@@ -81,12 +71,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <>
       {/* ─────────────────────────────────────────────────────────────────
           DESKTOP SIDEBAR (md:flex)
-          Permanent Left-Hand Navigation Panel with Full Height
+          Permanent Full-Height Left-Hand Navigation Panel with Smooth Scroll
           ───────────────────────────────────────────────────────────────── */}
       <aside className="hidden md:flex w-80 lg:w-96 bg-neutral-900/95 border-r border-neutral-800 flex-col shrink-0 h-full select-none z-20 overflow-hidden">
         {/* Desktop Tab Selector Bar */}
         <div className="flex items-center justify-between border-b border-neutral-800 p-2 bg-neutral-950/60 shrink-0">
-          {desktopTabs.map(tab => {
+          {tabsList.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
@@ -116,8 +106,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
 
-        {/* Desktop Tab Content Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 overscroll-contain">
+        {/* Desktop Tab Content Area (Ensures smooth scroll with custom scrollbar) */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 overscroll-contain pb-20">
           {activeTab === 'ratios' && <RatioTab state={state} onChangeState={onChangeState} language={language} />}
           {activeTab === 'layouts' && <LayoutTab state={state} onChangeState={onChangeState} language={language} />}
           {activeTab === 'styles' && <StyleTab state={state} onChangeState={onChangeState} language={language} />}
@@ -132,14 +122,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           Collapsible Upward-Opening Drawer with 1-click open / 2-click close
           ───────────────────────────────────────────────────────────────── */}
       <aside
-        className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-neutral-900/97 backdrop-blur-xl border-t border-neutral-800 shadow-2xl flex flex-col shrink-0 select-none transition-all duration-300 ease-out ${
-          isOpen ? 'h-[52vh] sm:h-[46vh]' : 'h-14'
+        className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-neutral-900/98 backdrop-blur-2xl border-t border-neutral-800 shadow-2xl flex flex-col shrink-0 select-none transition-all duration-300 ease-out ${
+          isOpen ? 'h-[75vh] sm:h-[65vh]' : 'h-14'
         } overflow-hidden`}
       >
         {/* Mobile bottom dock bar */}
-        <div className="h-14 flex items-center px-2 sm:px-4 bg-neutral-950/90 border-b border-neutral-800 shrink-0 gap-1">
+        <div className="h-14 flex items-center px-2 sm:px-4 bg-neutral-950/95 border-b border-neutral-800 shrink-0 gap-1">
           <div className="flex-1 flex items-center justify-around overflow-x-auto">
-            {mobileTabs.map(tab => {
+            {tabsList.map(tab => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id && isOpen;
               return (
@@ -174,7 +164,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Mobile Drawer content */}
         {isOpen && (
-          <div className="flex-1 overflow-y-auto p-4 overscroll-contain">
+          <div className="flex-1 overflow-y-auto p-4 overscroll-contain pb-28">
             {activeTab === 'ratios' && <RatioTab state={state} onChangeState={onChangeState} language={language} />}
             {activeTab === 'layouts' && <LayoutTab state={state} onChangeState={onChangeState} language={language} />}
             {activeTab === 'styles' && <StyleTab state={state} onChangeState={onChangeState} language={language} />}
