@@ -1,4 +1,5 @@
 // Client-side Telemetry & Error Diagnostic Logger
+import { supabaseService } from './supabaseClient';
 
 export interface ClientErrorLog {
   id: string;
@@ -111,6 +112,17 @@ export class TelemetryService {
       this.errors.pop();
     }
     this.saveToStorage();
+
+    // Broadcast to centralized Supabase database
+    supabaseService.logError({
+      message: errorEntry.message,
+      stack: errorEntry.stack,
+      source: errorEntry.source,
+      url: errorEntry.url,
+      user_agent: errorEntry.userAgent,
+      screen_resolution: errorEntry.screenResolution,
+      state_snapshot: errorEntry.stateSnapshot,
+    }).catch(() => {});
   }
 
   public logMetric(metric: ClientPerformanceMetric['metric'], value: number, unit = 'ms') {
