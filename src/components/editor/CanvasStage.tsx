@@ -1,20 +1,23 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import {
+  CollageState,
+  CollageCell,
+} from '../../types';
 import {
   Upload,
+  Move,
+  Trash2,
   ZoomIn,
   ZoomOut,
-  Trash2,
-  Image as ImageIcon,
-  Move,
-  X,
-  Plus,
-  Minus,
-  RotateCcw,
-  Crosshair,
+  RotateCw,
+  Sparkles,
   Maximize2,
   Minimize2,
+  Sliders,
+  RotateCcw,
+  Crop,
+  Check,
 } from 'lucide-react';
-import { CollageState } from '../../types';
 import { Language, TRANSLATIONS } from '../../core/i18n';
 
 interface CanvasStageProps {
@@ -42,48 +45,62 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
   language,
   onCanvasClick,
 }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const activeCellTargetRef = useRef<string | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const activeCellTargetRef = useRef<string | null>(null);
 
   const t = TRANSLATIONS[language];
 
-  // Stage Pan
+  // Pan / Canvas Workspace Navigation
   const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
-  const panRef = useRef({ x: 0, y: 0 });
-
-  // Stage Pan Gesture refs
   const isPanningRef = useRef(false);
   const panStartRef = useRef({ mouseX: 0, mouseY: 0, startPanX: 0, startPanY: 0 });
+  const panRef = useRef(panPosition);
+  panRef.current = panPosition;
+
+  // Touch Pinch-to-Zoom & Pan
   const lastPinchDistRef = useRef<number | null>(null);
   const lastPinchCenterRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Badge drag
-  const [draggingBadgeId, setDraggingBadgeId] = useState<string | null>(null);
-  const badgeDragRef = useRef<{ mouseX: number; mouseY: number; badgeX: number; badgeY: number } | null>(null);
-
-  // Cell Photo Pan / Move inside cell
-  const [draggingPhotoCellId, setDraggingPhotoCellId] = useState<string | null>(null);
-  const photoDragRef = useRef<{ mouseX: number; mouseY: number; startOffsetX: number; startOffsetY: number; cellId: string } | null>(null);
-
-  // Active cell action popup
+  // Floating Action Toolbar for active cell
   const [actionCellId, setActionCellId] = useState<string | null>(null);
 
-  // ── Mouse wheel zoom ───────────────────────────────────────────────────────
+  // Dragging inside cell (Photo Repositioning)
+  const [draggingPhotoCellId, setDraggingPhotoCellId] = useState<string | null>(null);
+  const photoDragRef = useRef<{
+    mouseX: number;
+    mouseY: number;
+    startOffsetX: number;
+    startOffsetY: number;
+    cellId: string;
+  } | null>(null);
+
+  // Badge Dragging
+  const [draggingBadgeId, setDraggingBadgeId] = useState<string | null>(null);
+  const badgeDragRef = useRef<{
+    mouseX: number;
+    mouseY: number;
+    badgeX: number;
+    badgeY: number;
+  } | null>(null);
+
+  // ── Wheel Zoom & Touch Pinch Handler ───────────────────────────────────────
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
+
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      const delta = e.deltaY > 0 ? -0.08 : 0.08;
-      setZoomLevel(prev => Math.min(3, Math.max(0.3, Number((prev + delta).toFixed(2)))));
+      const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+      setZoomLevel(prev => Math.min(3, Math.max(0.3, Number((prev * zoomFactor).toFixed(2)))));
     };
+
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
   }, [setZoomLevel]);
 
-  // ── Touch gestures on Stage (pinch + pan) ──────────────────────────────────
+  // ── Touch Gestures (Pinch zoom & Two-finger Canvas Pan) ─────────────────────
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
@@ -160,11 +177,11 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
       el.removeEventListener('touchmove', onTouchMove);
       el.removeEventListener('touchend', onTouchEnd);
     };
-  }, [draggingBadgeId, draggingPhotoCellId, setZoomLevel]);
+  }, [setZoomLevel, draggingPhotoCellId, draggingBadgeId]);
 
-  // ── Global Mouse / Touch Move for Dragging Photos Inside Cells ─────────────
+  // ── Mouse & Touch Photo Drag Repositioning ─────────────────────────────────
   useEffect(() => {
-    if (!draggingPhotoCellId || !photoDragRef.current) return;
+    if (!draggingPhotoCellId) return;
 
     const onMouseMove = (e: MouseEvent) => {
       if (!photoDragRef.current) return;
@@ -252,8 +269,8 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
     };
 
     const onTouchMove = (e: TouchEvent) => {
+      if (!badgeDragRef.current || !e.touches[0] || !canvasRef.current) return;
       e.preventDefault();
-      if (!badgeDragRef.current || !canvasRef.current || !e.touches[0]) return;
       const rect = canvasRef.current.getBoundingClientRect();
       const dx = ((e.touches[0].clientX - badgeDragRef.current.mouseX) / rect.width) * 100;
       const dy = ((e.touches[0].clientY - badgeDragRef.current.mouseY) / rect.height) * 100;
@@ -288,10 +305,12 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
     };
   }, [draggingBadgeId, onChangeState]);
 
-  // ── Desktop Stage Pan ──────────────────────────────────────────────────────
+  // ── Stage Mouse Pan Starter ────────────────────────────────────────────────
   const handleStageMouseDown = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-    if (target.dataset.panTarget !== '1') return;
+    const isBackground = target === stageRef.current || target.dataset.panTarget === '1';
+    if (!isBackground) return;
+
     isPanningRef.current = true;
     panStartRef.current = {
       mouseX: e.clientX,
@@ -407,28 +426,29 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
       return {
         aspectRatio: `${w} / ${h}`,
         width: aspect >= 1
-          ? `min(86vw, calc((100dvh - 180px) * ${aspect}), 640px)`
-          : `min(calc(75vh * ${aspect}), 82vw, 480px)`,
+          ? `min(76vw, calc((100dvh - 120px) * ${aspect}), 600px)`
+          : `min(calc((100dvh - 120px) * ${aspect}), 72vw, 440px)`,
+        maxHeight: 'calc(100dvh - 110px)',
       };
     }
 
     switch (state.aspectRatio) {
       case '1:1':
-        return { aspectRatio: '1 / 1', width: 'min(82vw, calc(100dvh - 180px), 520px)' };
+        return { aspectRatio: '1 / 1', width: 'min(76vw, calc(100dvh - 120px), 500px)', maxHeight: 'calc(100dvh - 110px)' };
       case '4:5':
-        return { aspectRatio: '4 / 5', width: 'min(76vw, calc(100dvh - 180px), 460px)' };
+        return { aspectRatio: '4 / 5', width: 'min(70vw, calc(100dvh - 120px), 440px)', maxHeight: 'calc(100dvh - 110px)' };
       case '9:16':
-        return { aspectRatio: '9 / 16', width: 'min(60vw, calc(100dvh - 180px), 380px)' };
+        return { aspectRatio: '9 / 16', width: 'min(55vw, calc(100dvh - 120px), 360px)', maxHeight: 'calc(100dvh - 110px)' };
       case '16:9':
-        return { aspectRatio: '16 / 9', width: 'min(88vw, calc(100dvh - 180px), 640px)' };
+        return { aspectRatio: '16 / 9', width: 'min(82vw, calc(100dvh - 120px), 620px)', maxHeight: 'calc(100dvh - 110px)' };
       case '4:3':
-        return { aspectRatio: '4 / 3', width: 'min(84vw, calc(100dvh - 180px), 560px)' };
+        return { aspectRatio: '4 / 3', width: 'min(78vw, calc(100dvh - 120px), 540px)', maxHeight: 'calc(100dvh - 110px)' };
       case '3:2':
-        return { aspectRatio: '3 / 2', width: 'min(86vw, calc(100dvh - 180px), 580px)' };
+        return { aspectRatio: '3 / 2', width: 'min(80vw, calc(100dvh - 120px), 560px)', maxHeight: 'calc(100dvh - 110px)' };
       case 'A4':
-        return { aspectRatio: '1 / 1.414', width: 'min(66vw, calc(100dvh - 180px), 440px)' };
+        return { aspectRatio: '1 / 1.414', width: 'min(62vw, calc(100dvh - 120px), 420px)', maxHeight: 'calc(100dvh - 110px)' };
       default:
-        return { aspectRatio: '16 / 9', width: 'min(86vw, calc(100dvh - 180px), 580px)' };
+        return { aspectRatio: '16 / 9', width: 'min(80vw, calc(100dvh - 120px), 560px)', maxHeight: 'calc(100dvh - 110px)' };
     }
   };
 
@@ -475,7 +495,7 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
     >
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
 
-      {/* Reset button */}
+      {/* Reset view button */}
       <button
         onClick={() => { setZoomLevel(1); setPanPosition({ x: 0, y: 0 }); panRef.current = { x: 0, y: 0 }; }}
         className="absolute top-3 right-3 z-30 flex items-center gap-1.5 px-2.5 py-1.5 bg-neutral-900/85 backdrop-blur-md border border-neutral-800 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800 transition-all duration-200 shadow text-[11px] font-mono cursor-pointer hover:scale-105 active:scale-95"
@@ -497,9 +517,9 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
           transformOrigin: 'center center',
           transition: draggingBadgeId || draggingPhotoCellId ? 'none' : 'transform 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
-        className="shrink-0 relative flex items-center justify-center"
+        className="shrink-0 relative flex items-center justify-center p-4"
       >
-        {/* ── Main Canvas Container (overflow-hidden strictly clips everything inside canvas bounds!) ── */}
+        {/* ── Main Canvas Container ── */}
         <div
           ref={canvasRef}
           id="collage-main-canvas"
@@ -598,7 +618,6 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
           {/* ─ Badges ─ */}
           {state.badges?.map(badge => {
             const isSel = selectedBadgeId === badge.id;
-            const isDragging = draggingBadgeId === badge.id;
             return (
               <div
                 key={badge.id}
@@ -606,229 +625,180 @@ export const CanvasStage: React.FC<CanvasStageProps> = ({
                   e.stopPropagation();
                   onSelectBadge(badge.id);
                   onSelectCell(null);
-                  setActionCellId(null);
                   setDraggingBadgeId(badge.id);
-                  badgeDragRef.current = { mouseX: e.clientX, mouseY: e.clientY, badgeX: badge.x, badgeY: badge.y };
+                  badgeDragRef.current = {
+                    mouseX: e.clientX,
+                    mouseY: e.clientY,
+                    badgeX: badge.x,
+                    badgeY: badge.y,
+                  };
                 }}
                 onTouchStart={e => {
+                  if (!e.touches[0]) return;
                   e.stopPropagation();
-                  if (e.touches.length > 0) {
-                    onSelectBadge(badge.id);
-                    onSelectCell(null);
-                    setActionCellId(null);
-                    setDraggingBadgeId(badge.id);
-                    badgeDragRef.current = { mouseX: e.touches[0].clientX, mouseY: e.touches[0].clientY, badgeX: badge.x, badgeY: badge.y };
-                  }
+                  onSelectBadge(badge.id);
+                  onSelectCell(null);
+                  setDraggingBadgeId(badge.id);
+                  badgeDragRef.current = {
+                    mouseX: e.touches[0].clientX,
+                    mouseY: e.touches[0].clientY,
+                    badgeX: badge.x,
+                    badgeY: badge.y,
+                  };
                 }}
-                style={{ left: `${badge.x}%`, top: `${badge.y}%`, transform: `scale(${badge.scale || 1})`, transformOrigin: 'top left' }}
-                className={`absolute z-30 cursor-grab active:cursor-grabbing select-none transition-transform duration-100 ${isDragging ? 'opacity-90 z-50' : ''}`}
+                style={{
+                  position: 'absolute',
+                  left: `${badge.x}%`,
+                  top: `${badge.y}%`,
+                  transform: `scale(${badge.scale || 1})`,
+                  transformOrigin: 'top left',
+                  cursor: 'grab',
+                  zIndex: 30,
+                }}
+                className={`select-none transition-shadow ${
+                  isSel ? 'ring-2 ring-pink-500 rounded-2xl shadow-xl' : 'hover:ring-1 hover:ring-white/40'
+                }`}
               >
                 <div
-                  className={`bg-neutral-950/90 backdrop-blur-md px-2.5 py-1.5 rounded-xl shadow-2xl border transition-all duration-200 ${
+                  className={`px-3 py-1.5 rounded-2xl border shadow-xl backdrop-blur-md flex items-center gap-2 text-xs font-semibold ${
                     badge.color === 'emerald'
-                      ? 'border-emerald-500/60'
-                      : badge.color === 'rose'
-                      ? 'border-rose-500/60'
+                      ? 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300'
                       : badge.color === 'amber'
-                      ? 'border-amber-500/60'
-                      : 'border-indigo-500/60'
-                  } ${isSel ? 'ring-2 ring-pink-400 ring-offset-1 ring-offset-neutral-950 scale-105' : ''}`}>
-                  <div className="flex items-center gap-1.5">
-                    <Move className="w-2.5 h-2.5 text-neutral-600" />
-                    <div>
-                      <div className="text-[9px] uppercase font-bold tracking-wider text-neutral-400">{badge.title}</div>
-                      {badge.value && <div className="text-xs font-bold text-white">{badge.value}</div>}
-                    </div>
+                      ? 'bg-amber-950/80 border-amber-500/40 text-amber-300'
+                      : badge.color === 'rose'
+                      ? 'bg-rose-950/80 border-rose-500/40 text-rose-300'
+                      : badge.color === 'blue'
+                      ? 'bg-blue-950/80 border-blue-500/40 text-blue-300'
+                      : 'bg-indigo-950/80 border-indigo-500/40 text-indigo-300'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase tracking-wider opacity-80">{badge.title}</span>
+                    {badge.value && <span className="font-bold text-white text-[11px]">{badge.value}</span>}
                   </div>
                 </div>
               </div>
             );
           })}
         </div>
-
-        {/* ─ High Z-Index Floating Cell Action Toolbar (Icon-Only, Compact & Auto-expanding) ─ */}
-        {activeCell && (
-          <div
-            className="absolute z-50 pointer-events-auto animate-in fade-in zoom-in-95 duration-150"
-            style={{
-              left: `${(activeCell.x + activeCell.w / 2) * 100}%`,
-              top: `${activeCell.y * 100}%`,
-              transform: 'translate(-50%, -135%)',
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex items-center gap-1 bg-neutral-950/95 backdrop-blur-xl p-1.5 rounded-2xl border border-neutral-700/80 shadow-2xl transition-all duration-200">
-              {/* Replace Image Button (Compact Icon) */}
-              <button
-                onClick={() => handleImageUpload(activeCell.id)}
-                className="p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm"
-                title={t.replacePhoto}
-              >
-                <ImageIcon className="w-4 h-4" />
-              </button>
-
-              {/* Toggle Fit / Fill Mode (Icon button) */}
-              <button
-                onClick={() => handleToggleFitMode(activeCell.id)}
-                className={`p-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 border ${
-                  activeCell.fitMode === 'cover'
-                    ? 'bg-purple-600/30 border-purple-500 text-purple-300 shadow-sm'
-                    : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-300 hover:text-white'
-                }`}
-                title={activeCell.fitMode === 'cover' ? t.fitModeFull : t.fitModeFill}
-              >
-                {activeCell.fitMode === 'cover' ? (
-                  <Minimize2 className="w-4 h-4 text-purple-400" />
-                ) : (
-                  <Maximize2 className="w-4 h-4 text-indigo-400" />
-                )}
-              </button>
-
-              {/* Zoom In */}
-              <button
-                onClick={() =>
-                  onChangeState(prev => ({
-                    ...prev,
-                    cells: prev.cells.map(c =>
-                      c.id === activeCell.id ? { ...c, zoom: Math.min(3.5, Number(((c.zoom || 1) + 0.2).toFixed(2))) } : c
-                    ),
-                  }))
-                }
-                className="p-2 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
-                title={t.zoomIn}
-              >
-                <ZoomIn className="w-4 h-4" />
-              </button>
-
-              {/* Zoom Out */}
-              <button
-                onClick={() =>
-                  onChangeState(prev => ({
-                    ...prev,
-                    cells: prev.cells.map(c =>
-                      c.id === activeCell.id ? { ...c, zoom: Math.max(0.5, Number(((c.zoom || 1) - 0.2).toFixed(2))) } : c
-                    ),
-                  }))
-                }
-                className="p-2 text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
-                title={t.zoomOut}
-              >
-                <ZoomOut className="w-4 h-4" />
-              </button>
-
-              {/* Reset Center */}
-              <button
-                onClick={() => handleCenterPhoto(activeCell.id)}
-                className="p-2 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 border border-neutral-800"
-                title={t.resetCenter}
-              >
-                <Crosshair className="w-4 h-4 text-indigo-400" />
-              </button>
-
-              <div className="w-px h-4 bg-neutral-800 mx-0.5" />
-
-              {/* Remove Photo */}
-              <button
-                onClick={() => {
-                  onChangeState(prev => ({
-                    ...prev,
-                    cells: prev.cells.map(c => (c.id === activeCell.id ? { ...c, imageUrl: undefined, offsetX: 0, offsetY: 0, fitMode: 'contain' } : c)),
-                  }));
-                  setActionCellId(null);
-                }}
-                className="p-2 bg-rose-950/70 hover:bg-rose-900 text-rose-300 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
-                title={t.removePhoto}
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-
-              {/* Close Toolbar */}
-              <button
-                onClick={() => setActionCellId(null)}
-                className="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            {/* Tooltip Down Arrow */}
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-neutral-700" />
-          </div>
-        )}
-
-        {/* ─ High Z-Index Floating Badge Edit Toolbar ─ */}
-        {selectedBadge && (
-          <div
-            className="absolute z-50 pointer-events-auto animate-in fade-in zoom-in-95 duration-150"
-            style={{
-              left: `${selectedBadge.x}%`,
-              top: `${selectedBadge.y}%`,
-              transform: 'translate(-10%, -135%)',
-            }}
-            onClick={e => e.stopPropagation()}
-            onMouseDown={e => e.stopPropagation()}
-            onTouchStart={e => e.stopPropagation()}
-          >
-            <div className="flex items-center gap-1 bg-neutral-950/95 backdrop-blur-xl border border-neutral-700 rounded-2xl p-1.5 shadow-2xl transition-all duration-200">
-              <button
-                onPointerDown={e => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  onChangeState(prev => ({
-                    ...prev,
-                    badges: prev.badges.map(b =>
-                      b.id === selectedBadge.id ? { ...b, scale: Math.max(0.5, Number(((b.scale || 1) - 0.1).toFixed(1))) } : b
-                    ),
-                  }));
-                }}
-                className="p-1.5 hover:bg-neutral-800 text-neutral-400 hover:text-white rounded-lg transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95"
-                title="Shrink"
-              >
-                <Minus className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onPointerDown={e => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  onChangeState(prev => ({
-                    ...prev,
-                    badges: prev.badges.map(b =>
-                      b.id === selectedBadge.id ? { ...b, scale: Math.min(2.5, Number(((b.scale || 1) + 0.1).toFixed(1))) } : b
-                    ),
-                  }));
-                }}
-                className="p-1.5 hover:bg-neutral-800 text-neutral-400 hover:text-white rounded-lg transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95"
-                title="Grow"
-              >
-                <Plus className="w-3.5 h-3.5" />
-              </button>
-              <div className="w-px h-4 bg-neutral-700 mx-0.5" />
-              <button
-                onPointerDown={e => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  onChangeState(prev => ({ ...prev, badges: prev.badges.filter(b => b.id !== selectedBadge.id) }));
-                  onSelectBadge(null);
-                }}
-                className="p-1.5 hover:bg-rose-900/80 text-rose-400 hover:text-rose-200 rounded-lg transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95"
-                title={t.delete}
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onPointerDown={e => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  onSelectBadge(null);
-                }}
-                className="p-1.5 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-lg transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-            <div className="absolute left-6 bottom-0 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-neutral-700" />
-          </div>
-        )}
       </div>
+
+      {/* ── Compact Floating Action Toolbar for Selected Photo Slot ── */}
+      {activeCell && activeCell.imageUrl && (
+        <div
+          style={{
+            animation: 'fadeInUp 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+          className="absolute bottom-16 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 bg-neutral-900/95 backdrop-blur-xl border border-neutral-700/80 shadow-2xl rounded-2xl px-2 py-1.5 flex items-center gap-1 sm:gap-1.5 text-xs select-none max-w-[94vw] overflow-x-auto"
+        >
+          {/* Zoom controls */}
+          <div className="flex items-center gap-0.5 bg-neutral-950 p-0.5 rounded-xl border border-neutral-800">
+            <button
+              onClick={() => {
+                const z = Math.max(0.4, Number(((activeCell.zoom || 1) - 0.15).toFixed(2)));
+                onChangeState(prev => ({
+                  ...prev,
+                  cells: prev.cells.map(c => (c.id === activeCell.id ? { ...c, zoom: z } : c)),
+                }));
+              }}
+              className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
+              title="Zoom out"
+            >
+              <ZoomOut className="w-3.5 h-3.5" />
+            </button>
+            <span className="text-[10px] font-mono text-neutral-300 px-1 min-w-[34px] text-center">
+              {Math.round((activeCell.zoom || 1) * 100)}%
+            </span>
+            <button
+              onClick={() => {
+                const z = Math.min(3.5, Number(((activeCell.zoom || 1) + 0.15).toFixed(2)));
+                onChangeState(prev => ({
+                  ...prev,
+                  cells: prev.cells.map(c => (c.id === activeCell.id ? { ...c, zoom: z } : c)),
+                }));
+              }}
+              className="p-1.5 text-neutral-400 hover:text-white rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
+              title="Zoom in"
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Rotate 90 deg */}
+          <button
+            onClick={() => {
+              const r = ((activeCell.rotate || 0) + 90) % 360;
+              onChangeState(prev => ({
+                ...prev,
+                cells: prev.cells.map(c => (c.id === activeCell.id ? { ...c, rotate: r } : c)),
+              }));
+            }}
+            className="p-2 bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 rounded-xl text-neutral-300 hover:text-white transition-colors cursor-pointer"
+            title="Rotate 90°"
+          >
+            <RotateCw className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Center alignment */}
+          <button
+            onClick={() => handleCenterPhoto(activeCell.id)}
+            className="p-2 bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 rounded-xl text-neutral-300 hover:text-white transition-colors cursor-pointer"
+            title="Center Photo"
+          >
+            <Move className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Toggle Fit / Fill (no crop vs full fill) */}
+          <button
+            onClick={() => handleToggleFitMode(activeCell.id)}
+            className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+              (activeCell.fitMode || 'contain') === 'contain'
+                ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/50'
+                : 'bg-neutral-950 text-neutral-400 border border-neutral-800 hover:text-white'
+            }`}
+            title={(activeCell.fitMode || 'contain') === 'contain' ? 'Mode: Contain (No crop)' : 'Mode: Cover (Fill slot)'}
+          >
+            {(activeCell.fitMode || 'contain') === 'contain' ? (
+              <>
+                <Minimize2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Fit (No-Crop)</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Fill Slot</span>
+              </>
+            )}
+          </button>
+
+          {/* Replace Image */}
+          <button
+            onClick={() => handleImageUpload(activeCell.id)}
+            className="p-2 bg-neutral-950 hover:bg-neutral-800 border border-neutral-800 rounded-xl text-neutral-300 hover:text-white transition-colors cursor-pointer"
+            title="Replace Photo"
+          >
+            <Upload className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Remove Photo */}
+          <button
+            onClick={() => {
+              onChangeState(prev => ({
+                ...prev,
+                cells: prev.cells.map(c =>
+                  c.id === activeCell.id ? { ...c, imageUrl: undefined, offsetX: 0, offsetY: 0, zoom: 1 } : c
+                ),
+              }));
+              setActionCellId(null);
+            }}
+            className="p-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-xl transition-colors cursor-pointer"
+            title="Delete Photo"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
