@@ -2,7 +2,7 @@
 
 ## Application Metadata
 - **Name**: CollaGenie (AI Photo Collage & Mockup Studio)
-- **URL**: https://collagenie.app
+- **URL**: https://collages.duckdns.org
 - **Category**: Web-based Graphic Design & Image Composition Tool
 - **Target Audience**: Creators, SaaS Founders, Marketers, Photographers, Social Media Managers
 

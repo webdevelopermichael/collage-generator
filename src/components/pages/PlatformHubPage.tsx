@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2, Layout, Smartphone, Share2, Sparkles } from 'lucide-react';
 import { Language } from '../../core/i18n';
+import { AdSenseSlot } from '../common/AdSenseSlot';
 
 export type PlatformId = 'instagram' | 'tiktok' | 'saas-mockup' | 'pinterest';
 
@@ -223,6 +224,19 @@ export const PlatformHubPage: React.FC<PlatformHubPageProps> = ({
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Contextual In-Page AdSense Unit */}
+        <div className="p-4 rounded-2xl bg-neutral-900/80 border border-neutral-800 text-center overflow-hidden">
+          <div className="flex items-center justify-between text-[9px] uppercase font-bold text-neutral-500 mb-2 px-1">
+            <span>Advertisement</span>
+            <span className="text-indigo-400">Google Partner</span>
+          </div>
+          <AdSenseSlot
+            slot="7994067288"
+            client="ca-pub-9711840143228374"
+            className="rounded-xl overflow-hidden"
+          />
         </div>
 
         {/* FAQs */}

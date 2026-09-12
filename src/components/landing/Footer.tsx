@@ -10,6 +10,12 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onOpenEditor, onNavigatePage, language }) => {
   const t = TRANSLATIONS[language];
+  const langPrefix = language === 'en' ? '' : `/${language}`;
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, page: string) => {
+    e.preventDefault();
+    onNavigatePage(page);
+  };
 
   return (
     <footer className="bg-neutral-950 border-t border-neutral-900 py-12 text-xs text-neutral-400">
@@ -17,15 +23,16 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEditor, onNavigatePage, la
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
           {/* Brand Col */}
           <div className="md:col-span-1 space-y-3">
-            <div
-              className="flex items-center gap-2.5 cursor-pointer"
-              onClick={() => onNavigatePage('home')}
+            <a
+              href={langPrefix || '/'}
+              onClick={(e) => handleLinkClick(e, 'home')}
+              className="flex items-center gap-2.5 cursor-pointer inline-flex"
             >
               <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white">
                 <Sparkles className="w-4 h-4" />
               </div>
               <span className="font-heading font-bold text-base text-white">CollaGenie</span>
-            </div>
+            </a>
             <p className="text-neutral-500 leading-relaxed text-[11px]">
               {t.footerDesc}
             </p>
@@ -38,9 +45,13 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEditor, onNavigatePage, la
             </h4>
             <ul className="space-y-2">
               <li>
-                <button onClick={onOpenEditor} className="hover:text-white transition-colors cursor-pointer">
+                <a
+                  href={`${langPrefix}/editor`}
+                  onClick={(e) => { e.preventDefault(); onOpenEditor(); }}
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
                   Online Photo Grid Editor
-                </button>
+                </a>
               </li>
               <li>
                 <a href="#ai-generator" className="hover:text-white transition-colors">
@@ -53,9 +64,13 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEditor, onNavigatePage, la
                 </a>
               </li>
               <li>
-                <button onClick={onOpenEditor} className="hover:text-white transition-colors cursor-pointer">
+                <a
+                  href={`${langPrefix}/editor`}
+                  onClick={(e) => { e.preventDefault(); onOpenEditor(); }}
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
                   Ultra-HD 4K Canvas
-                </button>
+                </a>
               </li>
             </ul>
           </div>
@@ -67,24 +82,40 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEditor, onNavigatePage, la
             </h4>
             <ul className="space-y-2">
               <li>
-                <button onClick={() => onNavigatePage('platform-instagram')} className="hover:text-white transition-colors cursor-pointer">
+                <a
+                  href={`${langPrefix}/platforms/instagram-collages`}
+                  onClick={(e) => handleLinkClick(e, 'platform-instagram')}
+                  className="hover:text-white transition-colors cursor-pointer block"
+                >
                   Instagram Collages (4:5, 1:1)
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigatePage('platform-tiktok')} className="hover:text-white transition-colors cursor-pointer">
+                <a
+                  href={`${langPrefix}/platforms/tiktok-mosaic`}
+                  onClick={(e) => handleLinkClick(e, 'platform-tiktok')}
+                  className="hover:text-white transition-colors cursor-pointer block"
+                >
                   TikTok & Reels (9:16)
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigatePage('platform-saas-mockup')} className="hover:text-white transition-colors cursor-pointer">
+                <a
+                  href={`${langPrefix}/platforms/saas-mockups`}
+                  onClick={(e) => handleLinkClick(e, 'platform-saas-mockup')}
+                  className="hover:text-white transition-colors cursor-pointer block"
+                >
                   SaaS Product Mockups
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigatePage('platform-pinterest')} className="hover:text-white transition-colors cursor-pointer">
+                <a
+                  href={`${langPrefix}/platforms/pinterest-grids`}
+                  onClick={(e) => handleLinkClick(e, 'platform-pinterest')}
+                  className="hover:text-white transition-colors cursor-pointer block"
+                >
                   Pinterest Pin Grids (2:3)
-                </button>
+                </a>
               </li>
             </ul>
           </div>
@@ -96,25 +127,41 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEditor, onNavigatePage, la
             </h4>
             <ul className="space-y-2">
               <li>
-                <button onClick={() => onNavigatePage('about')} className="hover:text-white transition-colors cursor-pointer">
+                <a
+                  href={`${langPrefix}/about`}
+                  onClick={(e) => handleLinkClick(e, 'about')}
+                  className="hover:text-white transition-colors cursor-pointer block"
+                >
                   About CollaGenie & Tech
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigatePage('guides')} className="hover:text-white transition-colors cursor-pointer">
+                <a
+                  href={`${langPrefix}/guides`}
+                  onClick={(e) => handleLinkClick(e, 'guides')}
+                  className="hover:text-white transition-colors cursor-pointer block"
+                >
                   Design Guides & Blog
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigatePage('contact')} className="hover:text-white transition-colors cursor-pointer">
+                <a
+                  href={`${langPrefix}/contact`}
+                  onClick={(e) => handleLinkClick(e, 'contact')}
+                  className="hover:text-white transition-colors cursor-pointer block"
+                >
                   Support & Contact
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigatePage('admin')} className="hover:text-indigo-400 transition-colors cursor-pointer flex items-center gap-1">
+                <a
+                  href="/admin"
+                  onClick={(e) => handleLinkClick(e, 'admin')}
+                  className="hover:text-indigo-400 transition-colors cursor-pointer flex items-center gap-1"
+                >
                   <Lock className="w-3 h-3 text-neutral-500" />
                   <span>Admin Console</span>
-                </button>
+                </a>
               </li>
             </ul>
           </div>
@@ -126,19 +173,31 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEditor, onNavigatePage, la
             </h4>
             <ul className="space-y-2">
               <li>
-                <button onClick={() => onNavigatePage('privacy')} className="hover:text-white transition-colors cursor-pointer">
+                <a
+                  href={`${langPrefix}/privacy-policy`}
+                  onClick={(e) => handleLinkClick(e, 'privacy')}
+                  className="hover:text-white transition-colors cursor-pointer block"
+                >
                   Privacy Policy & Cookies
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigatePage('terms')} className="hover:text-white transition-colors cursor-pointer">
+                <a
+                  href={`${langPrefix}/terms-of-service`}
+                  onClick={(e) => handleLinkClick(e, 'terms')}
+                  className="hover:text-white transition-colors cursor-pointer block"
+                >
                   Terms of Service
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigatePage('dmca')} className="hover:text-white transition-colors cursor-pointer">
+                <a
+                  href={`${langPrefix}/dmca`}
+                  onClick={(e) => handleLinkClick(e, 'dmca')}
+                  className="hover:text-white transition-colors cursor-pointer block"
+                >
                   DMCA Takedown Policy
-                </button>
+                </a>
               </li>
             </ul>
           </div>

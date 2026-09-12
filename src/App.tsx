@@ -274,6 +274,7 @@ export function App() {
             onLogout={handleLogout}
             language={language}
             onSelectLanguage={handleSelectLanguage}
+            onNavigatePage={(page: string) => navigateTo(page as AppView)}
           />
           <main className="flex-grow">
             <Hero
@@ -341,6 +342,7 @@ export function App() {
             onLogout={handleLogout}
             language={language}
             onSelectLanguage={handleSelectLanguage}
+            onNavigatePage={(page: string) => navigateTo(page as AppView)}
           />
           <AboutPage
             onOpenEditor={() => navigateTo('editor')}
@@ -368,6 +370,7 @@ export function App() {
             onLogout={handleLogout}
             language={language}
             onSelectLanguage={handleSelectLanguage}
+            onNavigatePage={(page: string) => navigateTo(page as AppView)}
           />
           <PlatformHubPage
             platformId={
@@ -401,6 +404,7 @@ export function App() {
             onLogout={handleLogout}
             language={language}
             onSelectLanguage={handleSelectLanguage}
+            onNavigatePage={(page: string) => navigateTo(page as AppView)}
           />
           <GuidesPage
             selectedSlug={activeGuideSlug}
@@ -427,6 +431,7 @@ export function App() {
             onLogout={handleLogout}
             language={language}
             onSelectLanguage={handleSelectLanguage}
+            onNavigatePage={(page: string) => navigateTo(page as AppView)}
           />
           <LegalPages
             view={currentView}

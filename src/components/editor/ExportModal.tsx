@@ -4,7 +4,6 @@ import { renderCollageToCanvas, downloadCanvas } from '../../core/exportUtils';
 import { X, Download, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Language, TRANSLATIONS } from '../../core/i18n';
-import { AdSenseSlot } from '../common/AdSenseSlot';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -128,20 +127,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, state
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Real Google AdSense Block (Extract Slot: 7994067288) */}
-          <div className="p-3 rounded-xl bg-neutral-950/90 border border-neutral-800 overflow-hidden text-center">
-            <div className="flex items-center justify-between text-[9px] uppercase font-bold text-neutral-500 mb-2 px-1">
-              <span>Advertisement</span>
-              <span className="text-indigo-400/80">Google AdSense</span>
-            </div>
-            
-            <AdSenseSlot
-              slot="7994067288"
-              client="ca-pub-9711840143228374"
-              className="rounded-lg bg-neutral-900/50"
-            />
           </div>
         </div>
 

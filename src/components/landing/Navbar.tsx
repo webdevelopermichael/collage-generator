@@ -10,6 +10,7 @@ interface NavbarProps {
   onLogout: () => void;
   language: Language;
   onSelectLanguage: (lang: Language) => void;
+  onNavigatePage?: (page: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -19,6 +20,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogout,
   language,
   onSelectLanguage,
+  onNavigatePage,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -64,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-neutral-300">
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-neutral-300">
           <a href="#features" className="hover:text-white transition-colors">
             {t.features}
           </a>
@@ -74,6 +76,30 @@ export const Navbar: React.FC<NavbarProps> = ({
           </a>
           <a href="#live-demo" className="hover:text-white transition-colors">
             {t.livePreview}
+          </a>
+          <a
+            href={`${language === 'en' ? '' : `/${language}`}/guides`}
+            onClick={(e) => {
+              if (onNavigatePage) {
+                e.preventDefault();
+                onNavigatePage('guides');
+              }
+            }}
+            className="hover:text-white transition-colors"
+          >
+            Guides & Blog
+          </a>
+          <a
+            href={`${language === 'en' ? '' : `/${language}`}/about`}
+            onClick={(e) => {
+              if (onNavigatePage) {
+                e.preventDefault();
+                onNavigatePage('about');
+              }
+            }}
+            className="hover:text-white transition-colors"
+          >
+            About
           </a>
           <a href="#faq" className="hover:text-white transition-colors">
             {t.faqAndGuide}
@@ -207,6 +233,32 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="block text-lg font-semibold text-neutral-200 hover:text-white py-1"
             >
               {t.livePreview}
+            </a>
+            <a
+              href={`${language === 'en' ? '' : `/${language}`}/guides`}
+              onClick={(e) => {
+                setMobileMenuOpen(false);
+                if (onNavigatePage) {
+                  e.preventDefault();
+                  onNavigatePage('guides');
+                }
+              }}
+              className="block text-lg font-semibold text-neutral-200 hover:text-white py-1"
+            >
+              Guides & Blog
+            </a>
+            <a
+              href={`${language === 'en' ? '' : `/${language}`}/about`}
+              onClick={(e) => {
+                setMobileMenuOpen(false);
+                if (onNavigatePage) {
+                  e.preventDefault();
+                  onNavigatePage('about');
+                }
+              }}
+              className="block text-lg font-semibold text-neutral-200 hover:text-white py-1"
+            >
+              About
             </a>
             <a
               href="#faq"

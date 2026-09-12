@@ -1,6 +1,7 @@
 import React from 'react';
 import { BookOpen, Clock, User, ArrowRight, CheckCircle2, Sparkles, TrendingUp } from 'lucide-react';
 import { Language } from '../../core/i18n';
+import { AdSenseSlot } from '../common/AdSenseSlot';
 
 export interface GuideArticle {
   slug: string;
@@ -175,6 +176,69 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
       },
     ],
   },
+  {
+    slug: 'ecommerce-multi-product-collage-layouts-that-convert',
+    title: 'E-Commerce Multi-Product Grids: Layout Architecture That Converts in 2026',
+    category: 'E-Commerce & Retail',
+    readTime: '8 min read',
+    author: 'CollaGenie Commerce Lab',
+    date: 'September 2026',
+    summary: 'How direct-to-consumer (DTC) brands and Shopify merchants construct multi-angle photo collages, bundle showcases, and colorway comparison matrices.',
+    content: [
+      {
+        heading: '1. Why Multi-Angle Product Grids Reduce Return Rates',
+        paragraphs: [
+          'Online apparel and electronics retailers report up to a 28% reduction in returns when product galleries feature multi-angle collage hero cards. Customers obtain an immediate spatial understanding of dimensions, texture, and real-world scale when wide shots and macro close-ups are displayed in a single unified frame.',
+          'Rather than forcing users to swipe through 10 separate images, an asymmetrical Bento collage answers sizing and aesthetic questions in the first 2 seconds of visual inspection.',
+        ],
+        tips: [
+          'Position the primary product hero shot in the top-left or full-left 50% split.',
+          'Use remaining slots for material textures, packaging details, and lifestyle context.',
+        ],
+      },
+      {
+        heading: '2. Structuring Colorway and Bundle Collages',
+        paragraphs: [
+          'Cross-selling multiple SKUs in one bundle post requires deliberate grid geometry. Equal 3-column or 4-quadrant arrangements allow each item to share equivalent optical weight, preventing one item from overshadowing secondary components of the kit.',
+          'Maintaining a consistent background color or gradient (such as soft alabaster or studio charcoal) across all slots eliminates jarring color seams and delivers high-end editorial polish.',
+        ],
+      },
+      {
+        heading: '3. Technical Export Best Practices for E-Commerce CDNs',
+        paragraphs: [
+          'Export at 2000×2000 px square or 1600×2000 px (4:5) in WebP or PNG format. CollaGenie enables lossless 2x/4x rendering directly from your browser, ensuring crisp zoom capabilities on desktop monitors without pixelation.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'preparing-photo-collages-for-high-res-print-and-posters',
+    title: 'Print-Ready Photo Collages: Mastering DPI, Margins, and A4/Poster Formats',
+    category: 'Print & Production',
+    readTime: '7 min read',
+    author: 'Print Production Engineering Team',
+    date: 'September 2026',
+    summary: 'A definitive technical guide to export resolutions, aspect ratios (A4, 3:2), DPI math, and bleed margins when printing family photo books, art prints, and wall posters.',
+    content: [
+      {
+        heading: '1. The Math of Print Resolution: DPI vs. Screen Pixels',
+        paragraphs: [
+          'Standard computer screens display content at 72 to 144 PPI (pixels per inch). Commercial photo printing, offset lithography, and fine art giclée printers, however, require 300 DPI (dots per inch) for clean, tack-sharp reproduction.',
+          'For an A4 print (8.27 × 11.69 inches), your graphic canvas must measure at least 2480 × 3508 pixels. Exporting standard social media collages at 1080px will result in noticeable blur and jagged edges on physical paper.',
+        ],
+        tips: [
+          'Always select the A4 preset (1:1.414 ratio) or 3:2 Photography ratio in CollaGenie.',
+          'Utilize 4K Ultra-HD export mode to produce the maximum pixel density supported by modern canvas hardware.',
+        ],
+      },
+      {
+        heading: '2. Outer Margins and Safe Cutting Zones',
+        paragraphs: [
+          'When designing a collage intended for framing or canvas wrapping, outer padding is critical. Setting outer padding between 24px and 48px prevents frame lips and matting borders from obscuring peripheral faces and typography.',
+        ],
+      },
+    ],
+  },
 ];
 
 interface GuidesPageProps {
@@ -271,6 +335,19 @@ export const GuidesPage: React.FC<GuidesPageProps> = ({
                   )}
                 </section>
               ))}
+            </div>
+
+            {/* Contextual In-Article AdSense Banner (Surrounded by rich content) */}
+            <div className="p-4 rounded-2xl bg-neutral-900/80 border border-neutral-800 text-center my-8 overflow-hidden">
+              <div className="flex items-center justify-between text-[9px] uppercase font-bold text-neutral-500 mb-2 px-1">
+                <span>Advertisement</span>
+                <span className="text-indigo-400">Google Partner</span>
+              </div>
+              <AdSenseSlot
+                slot="7994067288"
+                client="ca-pub-9711840143228374"
+                className="rounded-xl overflow-hidden"
+              />
             </div>
 
             <div className="p-8 rounded-3xl bg-gradient-to-tr from-neutral-900 to-neutral-900/60 border border-neutral-800 text-center space-y-4 mt-12">
