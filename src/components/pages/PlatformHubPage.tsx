@@ -254,6 +254,46 @@ export const PlatformHubPage: React.FC<PlatformHubPageProps> = ({
             ))}
           </div>
         </div>
+
+        {/* Comprehensive Workflow & Architecture Guide */}
+        <article className="p-8 rounded-3xl bg-neutral-900/40 border border-neutral-800 space-y-6 text-sm text-neutral-300 leading-relaxed">
+          <h2 className="text-xl font-heading font-bold text-white">
+            Professional Design Workflow & Curation Guidelines
+          </h2>
+          <p>
+            Crafting engaging visual assets for {content.title} requires an intentional balance between content density and negative breathing space. In modern feed algorithms, high visual contrast and clear structural hierarchy dictate user dwell time and click-through rates.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            <div className="space-y-2 p-5 rounded-2xl bg-neutral-900/60 border border-neutral-800">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                Color Harmony & Gradients
+              </h3>
+              <p className="text-xs text-neutral-400 leading-relaxed">
+                Utilize subtle mesh or radial gradients that borrow dominant hues from your image subjects. Avoid jarring pure black or stark white borders unless designing high-contrast Swiss typography layouts.
+              </p>
+            </div>
+            <div className="space-y-2 p-5 rounded-2xl bg-neutral-900/60 border border-neutral-800">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-indigo-400" />
+                DPI Scaling & Retinal Sharpness
+              </h3>
+              <p className="text-xs text-neutral-400 leading-relaxed">
+                Always export using CollaGenie’s 2x or 4K Retina mode. Social media algorithms heavily compress media during upload; beginning with maximum pixel fidelity prevents blurry text and pixelated artifacting.
+              </p>
+            </div>
+          </div>
+          <p className="text-xs text-neutral-400 pt-2">
+            Want to learn more? Read our comprehensive guides on{' '}
+            <a href="/guides/how-to-create-aesthetic-photo-collages-2026" className="text-indigo-400 hover:underline">
+              Aesthetic Photo Collages in 2026
+            </a>{' '}
+            and{' '}
+            <a href="/guides/optimal-aspect-ratios-for-instagram-tiktok-and-twitter" className="text-indigo-400 hover:underline">
+              Optimal Social Media Aspect Ratios
+            </a>.
+          </p>
+        </article>
       </div>
     </div>
   );
