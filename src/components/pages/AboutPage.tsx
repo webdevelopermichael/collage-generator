@@ -14,9 +14,16 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenEditor, onNavigateHo
       <div className="max-w-4xl mx-auto space-y-12">
         {/* Breadcrumb navigation */}
         <nav className="flex items-center gap-2 text-xs text-neutral-500 font-mono">
-          <button onClick={onNavigateHome} className="hover:text-indigo-400 cursor-pointer">
+          <a
+            href={language === 'en' ? '/' : `/${language}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigateHome();
+            }}
+            className="hover:text-indigo-400 cursor-pointer"
+          >
             Home
-          </button>
+          </a>
           <span>/</span>
           <span className="text-neutral-300">About & Technology</span>
         </nav>

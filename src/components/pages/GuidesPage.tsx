@@ -263,16 +263,27 @@ export const GuidesPage: React.FC<GuidesPageProps> = ({
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Navigation Breadcrumb */}
         <div className="flex items-center gap-2 text-xs text-neutral-400">
-          <button onClick={onNavigateHome} className="hover:text-white transition-colors cursor-pointer">
+          <a
+            href={language === 'en' ? '/' : `/${language}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigateHome();
+            }}
+            className="hover:text-white transition-colors cursor-pointer"
+          >
             Home
-          </button>
+          </a>
           <span>/</span>
-          <button
-            onClick={() => onOpenArticle('')}
+          <a
+            href={`${language === 'en' ? '' : `/${language}`}/guides`}
+            onClick={(e) => {
+              e.preventDefault();
+              onOpenArticle('');
+            }}
             className={`hover:text-white transition-colors cursor-pointer ${!activeArticle ? 'text-indigo-400 font-semibold' : ''}`}
           >
             Design Guides & Blog
-          </button>
+          </a>
           {activeArticle && (
             <>
               <span>/</span>
@@ -382,10 +393,14 @@ export const GuidesPage: React.FC<GuidesPageProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
               {GUIDE_ARTICLES.map(art => (
-                <div
+                <a
                   key={art.slug}
-                  onClick={() => onOpenArticle(art.slug)}
-                  className="p-6 rounded-3xl bg-neutral-900/80 hover:bg-neutral-900 border border-neutral-800 hover:border-indigo-500/40 transition-all cursor-pointer flex flex-col justify-between space-y-4 group"
+                  href={`${language === 'en' ? '' : `/${language}`}/guides/${art.slug}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onOpenArticle(art.slug);
+                  }}
+                  className="p-6 rounded-3xl bg-neutral-900/80 hover:bg-neutral-900 border border-neutral-800 hover:border-indigo-500/40 transition-all cursor-pointer flex flex-col justify-between space-y-4 group no-underline text-inherit block"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
@@ -409,7 +424,7 @@ export const GuidesPage: React.FC<GuidesPageProps> = ({
                       <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           </div>

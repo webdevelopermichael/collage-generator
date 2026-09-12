@@ -22,9 +22,16 @@ export const LegalPages: React.FC<LegalPagesProps> = ({ view, onNavigateHome, la
       <div className="max-w-3xl mx-auto space-y-8">
         {/* Breadcrumbs */}
         <nav className="flex items-center gap-2 text-xs text-neutral-500 font-mono">
-          <button onClick={onNavigateHome} className="hover:text-indigo-400 cursor-pointer">
+          <a
+            href={language === 'en' ? '/' : `/${language}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigateHome();
+            }}
+            className="hover:text-indigo-400 cursor-pointer"
+          >
             Home
-          </button>
+          </a>
           <span>/</span>
           <span className="text-neutral-300 capitalize">{view === 'dmca' ? 'DMCA Policy' : view}</span>
         </nav>
