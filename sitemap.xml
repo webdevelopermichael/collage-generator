@@ -65,33 +65,51 @@
   <!-- Knowledge Base & Guides -->
   <url>
     <loc>https://collages.duckdns.org/guides</loc>
-    <lastmod>2026-08-23</lastmod>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
   </url>
   <url>
     <loc>https://collages.duckdns.org/guides/how-to-create-aesthetic-photo-collages-2026</loc>
-    <lastmod>2026-08-23</lastmod>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://collages.duckdns.org/guides/understanding-image-resolutions-retina-4k-explained</loc>
-    <lastmod>2026-08-23</lastmod>
+    <loc>https://collages.duckdns.org/guides/5-bento-grid-mockup-layouts-to-boost-product-hunt-upvotes</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://collages.duckdns.org/guides/how-founders-build-high-converting-saas-mockups</loc>
-    <lastmod>2026-08-23</lastmod>
+    <loc>https://collages.duckdns.org/guides/how-to-design-aesthetic-moodboards-and-pinterest-grids</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://collages.duckdns.org/guides/client-side-privacy-zero-logs-architecture-guide</loc>
-    <lastmod>2026-08-23</lastmod>
+    <loc>https://collages.duckdns.org/guides/optimal-aspect-ratios-for-instagram-tiktok-and-twitter</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://collages.duckdns.org/guides/client-side-privacy-why-browser-canvas-processing-matters</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://collages.duckdns.org/guides/ecommerce-multi-product-collage-layouts-that-convert</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://collages.duckdns.org/guides/preparing-photo-collages-for-high-res-print-and-posters</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <!-- Trust & Legal Pages -->
